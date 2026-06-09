@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}آدرس‌ها | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="account-hero">
+  <div class="container">
+    {% include 'partials/profile_breadcrumbs.html' %}
+
+    <div class="page-hero-content">
+      <span class="section-eyebrow">حساب کاربری</span>
+      <h1 class="page-title">آدرس‌های من</h1>
+      <p class="page-description">
+        نشانی‌های ارسال سفارش را اضافه، ویرایش یا مدیریت کنید تا خریدهای بعدی سریع‌تر انجام شود.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="account-section">
+  <div class="container">
+    <div class="profile-layout">
+
+      {% include 'partials/profile_sidebar.html' with active_page='addresses' %}
+
+      <div class="profile-content">
+        <section class="profile-panel addresses-panel">
+
+          <div class="addresses-header">
+            <div>
+              <span class="section-eyebrow">آدرس‌ها</span>
+              <h2 class="addresses-title">مدیریت نشانی‌های ارسال</h2>
+              <p class="addresses-text">
+                آدرس‌هایی که بیشتر استفاده می‌کنید را اینجا نگه دارید تا هنگام ثبت سفارش، انتخاب آن‌ها ساده‌تر باشد.
+              </p>
+            </div>
+
+            <button
+              class="btn btn-primary"
+              type="button"
+              data-address-modal-open
+              data-address-mode="create"
+              aria-controls="address-modal"
+            >
+              افزودن آدرس جدید
+            </button>
+          </div>
+
+          <div class="addresses-summary">
+            <div class="addresses-summary-item">
+              <span class="addresses-summary-number">۲</span>
+              <span class="addresses-summary-label">آدرس ذخیره‌شده</span>
+            </div>
+
+            <div class="addresses-summary-item">
+              <span class="addresses-summary-number">تهران</span>
+              <span class="addresses-summary-label">آخرین شهر ارسال</span>
+            </div>
+
+            <div class="addresses-summary-item">
+              <span class="addresses-summary-number">سریع</span>
+              <span class="addresses-summary-label">آماده برای سفارش بعدی</span>
+            </div>
+          </div>
+
+          <div class="addresses-grid">
+
+            <article class="address-card">
+              <div class="address-card-head">
+                <div class="address-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+
+                <div class="address-card-title-wrap">
+                  <h3 class="address-card-title">کاربر عزیز</h3>
+                  <p class="address-card-city">تهران، تهران</p>
+                </div>
+              </div>
+
+              <div class="address-card-body">
+                <p class="address-full">
+                  خیابان ولیعصر، بالاتر از میدان ونک، کوچه روشن، ساختمان مهر، طبقه سوم
+                </p>
+
+                <dl class="address-meta-list">
+                  <div>
+                    <dt>پلاک</dt>
+                    <dd>۲۴</dd>
+                  </div>
+
+                  <div>
+                    <dt>واحد</dt>
+                    <dd>۶</dd>
+                  </div>
+
+                  <div>
+                    <dt>کد پستی</dt>
+                    <dd>۱۵۹۸۷۴۵۶۳۲</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div class="address-card-actions">
+                <button
+                  class="address-action-btn"
+                  type="button"
+                  data-address-modal-open
+                  data-address-mode="edit"
+                  data-address-id="1"
+                  data-fullname="کاربر عزیز"
+                  data-province="تهران"
+                  data-city="تهران"
+                  data-plaque-number="۲۴"
+                  data-unit-number="۶"
+                  data-postal-address="خیابان ولیعصر، بالاتر از میدان ونک، کوچه روشن، ساختمان مهر، طبقه سوم"
+                  data-zip-code="۱۵۹۸۷۴۵۶۳۲"
+                  aria-controls="address-modal"
+                >
+                  ویرایش
+                </button>
+
+                <button class="address-action-btn address-action-danger" type="button">
+                  حذف
+                </button>
+              </div>
+            </article>
+
+            <article class="address-card">
+              <div class="address-card-head">
+                <div class="address-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M3.5 10.75 12 4l8.5 6.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5.5 9.75V20h13V9.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9.5 20v-6h5v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+
+                <div class="address-card-title-wrap">
+                  <h3 class="address-card-title">کاربر عزیز</h3>
+                  <p class="address-card-city">البرز، کرج</p>
+                </div>
+              </div>
+
+              <div class="address-card-body">
+                <p class="address-full">
+                  کرج، عظیمیه، بلوار استقلال، خیابان سرو، پلاک ۱۸، ساختمان آفتاب
+                </p>
+
+                <dl class="address-meta-list">
+                  <div>
+                    <dt>پلاک</dt>
+                    <dd>۱۸</dd>
+                  </div>
+
+                  <div>
+                    <dt>واحد</dt>
+                    <dd>۴</dd>
+                  </div>
+
+                  <div>
+                    <dt>کد پستی</dt>
+                    <dd>۳۱۴۵۶۷۸۹۱۲</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div class="address-card-actions">
+                <button
+                  class="address-action-btn"
+                  type="button"
+                  data-address-modal-open
+                  data-address-mode="edit"
+                  data-address-id="2"
+                  data-fullname="کاربر عزیز"
+                  data-province="البرز"
+                  data-city="کرج"
+                  data-plaque-number="۱۸"
+                  data-unit-number="۴"
+                  data-postal-address="کرج، عظیمیه، بلوار استقلال، خیابان سرو، پلاک ۱۸، ساختمان آفتاب"
+                  data-zip-code="۳۱۴۵۶۷۸۹۱۲"
+                  aria-controls="address-modal"
+                >
+                  ویرایش
+                </button>
+
+                <button class="address-action-btn address-action-danger" type="button">
+                  حذف
+                </button>
+              </div>
+            </article>
+
+          </div>
+
+          <div class="empty-state addresses-empty hidden">
+            <div class="empty-state-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="empty-state-title">هنوز آدرسی ثبت نشده است</h3>
+            <p class="empty-state-text">
+              برای ثبت سفارش سریع‌تر، اولین نشانی ارسال خود را اضافه کنید.
+            </p>
+            <button
+              class="btn btn-primary"
+              type="button"
+              data-address-modal-open
+              data-address-mode="create"
+              aria-controls="address-modal"
+            >
+              افزودن آدرس
+            </button>
+          </div>
+
+        </section>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div
+  class="address-modal"
+  id="address-modal"
+  data-address-modal
+  aria-hidden="true"
+>
+  <div class="address-modal-backdrop" data-address-modal-close></div>
+
+  <section
+    class="address-modal-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="address-modal-title"
+    aria-describedby="address-modal-description"
+  >
+    <div class="address-modal-head">
+      <div>
+        <span class="section-eyebrow">نشانی ارسال</span>
+        <h2 class="address-modal-title" id="address-modal-title" data-address-modal-title>
+          افزودن آدرس جدید
+        </h2>
+        <p class="address-modal-description" id="address-modal-description">
+          اطلاعات نشانی را دقیق وارد کنید تا سفارش بدون تأخیر ارسال شود.
+        </p>
+      </div>
+
+      <button
+        class="address-modal-close"
+        type="button"
+        data-address-modal-close
+        aria-label="بستن پنجره آدرس"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="m6 6 12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <form class="address-form" method="post" action="#" data-address-form>
+      {# {% csrf_token %} #}
+
+      <input type="hidden" name="address_id" value="" data-address-id-input>
+
+      <div class="form-grid address-form-grid">
+        <div class="form-group">
+          <label class="form-label" for="address-fullname">نام و نام خانوادگی</label>
+          <input
+            class="form-input"
+            id="address-fullname"
+            name="fullname"
+            type="text"
+            placeholder="مثلاً کاربر عزیز"
+            autocomplete="name"
+            data-address-field="fullname"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address-zip-code">کد پستی</label>
+          <input
+            class="form-input"
+            id="address-zip-code"
+            name="zip_code"
+            type="text"
+            inputmode="numeric"
+            maxlength="10"
+            placeholder="مثلاً ۱۵۹۸۷۴۵۶۳۲"
+            autocomplete="postal-code"
+            data-address-field="zip_code"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address-province">استان</label>
+          <input
+            class="form-input"
+            id="address-province"
+            name="province"
+            type="text"
+            placeholder="مثلاً تهران"
+            autocomplete="address-level1"
+            data-address-field="province"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address-city">شهر</label>
+          <input
+            class="form-input"
+            id="address-city"
+            name="city"
+            type="text"
+            placeholder="مثلاً تهران"
+            autocomplete="address-level2"
+            data-address-field="city"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address-plaque-number">پلاک</label>
+          <input
+            class="form-input"
+            id="address-plaque-number"
+            name="plaque_number"
+            type="text"
+            inputmode="numeric"
+            placeholder="مثلاً ۲۴"
+            data-address-field="plaque_number"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address-unit-number">واحد</label>
+          <input
+            class="form-input"
+            id="address-unit-number"
+            name="unit_number"
+            type="text"
+            inputmode="numeric"
+            placeholder="مثلاً ۶"
+            data-address-field="unit_number"
+          >
+        </div>
+
+        <div class="form-group form-group-full">
+          <label class="form-label" for="address-postal-address">نشانی پستی</label>
+          <textarea
+            class="form-textarea"
+            id="address-postal-address"
+            name="postal_address"
+            placeholder="خیابان، کوچه، ساختمان، طبقه و توضیحات لازم برای ارسال"
+            autocomplete="street-address"
+            data-address-field="postal_address"
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="address-modal-actions">
+        <button class="btn btn-primary" type="submit" data-address-submit-text>
+          ذخیره آدرس
+        </button>
+
+        <button class="btn btn-outline" type="button" data-address-modal-close>
+          انصراف
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+
+{% endblock %}

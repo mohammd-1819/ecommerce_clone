@@ -63,14 +63,24 @@
     searchOpen: "[data-search-open]",
     searchClose: "[data-search-close]",
     searchOverlay: "[data-search-overlay]",
-    searchInput: "[data-search-input]"
+    searchInput: "[data-search-input]",
+
+    addressModalOpen: "[data-address-modal-open]",
+    addressModalClose: "[data-address-modal-close]",
+    addressModal: "[data-address-modal]",
+    addressForm: "[data-address-form]",
+    addressModalTitle: "[data-address-modal-title]",
+    addressSubmitText: "[data-address-submit-text]",
+    addressIdInput: "[data-address-id-input]",
+    addressField: "[data-address-field]"
   };
 
   const CLASS_NAMES = {
     scrolled: "is-scrolled",
     active: "is-active",
     visible: "is-visible",
-    menuOpen: "menu-open"
+    menuOpen: "menu-open",
+    addressModalOpen: "address-modal-open"
   };
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -610,11 +620,188 @@ function initOrderTabs() {
     });
   }
 
+
+  function initAddressModal() {
+      const modal = $(SELECTORS.addressModal);
+      const form = $(SELECTORS.addressForm);
+      const openButtons = $all(SELECTORS.addressModalOpen);
+      const closeButtons = $all(SELECTORS.addressModalClose);
+
+      if (!modal || openButtons.length === 0) return;
+
+      const dialog = $(".address-modal-dialog", modal);
+      const title = $(SELECTORS.addressModalTitle, modal);
+      const submitText = $(SELECTORS.addressSubmitText, modal);
+      const addressIdInput = $(SELECTORS.addressIdInput, modal);
+      const fields = $all(SELECTORS.addressField, modal);
+
+      let lastFocusedElement = null;
+
+      const focusableSelector = [
+        "a[href]",
+        "button:not([disabled])",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        "textarea:not([disabled])",
+        "[tabindex]:not([tabindex='-1'])"
+      ].join(",");
+
+      const getFocusableElements = () => $all(focusableSelector, modal);
+
+      const toDatasetKey = (name) => {
+        return name.replace(/_([a-z])/g, function (_, letter) {
+          return letter.toUpperCase();
+        });
+      };
+
+      const setOpenButtonState = (state) => {
+        openButtons.forEach((button) => {
+          button.setAttribute("aria-expanded", state ? "true" : "false");
+        });
+      };
+
+      const resetForm = () => {
+        if (form) {
+          form.reset();
+        }
+
+        if (addressIdInput) {
+          addressIdInput.value = "";
+        }
+
+        fields.forEach((field) => {
+          field.value = "";
+        });
+      };
+
+      const fillFormFromButton = (button) => {
+        if (!button) return;
+
+        if (addressIdInput) {
+          addressIdInput.value = button.getAttribute("data-address-id") || "";
+        }
+
+        fields.forEach((field) => {
+          const fieldName = field.getAttribute("data-address-field");
+
+          if (!fieldName) return;
+
+          const datasetKey = toDatasetKey(fieldName);
+          const value = button.dataset[datasetKey] || "";
+
+          field.value = value;
+        });
+      };
+
+      const setModalMode = (mode) => {
+        const isEdit = mode === "edit";
+
+        if (title) {
+          title.textContent = isEdit ? "ویرایش آدرس" : "افزودن آدرس جدید";
+        }
+
+        if (submitText) {
+          submitText.textContent = isEdit ? "ذخیره تغییرات" : "ذخیره آدرس";
+        }
+      };
+
+      const openModal = (button) => {
+        const mode = button.getAttribute("data-address-mode") || "create";
+
+        lastFocusedElement = document.activeElement;
+
+        resetForm();
+        setModalMode(mode);
+
+        if (mode === "edit") {
+          fillFormFromButton(button);
+        }
+
+        modal.classList.add(CLASS_NAMES.active);
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add(CLASS_NAMES.addressModalOpen);
+        setOpenButtonState(true);
+
+        window.setTimeout(() => {
+          const firstFocusable = getFocusableElements()[0];
+
+          if (firstFocusable) {
+            firstFocusable.focus();
+          } else if (dialog) {
+            dialog.setAttribute("tabindex", "-1");
+            dialog.focus();
+          }
+        }, 80);
+      };
+
+      const closeModal = () => {
+        modal.classList.remove(CLASS_NAMES.active);
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove(CLASS_NAMES.addressModalOpen);
+        setOpenButtonState(false);
+
+        if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+          lastFocusedElement.focus();
+        }
+      };
+
+      const trapFocus = (event) => {
+        if (!modal.classList.contains(CLASS_NAMES.active)) return;
+        if (event.key !== "Tab") return;
+
+        const focusable = getFocusableElements();
+
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        }
+
+        if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+
+      openButtons.forEach((button) => {
+        button.setAttribute("aria-expanded", "false");
+
+        button.addEventListener("click", () => {
+          openModal(button);
+        });
+      });
+
+      closeButtons.forEach((button) => {
+        button.addEventListener("click", closeModal);
+      });
+
+      modal.addEventListener("click", (event) => {
+        const closeTarget = event.target.closest(SELECTORS.addressModalClose);
+
+        if (closeTarget) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.classList.contains(CLASS_NAMES.active)) {
+          closeModal();
+        }
+
+        trapFocus(event);
+      });
+    }
+
   ready(function () {
     initHeaderScroll();
     initMobileMenu();
     initHeroSlider();
     initProfileMenu();
+    initAddressModal();
     initOrderTabs();
     initReveal();
     initQuantityControls();

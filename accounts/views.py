@@ -16,3 +16,10 @@ class ProfileOrdersView(View):
 
     def get(self, request):
         return render(request, self.template_name)
+
+
+class ProfileAddressView(View):
+    template_name = 'accounts/profile_address.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
