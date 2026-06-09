@@ -27,6 +27,13 @@
   const SELECTORS = {
     header: ".site-header",
 
+    profileMenu: ".profile-menu",
+    profileActiveLink: ".profile-menu-link.is-active",
+
+    orderTabsRoot: "[data-order-tabs]",
+    orderTab: "[data-order-tab]",
+    orderPanel: "[data-order-panel]",
+
     menuOpen: "[data-menu-open]",
     menuClose: "[data-menu-close]",
     mobileMenu: "[data-mobile-menu]",
@@ -506,10 +513,109 @@
     });
   }
 
+  function initProfileMenu() {
+  const menus = $all(SELECTORS.profileMenu);
+
+  if (menus.length === 0) return;
+
+  menus.forEach((menu) => {
+    const activeLink = $(SELECTORS.profileActiveLink, menu);
+
+    if (!activeLink) return;
+
+    activeLink.setAttribute("aria-current", "page");
+
+    window.requestAnimationFrame(() => {
+      const isScrollable = menu.scrollWidth > menu.clientWidth;
+
+      if (!isScrollable) return;
+
+      activeLink.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "nearest",
+        inline: "center"
+      });
+    });
+  });
+}
+
+
+function initOrderTabs() {
+    const tabGroups = $all(SELECTORS.orderTabsRoot);
+
+    if (tabGroups.length === 0) return;
+
+    tabGroups.forEach((group) => {
+      const tabs = $all(SELECTORS.orderTab, group);
+      const panels = $all(SELECTORS.orderPanel, group);
+
+      if (tabs.length === 0 || panels.length === 0) return;
+
+      function activateTab(targetName) {
+        tabs.forEach((tab) => {
+          const isActive = tab.getAttribute("data-order-tab") === targetName;
+
+          tab.classList.toggle(CLASS_NAMES.active, isActive);
+          tab.setAttribute("aria-selected", isActive ? "true" : "false");
+          tab.setAttribute("tabindex", isActive ? "0" : "-1");
+        });
+
+        panels.forEach((panel) => {
+          const isActive = panel.getAttribute("data-order-panel") === targetName;
+
+          panel.classList.toggle(CLASS_NAMES.active, isActive);
+
+          if (isActive) {
+            panel.removeAttribute("hidden");
+          } else {
+            panel.setAttribute("hidden", "");
+          }
+        });
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const targetName = tab.getAttribute("data-order-tab");
+
+          if (!targetName) return;
+
+          activateTab(targetName);
+        });
+
+        tab.addEventListener("keydown", (event) => {
+          const currentIndex = tabs.indexOf(tab);
+
+          if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+
+          event.preventDefault();
+
+          const direction = event.key === "ArrowRight" ? -1 : 1;
+          const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
+          const nextTab = tabs[nextIndex];
+          const targetName = nextTab.getAttribute("data-order-tab");
+
+          if (!targetName) return;
+
+          activateTab(targetName);
+          nextTab.focus();
+        });
+      });
+
+      const activeTab = tabs.find((tab) => tab.classList.contains(CLASS_NAMES.active)) || tabs[0];
+      const initialTarget = activeTab.getAttribute("data-order-tab");
+
+      if (initialTarget) {
+        activateTab(initialTarget);
+      }
+    });
+  }
+
   ready(function () {
     initHeaderScroll();
     initMobileMenu();
     initHeroSlider();
+    initProfileMenu();
+    initOrderTabs();
     initReveal();
     initQuantityControls();
     initProductGallery();

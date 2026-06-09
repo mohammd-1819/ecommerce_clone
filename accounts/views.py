@@ -1,0 +1,18 @@
+from django.shortcuts import render
+from django.views import View
+
+
+
+
+class ProfileDashboardView(View):
+    template_name = 'accounts/profile_dashboard.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+
+class ProfileOrdersView(View):
+    template_name = 'accounts/profile_orders.html'
+
+    def get(self, request):
+        return render(request, self.template_name)

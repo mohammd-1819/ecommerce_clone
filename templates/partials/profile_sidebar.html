@@ -1,0 +1,81 @@
+<aside class="profile-sidebar" aria-label="منوی حساب کاربری">
+  <div class="profile-sidebar-card">
+    <div class="profile-user-box">
+      <div class="profile-avatar" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 12.5C14.4853 12.5 16.5 10.4853 16.5 8C16.5 5.51472 14.4853 3.5 12 3.5C9.51472 3.5 7.5 5.51472 7.5 8C7.5 10.4853 9.51472 12.5 12 12.5Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M4.75 20.5C5.35 17.25 8.15 15.25 12 15.25C15.85 15.25 18.65 17.25 19.25 20.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="profile-user-info">
+        <strong class="profile-user-name">کاربر عزیز</strong>
+        <span class="profile-user-phone">۰۹۱۲۳۴۵۶۷۸۹</span>
+      </div>
+    </div>
+
+    <nav class="profile-menu">
+      <a class="profile-menu-link {% if active_page == 'dashboard' %}is-active{% endif %}" href="#">
+        <span class="profile-menu-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M4 10.5L12 4L20 10.5V20H15.5V14.5H8.5V20H4V10.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>پیشخوان</span>
+      </a>
+
+      <a class="profile-menu-link {% if active_page == 'orders' %}is-active{% endif %}" href="#">
+        <span class="profile-menu-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M6.5 7.5H17.5L18.75 20H5.25L6.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M9 7.5C9 5.6 10.2 4.25 12 4.25C13.8 4.25 15 5.6 15 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>سفارش‌ها</span>
+      </a>
+
+      <a class="profile-menu-link {% if active_page == 'addresses' %}is-active{% endif %}" href="#">
+        <span class="profile-menu-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 21C12 21 18 15.9 18 10.25C18 6.95 15.3 4.25 12 4.25C8.7 4.25 6 6.95 6 10.25C6 15.9 12 21 12 21Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M12 12.25C13.1046 12.25 14 11.3546 14 10.25C14 9.14543 13.1046 8.25 12 8.25C10.8954 8.25 10 9.14543 10 10.25C10 11.3546 10.8954 12.25 12 12.25Z" stroke="currentColor" stroke-width="1.7"/>
+          </svg>
+        </span>
+        <span>آدرس‌ها</span>
+      </a>
+
+      <a class="profile-menu-link {% if active_page == 'reviews' %}is-active{% endif %}" href="#">
+        <span class="profile-menu-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M5 5.5H19V15.5H9L5 19.25V5.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M8.5 9H15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M8.5 12H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>دیدگاه‌ها</span>
+      </a>
+
+      <a class="profile-menu-link {% if active_page == 'edit' %}is-active{% endif %}" href="#">
+        <span class="profile-menu-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 12.5C14.2091 12.5 16 10.7091 16 8.5C16 6.29086 14.2091 4.5 12 4.5C9.79086 4.5 8 6.29086 8 8.5C8 10.7091 9.79086 12.5 12 12.5Z" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M5.5 20C6.2 16.95 8.65 15.25 12 15.25C15.35 15.25 17.8 16.95 18.5 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M17.25 5.25L18.75 6.75" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>ویرایش حساب</span>
+      </a>
+    </nav>
+  </div>
+
+  <a class="profile-logout-link" href="#">
+    <span class="profile-menu-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M10 5H6.5C5.67157 5 5 5.67157 5 6.5V17.5C5 18.3284 5.67157 19 6.5 19H10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M14 8L18 12L14 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M18 12H9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span>خروج از حساب</span>
+  </a>
+</aside>

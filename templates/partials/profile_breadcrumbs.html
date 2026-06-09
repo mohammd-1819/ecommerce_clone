@@ -1,0 +1,17 @@
+<nav class="breadcrumbs" aria-label="مسیر صفحه">
+  <ol class="breadcrumbs-list">
+    <li class="breadcrumbs-item">
+      <a class="breadcrumbs-link" href="/">خانه</a>
+    </li>
+
+    {% if parent_title %}
+      <li class="breadcrumbs-item">
+        <a class="breadcrumbs-link" href="{{ parent_url|default:'#' }}">{{ parent_title }}</a>
+      </li>
+    {% endif %}
+
+    <li class="breadcrumbs-item is-current" aria-current="page">
+      {{ current_title|default:"حساب کاربری" }}
+    </li>
+  </ol>
+</nav>

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}حساب کاربری | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero account-hero">
+  <div class="container">
+    {% include 'partials/profile_breadcrumbs.html' with current_title="حساب کاربری" %}
+
+    <div class="page-hero-content">
+      <span class="section-eyebrow">حساب کاربری</span>
+      <h1 class="page-title">پیشخوان حساب</h1>
+      <p class="page-description">
+        سفارش‌ها، آدرس‌ها و اطلاعات حساب خود را در فضایی ساده و مرتب مدیریت کنید.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section account-section">
+  <div class="container">
+    <div class="profile-layout">
+      {% include 'partials/profile_sidebar.html' with active_page="dashboard" %}
+
+      <div class="profile-content">
+        <div class="profile-panel profile-welcome-panel">
+          <div class="profile-welcome-content">
+            <span class="profile-panel-eyebrow">خوش آمدید</span>
+            <h2 class="profile-panel-title">از این بخش می‌توانید حساب خود را مدیریت کنید.</h2>
+            <p class="profile-panel-text">
+              برای مشاهده سفارش‌ها، مدیریت آدرس‌ها، بررسی دیدگاه‌ها یا ویرایش اطلاعات حساب، از منوی حساب کاربری استفاده کنید.
+            </p>
+          </div>
+
+          <div class="profile-welcome-mark" aria-hidden="true">
+            <svg width="54" height="54" viewBox="0 0 24 24" fill="none">
+              <path d="M7 10.25V8C7 5.25 9.15 3.25 12 3.25C14.85 3.25 17 5.25 17 8V10.25" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M5.75 10.25H18.25L19.25 20.25H4.75L5.75 10.25Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M9.5 14.25H14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="profile-shortcuts-grid">
+          <a class="profile-shortcut-card" href="#">
+            <span class="profile-shortcut-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M6.5 7.5H17.5L18.75 20H5.25L6.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M9 7.5C9 5.6 10.2 4.25 12 4.25C13.8 4.25 15 5.6 15 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <strong>سفارش‌ها</strong>
+            <small>پیگیری وضعیت خریدها</small>
+          </a>
+
+          <a class="profile-shortcut-card" href="#">
+            <span class="profile-shortcut-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21C12 21 18 15.9 18 10.25C18 6.95 15.3 4.25 12 4.25C8.7 4.25 6 6.95 6 10.25C6 15.9 12 21 12 21Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M12 12.25C13.1046 12.25 14 11.3546 14 10.25C14 9.14543 13.1046 8.25 12 8.25C10.8954 8.25 10 9.14543 10 10.25C10 11.3546 10.8954 12.25 12 12.25Z" stroke="currentColor" stroke-width="1.7"/>
+              </svg>
+            </span>
+            <strong>آدرس‌ها</strong>
+            <small>مدیریت نشانی‌های ارسال</small>
+          </a>
+
+          <a class="profile-shortcut-card" href="#">
+            <span class="profile-shortcut-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M5 5.5H19V15.5H9L5 19.25V5.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M8.5 9H15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M8.5 12H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <strong>دیدگاه‌ها</strong>
+            <small>مشاهده نظرهای ثبت‌شده</small>
+          </a>
+
+          <a class="profile-shortcut-card" href="#">
+            <span class="profile-shortcut-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 12.5C14.2091 12.5 16 10.7091 16 8.5C16 6.29086 14.2091 4.5 12 4.5C9.79086 4.5 8 6.29086 8 8.5C8 10.7091 9.79086 12.5 12 12.5Z" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M5.5 20C6.2 16.95 8.65 15.25 12 15.25C15.35 15.25 17.8 16.95 18.5 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <strong>ویرایش حساب</strong>
+            <small>تغییر نام، شماره و مشخصات</small>
+          </a>
+        </div>
+
+        <div class="profile-panel profile-note-panel">
+          <h2 class="profile-panel-title">دسترسی سریع</h2>
+          <p class="profile-panel-text">
+            این پیشخوان ساده نگه داشته شده تا کاربر بدون شلوغی، سریع به بخش موردنظر خود برسد.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
