@@ -30,3 +30,10 @@ class ProfileCommentsView(View):
 
     def get(self, request):
         return render(request, self.template_name)
+
+
+class ProfileEditView(View):
+    template_name = 'accounts/profile_edit.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
