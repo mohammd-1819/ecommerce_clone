@@ -23,3 +23,10 @@ class ProfileAddressView(View):
 
     def get(self, request):
         return render(request, self.template_name)
+
+
+class ProfileCommentsView(View):
+    template_name = 'accounts/profile_comments.html'
+
+    def get(self, request):
+        return render(request, self.template_name)

@@ -3170,6 +3170,424 @@ body.address-modal-open {
 
 
 /* =========================================================
+   Account Comments Page
+========================================================= */
+
+.comments-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.comments-panel::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  left: -90px;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  background: rgba(var(--accent-rgb), 0.12);
+  pointer-events: none;
+}
+
+.comments-header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 24px;
+}
+
+.comments-title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.comments-text {
+  max-width: 610px;
+  margin: 10px 0 0;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 2;
+}
+
+.comments-summary {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.comments-summary-item {
+  min-height: 88px;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 18% 105%, rgba(var(--accent-rgb), 0.16), transparent 34%),
+    var(--color-surface);
+  border: 1px solid rgba(232, 222, 210, 0.82);
+}
+
+.comments-summary-number {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.comments-summary-label {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}
+
+.comments-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 18px;
+}
+
+.comment-card {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.94), var(--color-surface) 44%);
+  border: 1px solid rgba(232, 222, 210, 0.86);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.comment-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--accent-rgb), 0.55);
+  box-shadow: var(--shadow-card);
+}
+
+.comment-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 22px;
+  width: 52px;
+  height: 3px;
+  border-radius: 0 0 var(--radius-pill) var(--radius-pill);
+  background: var(--color-accent);
+  opacity: 0.75;
+}
+
+.comment-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.comment-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.comment-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 17px;
+  color: var(--color-primary);
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.58), transparent 42%),
+    rgba(var(--accent-rgb), 0.22);
+  border: 1px solid rgba(var(--accent-rgb), 0.36);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.comment-user-name {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.comment-date {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}
+
+.comment-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  background: rgba(var(--primary-rgb), 0.05);
+  border: 1px solid rgba(var(--primary-rgb), 0.07);
+}
+
+.comment-body {
+  position: relative;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  background: rgba(246, 242, 236, 0.62);
+  border: 1px solid rgba(232, 222, 210, 0.78);
+}
+
+.comment-body::before {
+  content: "“";
+  position: absolute;
+  top: -4px;
+  right: 14px;
+  color: rgba(var(--accent-rgb), 0.55);
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.comment-text {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  line-height: 2.05;
+}
+
+.comment-product-card {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background-color var(--transition);
+}
+
+.comment-product-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--accent-rgb), 0.58);
+  background: #FFFCF8;
+}
+
+.comment-product-image {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 50% 58%, rgba(var(--accent-rgb), 0.18), transparent 42%),
+    var(--color-bg);
+  overflow: hidden;
+}
+
+.comment-product-image img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  transition: transform var(--transition);
+}
+
+.comment-product-card:hover .comment-product-image img {
+  transform: scale(1.05) translateY(-1px);
+}
+
+.comment-product-info {
+  min-width: 0;
+}
+
+.comment-product-label {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+
+.comment-product-title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.comment-product-meta {
+  margin: 2px 0 0;
+  color: var(--color-muted);
+  font-size: 0.76rem;
+}
+
+.comment-product-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.comment-product-link::after {
+  content: "←";
+  color: var(--color-accent);
+  transition: transform var(--transition);
+}
+
+.comment-product-card:hover .comment-product-link::after {
+  transform: translateX(-4px);
+}
+
+.comments-empty {
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+}
+
+
+/* =========================================================
+   Account Comments Responsive
+========================================================= */
+
+@media (max-width: 992px) {
+  .comments-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .comment-product-card {
+    grid-template-columns: 68px 1fr;
+  }
+
+  .comment-product-link {
+    grid-column: 2;
+    width: fit-content;
+  }
+}
+
+@media (max-width: 768px) {
+  .comments-header {
+    margin-bottom: 20px;
+  }
+
+  .comments-summary {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .comments-summary-item {
+    min-height: auto;
+    padding: 15px 16px;
+  }
+
+  .comment-card {
+    padding: 18px;
+  }
+
+  .comment-card-head {
+    align-items: flex-start;
+  }
+
+  .comment-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .comment-body {
+    padding: 16px;
+  }
+
+  .comment-product-card {
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
+  }
+
+  .comment-product-image {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  .comment-card {
+    padding: 16px;
+  }
+
+  .comment-card-head {
+    gap: 12px;
+  }
+
+  .comment-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+  }
+
+  .comment-icon {
+    display: none;
+  }
+
+  .comment-text {
+    font-size: 0.86rem;
+  }
+
+  .comment-product-card {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .comment-product-image {
+    width: 100%;
+    height: 120px;
+  }
+
+  .comment-product-image img {
+    width: auto;
+    max-width: 120px;
+    height: 86%;
+  }
+
+  .comment-product-link {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-card,
+  .comment-product-card,
+  .comment-product-image img,
+  .comment-product-link::after {
+    transition: none;
+  }
+}
+
+
+
+/* =========================================================
    19. Contact / About Inner Pages
 ========================================================= */
 
