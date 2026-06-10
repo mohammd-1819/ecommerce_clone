@@ -6,7 +6,7 @@
 
 <section class="page-hero account-hero">
   <div class="container">
-    {% include 'partials/profile_breadcrumbs.html' with parent_title="حساب کاربری" parent_url="#" current_title="سفارش‌ها" %}
+    {% include 'partials/profile_breadcrumbs.html' %}
 
     <div class="page-hero-content">
       <span class="section-eyebrow">حساب کاربری</span>
@@ -117,7 +117,7 @@
                   <strong>۹۸۰٬۰۰۰ تومان</strong>
                 </div>
 
-                <a class="btn btn-sm btn-primary" href="#">مشاهده جزئیات</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
               </div>
             </article>
 
@@ -172,7 +172,7 @@
                   <strong>۶۷۰٬۰۰۰ تومان</strong>
                 </div>
 
-                <a class="btn btn-sm btn-primary" href="#">مشاهده جزئیات</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
               </div>
             </article>
 
@@ -257,7 +257,7 @@
                   <strong>۱٬۲۴۰٬۰۰۰ تومان</strong>
                 </div>
 
-                <a class="btn btn-sm btn-primary" href="#">مشاهده جزئیات</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
               </div>
             </article>
 
@@ -312,7 +312,7 @@
                   <strong>۵۶۰٬۰۰۰ تومان</strong>
                 </div>
 
-                <a class="btn btn-sm btn-primary" href="#">مشاهده جزئیات</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
               </div>
             </article>
 

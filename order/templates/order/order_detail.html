@@ -8,11 +8,11 @@
 <section class="page-hero order-detail-hero">
   <div class="container">
     <nav class="breadcrumb" aria-label="مسیر صفحه">
-      <a href="#">خانه</a>
+      <a href="{% url 'landing:home' %}">خانه</a>
       <span class="breadcrumb-separator">/</span>
-      <a href="#">حساب کاربری</a>
+      <a href="{% url 'accounts:profile-dashboard' %}">حساب کاربری</a>
       <span class="breadcrumb-separator">/</span>
-      <a href="#">سفارش‌ها</a>
+      <a href="{% url 'accounts:profile-orders' %}">سفارش‌ها</a>
       <span class="breadcrumb-separator">/</span>
       <span>جزئیات سفارش</span>
     </nav>
@@ -312,8 +312,8 @@
     </div>
 
     <div class="order-detail-actions reveal">
-      <a class="btn btn-outline" href="#">بازگشت به سفارش‌ها</a>
-      <a class="btn btn-primary" href="#">تماس با پشتیبانی</a>
+      <a class="btn btn-outline" href="{% url 'accounts:profile-orders' %}">بازگشت به سفارش‌ها</a>
+      <a class="btn btn-primary" href="{% url 'landing:contact' %}">تماس با پشتیبانی</a>
     </div>
 
   </div>

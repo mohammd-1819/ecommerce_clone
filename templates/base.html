@@ -13,7 +13,7 @@
 <body>
   <header class="site-header" aria-label="سربرگ سایت">
     <div class="container header-inner">
-      <a class="logo" href="#" aria-label="صفحه اصلی new danidor">
+      <a class="logo" href="{% url 'landing:home' %}" aria-label="صفحه اصلی new danidor">
         <span class="logo-mark" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 10.5h8.5a3.75 3.75 0 0 1 0 7.5H10a5 5 0 0 1-5-5v-2.5h2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -27,13 +27,37 @@
         </span>
       </a>
 
-      <nav class="main-nav" aria-label="منوی اصلی">
-        <a class="nav-link is-active" href="#">صفحه اصلی</a>
-        <a class="nav-link" href="#featured-products">محصولات</a>
-        <a class="nav-link" href="#categories">دسته‌بندی‌ها</a>
-        <a class="nav-link" href="#about">درباره ما</a>
-        <a class="nav-link" href="#footer">تماس با ما</a>
-      </nav>
+      {% with url_name=request.resolver_match.url_name namespace=request.resolver_match.namespace %}
+        <nav class="main-nav" aria-label="منوی اصلی">
+          <a
+            class="nav-link{% if namespace == 'landing' and url_name == 'home' %} is-active{% endif %}"
+            href="{% url 'landing:home' %}"
+          >
+            صفحه اصلی
+          </a>
+
+          <a
+            class="nav-link{% if namespace == 'products' or url_name == 'product-list' %} is-active{% endif %}"
+            href="#featured-products"
+          >
+            محصولات
+          </a>
+
+          <a
+            class="nav-link{% if namespace == 'landing' and url_name == 'about' %} is-active{% endif %}"
+            href="{% url 'landing:about' %}"
+          >
+            درباره ما
+          </a>
+
+          <a
+            class="nav-link{% if namespace == 'landing' and url_name == 'contact' %} is-active{% endif %}"
+            href="{% url 'landing:contact' %}"
+          >
+            تماس با ما
+          </a>
+        </nav>
+      {% endwith %}
 
       <div class="header-actions">
         <a class="header-icon search-icon" href="#featured-products" aria-label="جستجو در محصولات">
@@ -42,13 +66,13 @@
             <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </a>
-        <a class="header-icon account-icon" href="#" aria-label="حساب کاربری">
+        <a class="header-icon account-icon" href="{% url 'accounts:profile-dashboard' %}" aria-label="حساب کاربری">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/>
             <path d="M5.5 20a6.5 6.5 0 0 1 13 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </a>
-        <a class="header-icon" href="#" aria-label="سبد خرید">
+        <a class="header-icon" href="{% url 'cart:cart-detail' %}" aria-label="سبد خرید">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6.2 7.5h14l-1.4 7.2a2 2 0 0 1-2 1.6H9.1a2 2 0 0 1-2-1.7L6.2 7.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             <path d="M6.2 7.5 5.8 5H3.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -72,7 +96,7 @@
     <div class="container footer-main">
       <div class="footer-grid">
         <div class="footer-col">
-          <a class="footer-logo" href="#" aria-label="new danidor">
+          <a class="footer-logo" href="{% url 'landing:home' %}" aria-label="new danidor">
             <span class="logo-mark" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 10.5h8.5a3.75 3.75 0 0 1 0 7.5H10a5 5 0 0 1-5-5v-2.5h2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -106,20 +130,17 @@
         <div class="footer-col">
           <h2 class="footer-title">دسترسی سریع</h2>
           <nav class="footer-links" aria-label="دسترسی سریع">
-            <a href="#">صفحه اصلی</a>
+            <a href="{% url 'landing:home' %}">صفحه اصلی</a>
             <a href="#featured-products">محصولات</a>
-            <a href="#categories">دسته‌بندی‌ها</a>
-            <a href="#about">درباره ما</a>
+            <a href="{% url 'landing:about' %}">درباره ما</a>
           </nav>
         </div>
 
         <div class="footer-col">
           <h2 class="footer-title">راهنمای خرید</h2>
           <nav class="footer-links" aria-label="راهنمای خرید">
-            <a href="#">سبد خرید</a>
-            <a href="#">پیگیری سفارش</a>
-            <a href="#">سوالات متداول</a>
-            <a href="#">قوانین و شرایط</a>
+            <a href="{% url 'cart:cart-detail' %}">سبد خرید</a>
+            <a href="{% url 'landing:contact' %}">سوالات متداول</a>
           </nav>
         </div>
 
@@ -146,7 +167,7 @@
   <div class="mobile-menu-overlay" data-mobile-overlay aria-hidden="true"></div>
   <aside class="mobile-menu" data-mobile-menu aria-hidden="true" aria-label="منوی موبایل">
     <div class="mobile-menu-head">
-      <a class="logo" href="#" aria-label="صفحه اصلی new danidor">
+      <a class="logo" href="{% url 'landing:home' %}" aria-label="صفحه اصلی new danidor">
         <span class="logo-mark" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 10.5h8.5a3.75 3.75 0 0 1 0 7.5H10a5 5 0 0 1-5-5v-2.5h2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -167,16 +188,15 @@
     </div>
 
     <nav class="mobile-nav" aria-label="منوی موبایل">
-      <a class="nav-link is-active" href="#">صفحه اصلی</a>
+      <a class="nav-link is-active" href="{% url 'landing:home' %}">صفحه اصلی</a>
       <a class="nav-link" href="#featured-products">محصولات</a>
-      <a class="nav-link" href="#categories">دسته‌بندی‌ها</a>
-      <a class="nav-link" href="#about">درباره ما</a>
-      <a class="nav-link" href="#footer">تماس با ما</a>
+      <a class="nav-link" href="{% url 'landing:about' %}">درباره ما</a>
+      <a class="nav-link" href="{% url 'landing:contact' %}">تماس با ما</a>
     </nav>
 
     <div class="mobile-menu-actions">
       <a class="btn btn-primary" href="#featured-products">مشاهده محصولات</a>
-      <a class="btn btn-outline" href="#">ورود / ثبت نام</a>
+      <a class="btn btn-outline" href="{% url 'accounts:profile-dashboard' %}">ورود / ثبت نام</a>
     </div>
   </aside>
 
