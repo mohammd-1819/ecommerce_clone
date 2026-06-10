@@ -9,3 +9,10 @@ class CartView(View):
 
     def get(self, request):
         return render(request, self.template_name)
+
+
+class CechkoutView(View):
+    template_name = 'cart/checkout.html'
+
+    def get(self, request):
+        return render(request, self.template_name)

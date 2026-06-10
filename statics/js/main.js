@@ -86,6 +86,20 @@
     cartSubtotal: "[data-cart-subtotal]",
     cartTax: "[data-cart-tax]",
     cartFinal: "[data-cart-final]",
+
+
+    checkoutForm: "[data-checkout-form]",
+    checkoutChoice: "[data-checkout-choice]",
+    checkoutChoiceInput: ".checkout-choice-input",
+    checkoutSubmitButton: ".checkout-form button[type='submit']",
+
+    checkoutCoupon: "[data-checkout-coupon]",
+    checkoutCouponInput: "[data-checkout-coupon-input]",
+    checkoutCouponApply: "[data-checkout-coupon-apply]",
+    checkoutCouponMessage: "[data-checkout-coupon-message]",
+    checkoutDiscountRow: "[data-checkout-discount-row]",
+    checkoutDiscountAmount: "[data-checkout-discount-amount]",
+    checkoutFinalTotal: "[data-checkout-final-total]",
   };
 
   const CLASS_NAMES = {
@@ -966,12 +980,280 @@ function initOrderTabs() {
       });
     }
 
+  /* =========================================================
+   Checkout Page
+========================================================= */
+
+function initCheckoutChoices() {
+  const choices = $all(SELECTORS.checkoutChoice);
+
+  if (choices.length === 0) return;
+
+  const getInput = (choice) => {
+    return $(SELECTORS.checkoutChoiceInput, choice);
+  };
+
+  const getGroupChoices = (input) => {
+    if (!input || !input.name) return [];
+
+    return choices.filter((choice) => {
+      const choiceInput = getInput(choice);
+
+      return choiceInput && choiceInput.name === input.name;
+    });
+  };
+
+  const activateChoice = (choice, shouldFocus = false) => {
+    const input = getInput(choice);
+
+    if (!input || input.disabled) return;
+
+    const groupChoices = getGroupChoices(input);
+
+    input.checked = true;
+
+    groupChoices.forEach((groupChoice) => {
+      const groupInput = getInput(groupChoice);
+      const isActive = groupChoice === choice;
+
+      groupChoice.classList.toggle(CLASS_NAMES.active, isActive);
+      groupChoice.setAttribute("aria-checked", isActive ? "true" : "false");
+      groupChoice.setAttribute("tabindex", isActive ? "0" : "-1");
+
+      if (groupInput) {
+        groupInput.checked = isActive;
+      }
+    });
+
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+
+    if (shouldFocus) {
+      choice.focus();
+    }
+  };
+
+  const activateCheckedChoices = () => {
+    const groupedNames = new Set();
+
+    choices.forEach((choice) => {
+      const input = getInput(choice);
+
+      if (!input || !input.name || groupedNames.has(input.name)) return;
+
+      groupedNames.add(input.name);
+
+      const groupChoices = getGroupChoices(input);
+      const checkedChoice = groupChoices.find((item) => {
+        const itemInput = getInput(item);
+
+        return itemInput && itemInput.checked;
+      });
+
+      if (checkedChoice) {
+        activateChoice(checkedChoice);
+        return;
+      }
+
+      if (groupChoices[0]) {
+        activateChoice(groupChoices[0]);
+      }
+    });
+  };
+
+  const moveChoice = (choice, direction) => {
+    const input = getInput(choice);
+    const groupChoices = getGroupChoices(input);
+
+    if (groupChoices.length <= 1) return;
+
+    const currentIndex = groupChoices.indexOf(choice);
+    const nextIndex = (currentIndex + direction + groupChoices.length) % groupChoices.length;
+    const nextChoice = groupChoices[nextIndex];
+
+    if (nextChoice) {
+      activateChoice(nextChoice, true);
+    }
+  };
+
+  choices.forEach((choice) => {
+    const input = getInput(choice);
+
+    if (!input) return;
+
+    choice.setAttribute("role", "radio");
+    choice.setAttribute("aria-checked", input.checked ? "true" : "false");
+    choice.setAttribute("tabindex", input.checked ? "0" : "-1");
+
+    input.setAttribute("tabindex", "-1");
+
+    choice.addEventListener("click", (event) => {
+      const editButton = event.target.closest(SELECTORS.addressModalOpen);
+
+      if (editButton) return;
+
+      activateChoice(choice);
+    });
+
+    choice.addEventListener("keydown", (event) => {
+      const key = event.key;
+
+      if (key === "Enter" || key === " ") {
+        event.preventDefault();
+        activateChoice(choice);
+        return;
+      }
+
+      if (key === "ArrowDown" || key === "ArrowLeft") {
+        event.preventDefault();
+        moveChoice(choice, 1);
+        return;
+      }
+
+      if (key === "ArrowUp" || key === "ArrowRight") {
+        event.preventDefault();
+        moveChoice(choice, -1);
+      }
+    });
+
+    input.addEventListener("change", () => {
+      if (input.checked) {
+        activateChoice(choice);
+      }
+    });
+  });
+
+  $all(SELECTORS.addressModalOpen).forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+  });
+
+  activateCheckedChoices();
+}
+
+
+function initCheckoutSubmitState() {
+  const form = $(SELECTORS.checkoutForm);
+
+  if (!form) return;
+
+  const submitButton = $(SELECTORS.checkoutSubmitButton, form);
+
+  if (!submitButton) return;
+
+  const originalText = submitButton.textContent.trim();
+
+  form.addEventListener("submit", () => {
+    if (typeof form.checkValidity === "function" && !form.checkValidity()) {
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.setAttribute("aria-busy", "true");
+    submitButton.textContent = "در حال انتقال به پرداخت...";
+  });
+
+  window.addEventListener("pageshow", () => {
+    submitButton.disabled = false;
+    submitButton.removeAttribute("aria-busy");
+    submitButton.textContent = originalText;
+  });
+}
+
+
+function initCheckoutCouponMock() {
+  const coupon = $(SELECTORS.checkoutCoupon);
+
+  if (!coupon) return;
+
+  const input = $(SELECTORS.checkoutCouponInput, coupon);
+  const applyButton = $(SELECTORS.checkoutCouponApply, coupon);
+  const message = $(SELECTORS.checkoutCouponMessage, coupon);
+  const discountRow = $(SELECTORS.checkoutDiscountRow);
+  const discountAmount = $(SELECTORS.checkoutDiscountAmount);
+  const finalTotal = $(SELECTORS.checkoutFinalTotal);
+
+  if (!input || !applyButton || !message || !discountRow || !discountAmount || !finalTotal) return;
+
+  const formatPersianNumber = (number) => {
+    return new Intl.NumberFormat("fa-IR").format(number);
+  };
+
+  const baseTotal = Number(finalTotal.dataset.baseTotal || 0);
+
+  const coupons = {
+    WARM10: {
+      discount: 220000,
+      message: "کد تخفیف با موفقیت اعمال شد."
+    },
+    COFFEE10: {
+      discount: 220000,
+      message: "کد تخفیف قهوه با موفقیت اعمال شد."
+    }
+  };
+
+  const setMessage = (text, type) => {
+    message.textContent = text;
+    message.classList.remove("is-success", "is-error");
+
+    if (type) {
+      message.classList.add(type);
+    }
+  };
+
+  const applyCoupon = () => {
+    const code = input.value.trim().toUpperCase();
+
+    if (!code) {
+      discountRow.classList.add(CLASS_NAMES.hidden);
+      discountAmount.textContent = "- ۰ تومان";
+      finalTotal.textContent = `${formatPersianNumber(baseTotal)} تومان`;
+      setMessage("لطفاً کد تخفیف را وارد کنید.", "is-error");
+      return;
+    }
+
+    const couponData = coupons[code];
+
+    if (!couponData) {
+      discountRow.classList.add(CLASS_NAMES.hidden);
+      discountAmount.textContent = "- ۰ تومان";
+      finalTotal.textContent = `${formatPersianNumber(baseTotal)} تومان`;
+      setMessage("کد تخفیف واردشده معتبر نیست.", "is-error");
+      return;
+    }
+
+    const nextTotal = Math.max(baseTotal - couponData.discount, 0);
+
+    discountRow.classList.remove(CLASS_NAMES.hidden);
+    discountAmount.textContent = `- ${formatPersianNumber(couponData.discount)} تومان`;
+    finalTotal.textContent = `${formatPersianNumber(nextTotal)} تومان`;
+
+    setMessage(couponData.message, "is-success");
+  };
+
+  applyButton.addEventListener("click", applyCoupon);
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      applyCoupon();
+    }
+  });
+
+  input.addEventListener("input", () => {
+    input.value = input.value.toUpperCase();
+  });
+}
+
   ready(function () {
     initHeaderScroll();
     initMobileMenu();
     initHeroSlider();
     initProfileMenu();
     initAddressModal();
+    initCheckoutChoices();
+    initCheckoutSubmitState();
+    initCheckoutCouponMock();
     initOrderTabs();
     initReveal();
     initQuantityControls();
