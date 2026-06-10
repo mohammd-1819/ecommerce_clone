@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #local
     'landing',
     'accounts',
+    'cart',
 ]
 
 MIDDLEWARE = [

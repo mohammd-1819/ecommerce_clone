@@ -72,7 +72,20 @@
     addressModalTitle: "[data-address-modal-title]",
     addressSubmitText: "[data-address-submit-text]",
     addressIdInput: "[data-address-id-input]",
-    addressField: "[data-address-field]"
+    addressField: "[data-address-field]",
+
+
+    cartPage: "[data-cart-page]",
+    cartFilled: "[data-cart-filled]",
+    cartEmpty: "[data-cart-empty]",
+    cartItems: "[data-cart-items]",
+    cartItem: "[data-cart-item]",
+    cartRemove: "[data-cart-remove]",
+    cartItemTotal: "[data-cart-item-total]",
+    cartCountLabel: "[data-cart-count-label]",
+    cartSubtotal: "[data-cart-subtotal]",
+    cartTax: "[data-cart-tax]",
+    cartFinal: "[data-cart-final]",
   };
 
   const CLASS_NAMES = {
@@ -365,49 +378,206 @@
   }
 
   function initQuantityControls() {
-    const quantityGroups = $all(SELECTORS.quantity);
+      const quantityGroups = $all(SELECTORS.quantity);
 
-    quantityGroups.forEach((group) => {
-      const input = $(SELECTORS.quantityInput, group);
-      const increase = $(SELECTORS.quantityIncrease, group);
-      const decrease = $(SELECTORS.quantityDecrease, group);
+      quantityGroups.forEach((group) => {
+        const input = $(SELECTORS.quantityInput, group);
+        const increase = $(SELECTORS.quantityIncrease, group);
+        const decrease = $(SELECTORS.quantityDecrease, group);
 
-      if (!input) return;
+        if (!input) return;
 
-      const min = Number(input.getAttribute("min")) || 1;
-      const maxAttr = input.getAttribute("max");
-      const max = maxAttr ? Number(maxAttr) : Infinity;
+        const min = Number(input.getAttribute("min")) || 1;
+        const maxAttr = input.getAttribute("max");
+        const max = maxAttr ? Number(maxAttr) : Infinity;
 
-      const normalizeValue = (value) => {
-        const number = Number(value);
+        const normalizeValue = (value) => {
+          const number = Number(value);
 
-        if (Number.isNaN(number)) return min;
+          if (Number.isNaN(number)) return min;
 
-        return Math.min(Math.max(number, min), max);
-      };
+          return Math.min(Math.max(number, min), max);
+        };
 
-      const setValue = (value) => {
-        input.value = String(normalizeValue(value));
-        input.dispatchEvent(new Event("change", { bubbles: true }));
-      };
+        const notifyQuantityChange = () => {
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        };
 
-      if (increase) {
-        increase.addEventListener("click", () => {
-          setValue(normalizeValue(input.value) + 1);
+        const setValue = (value) => {
+          input.value = String(normalizeValue(value));
+          notifyQuantityChange();
+        };
+
+        if (increase) {
+          increase.addEventListener("click", () => {
+            setValue(normalizeValue(input.value) + 1);
+          });
+        }
+
+        if (decrease) {
+          decrease.addEventListener("click", () => {
+            setValue(normalizeValue(input.value) - 1);
+          });
+        }
+
+        input.addEventListener("change", () => {
+          input.value = String(normalizeValue(input.value));
+          notifyQuantityChange();
         });
-      }
-
-      if (decrease) {
-        decrease.addEventListener("click", () => {
-          setValue(normalizeValue(input.value) - 1);
-        });
-      }
-
-      input.addEventListener("change", () => {
-        setValue(input.value);
       });
+    }
+
+
+  function initCartPage() {
+    const cartPage = $(SELECTORS.cartPage);
+
+    if (!cartPage) return;
+
+    const filledState = $(SELECTORS.cartFilled, cartPage);
+    const emptyState = $(SELECTORS.cartEmpty, cartPage);
+    const itemsWrapper = $(SELECTORS.cartItems, cartPage);
+    const countLabel = $(SELECTORS.cartCountLabel, cartPage);
+    const subtotalEl = $(SELECTORS.cartSubtotal, cartPage);
+    const taxEl = $(SELECTORS.cartTax, cartPage);
+    const finalEl = $(SELECTORS.cartFinal, cartPage);
+    const summaryCount = $(".cart-summary-head span", cartPage);
+
+    if (!itemsWrapper) return;
+
+    const TAX_RATE = 0.1;
+
+    const formatNumberFa = (number) => {
+      return new Intl.NumberFormat("fa-IR").format(Math.round(number));
+    };
+
+    const formatMoneyFa = (number) => {
+      return `${formatNumberFa(number)} تومان`;
+    };
+
+    const getCartItems = () => {
+      return $all(SELECTORS.cartItem, itemsWrapper);
+    };
+
+    const getQuantityInput = (item) => {
+      return $(SELECTORS.quantityInput, item);
+    };
+
+    const getQuantityValue = (item) => {
+      const input = getQuantityInput(item);
+      const value = input ? Number(input.value) : 1;
+
+      if (Number.isNaN(value) || value < 1) return 1;
+
+      return value;
+    };
+
+    const getUnitPrice = (item) => {
+      const price = Number(item.getAttribute("data-price"));
+
+      if (Number.isNaN(price)) return 0;
+
+      return price;
+    };
+
+    const updateEmptyState = (itemCount) => {
+      const isEmpty = itemCount === 0;
+
+      if (filledState) {
+        filledState.classList.toggle("hidden", isEmpty);
+      }
+
+      if (emptyState) {
+        emptyState.classList.toggle("hidden", !isEmpty);
+      }
+    };
+
+    const updateCountLabels = (itemCount) => {
+      const labelText = `${formatNumberFa(itemCount)} کالا`;
+
+      if (countLabel) {
+        countLabel.textContent = labelText;
+      }
+
+      if (summaryCount) {
+        summaryCount.textContent = labelText;
+      }
+    };
+
+    const updateTotals = () => {
+      const items = getCartItems();
+
+      let subtotal = 0;
+
+      items.forEach((item) => {
+        const unitPrice = getUnitPrice(item);
+        const quantity = getQuantityValue(item);
+        const itemTotal = unitPrice * quantity;
+        const itemTotalEl = $(SELECTORS.cartItemTotal, item);
+
+        subtotal += itemTotal;
+
+        if (itemTotalEl) {
+          itemTotalEl.textContent = formatMoneyFa(itemTotal);
+        }
+      });
+
+      const tax = subtotal * TAX_RATE;
+      const finalTotal = subtotal + tax;
+
+      if (subtotalEl) {
+        subtotalEl.textContent = formatMoneyFa(subtotal);
+      }
+
+      if (taxEl) {
+        taxEl.textContent = formatMoneyFa(tax);
+      }
+
+      if (finalEl) {
+        finalEl.textContent = formatMoneyFa(finalTotal);
+      }
+
+      updateCountLabels(items.length);
+      updateEmptyState(items.length);
+    };
+
+    const removeCartItem = (item) => {
+      item.style.transition = "opacity 180ms ease, transform 180ms ease";
+      item.style.opacity = "0";
+      item.style.transform = "translateY(8px)";
+
+      window.setTimeout(() => {
+        item.remove();
+        updateTotals();
+      }, 180);
+    };
+
+    itemsWrapper.addEventListener("click", (event) => {
+      const removeButton = event.target.closest(SELECTORS.cartRemove);
+
+      if (!removeButton) return;
+
+      const item = removeButton.closest(SELECTORS.cartItem);
+
+      if (!item) return;
+
+      removeCartItem(item);
     });
+
+    itemsWrapper.addEventListener("input", (event) => {
+      if (!event.target.matches(SELECTORS.quantityInput)) return;
+
+      updateTotals();
+    });
+
+    itemsWrapper.addEventListener("change", (event) => {
+      if (!event.target.matches(SELECTORS.quantityInput)) return;
+
+      updateTotals();
+    });
+
+    updateTotals();
   }
+
 
   function initProductGallery() {
     const galleries = $all(SELECTORS.productGallery);
@@ -805,6 +975,7 @@ function initOrderTabs() {
     initOrderTabs();
     initReveal();
     initQuantityControls();
+    initCartPage();
     initProductGallery();
     initAccordions();
     initSearchOverlay();
