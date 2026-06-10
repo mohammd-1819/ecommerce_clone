@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}درباره ما | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero about-page-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <a href="#">صفحه اصلی</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>درباره ما</span>
+    </nav>
+
+    <div class="about-hero-grid">
+      <div class="about-hero-content reveal">
+        <span class="section-eyebrow">داستان ما</span>
+
+        <h1 class="page-title about-hero-title">
+          طعمی گرم برای لحظه‌هایی که آرام‌تر می‌گذرند
+        </h1>
+
+        <p class="about-hero-lead">
+          ما از دل علاقه به قهوه، چای و نوشیدنی‌های گرم شروع کردیم؛ با این باور که یک انتخاب ساده، اگر با دقت آماده شود، می‌تواند بخشی از حال خوب روزانه باشد.
+        </p>
+
+        <p class="about-hero-text">
+          در نام برند، تمرکز ما روی محصولاتی است که ظاهر مرتب، طعم قابل اعتماد و تجربه‌ای خوشایند داشته باشند؛ محصولاتی برای خانه، محل کار، هدیه و لحظه‌های کوتاهی که ارزش مکث کردن دارند.
+        </p>
+
+        <div class="about-hero-actions">
+          <a class="btn btn-primary" href="#">مشاهده محصولات</a>
+          <a class="btn btn-outline" href="#">تماس با ما</a>
+        </div>
+      </div>
+
+      <div class="about-hero-visual reveal" aria-label="تصاویر معرفی برند">
+        <div class="about-hero-image about-hero-image-main">
+          <img
+            src="{% static 'images/hero-2.jpg' %}"
+            alt="بسته قهوه و فنجان نوشیدنی گرم روی میز"
+          >
+        </div>
+
+        <div class="about-hero-image about-hero-image-small">
+          <img
+            src="{% static 'images/about-2.jpg' %}"
+            alt="دانه‌های قهوه تازه در دست"
+          >
+        </div>
+
+        <div class="about-floating-card">
+          <span class="about-floating-number">هر روز</span>
+          <span class="about-floating-text">با انتخابی گرم‌تر و ساده‌تر</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section about-story-section">
+  <div class="container">
+    <div class="about-story-grid">
+      <div class="about-story-images reveal">
+        <figure class="about-story-image about-story-image-tall">
+          <img
+            src="{% static 'images/coffe-cup.jpg' %}"
+            alt="فنجان قهوه کنار دانه‌های قهوه"
+          >
+        </figure>
+
+        <figure class="about-story-image about-story-image-rounded">
+          <img
+            src="{% static 'images/prod-1.jpg' %}"
+            alt="دانه‌های قهوه تازه و بسته‌بندی محصول"
+          >
+        </figure>
+      </div>
+
+      <div class="about-story-content reveal">
+        <span class="section-eyebrow">نگاه ما</span>
+
+        <h2 class="section-title">
+          محصول خوب فقط طعم نیست؛ حس اعتماد، نظم و کیفیت هم هست
+        </h2>
+
+        <p class="about-story-text">
+          برای ما، نوشیدنی گرم فقط یک محصول روزمره نیست. از انتخاب مواد اولیه تا بسته‌بندی، تلاش می‌کنیم همه‌چیز ساده، قابل اعتماد و خوش‌حس باشد؛ بدون شلوغی، بدون اغراق و بدون فاصله گرفتن از کیفیت واقعی.
+        </p>
+
+        <p class="about-story-text">
+          ما به تجربه‌ای فکر می‌کنیم که مشتری از اولین نگاه به بسته‌بندی تا آخرین جرعه نوشیدنی احساس می‌کند؛ تجربه‌ای آرام، مرتب و ماندگار.
+        </p>
+
+        <ul class="about-check-list" aria-label="ویژگی‌های نگاه برند">
+          <li>انتخاب دقیق محصول و ترکیب طعم‌ها</li>
+          <li>بسته‌بندی گرم، مرتب و مناسب هدیه</li>
+          <li>تمرکز بر وضوح، اعتماد و تجربه خرید ساده</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section about-values-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="section-eyebrow">ارزش‌های ما</span>
+        <h2 class="section-title">چیزی که در هر محصول دنبال می‌کنیم</h2>
+      </div>
+
+      <p class="section-subtitle">
+        ما می‌خواهیم انتخاب نوشیدنی گرم برای شما ساده‌تر، مطمئن‌تر و خوشایندتر باشد.
+      </p>
+    </div>
+
+    <div class="about-values-grid">
+      <article class="about-value-card reveal">
+        <span class="about-value-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M7 3h10v5a5 5 0 0 1-10 0V3Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M6 21h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M12 13v8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+
+        <h3 class="about-value-title">کیفیت قابل اعتماد</h3>
+        <p class="about-value-text">
+          محصولاتی انتخاب می‌کنیم که طعم، ظاهر و تجربه مصرف آن‌ها با وعده برند هماهنگ باشد.
+        </p>
+      </article>
+
+      <article class="about-value-card reveal">
+        <span class="about-value-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M5 12c4-7 10-7 14 0-4 7-10 7-14 0Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          </svg>
+        </span>
+
+        <h3 class="about-value-title">جزئیات مرتب</h3>
+        <p class="about-value-text">
+          از چیدمان محصول تا بسته‌بندی و متن‌ها، همه‌چیز باید آرام، خوانا و منظم دیده شود.
+        </p>
+      </article>
+
+      <article class="about-value-card reveal">
+        <span class="about-value-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M7 10h10v8a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-8Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M17 12h1.5a2.5 2.5 0 0 1 0 5H17" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M9 4c.8.7.8 1.5 0 2.2M12 4c.8.7.8 1.5 0 2.2M15 4c.8.7.8 1.5 0 2.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+
+        <h3 class="about-value-title">حس گرم روزانه</h3>
+        <p class="about-value-text">
+          هدف ما ساختن تجربه‌ای ساده و دلنشین برای لحظه‌های کوتاه خانه، کار و دورهمی است.
+        </p>
+      </article>
+
+      <article class="about-value-card reveal">
+        <span class="about-value-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M4 8h16v12H4V8Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M4 8l8 5 8-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M8 4h8l2 4H6l2-4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+          </svg>
+        </span>
+
+        <h3 class="about-value-title">مناسب هدیه و پذیرایی</h3>
+        <p class="about-value-text">
+          محصول باید هم برای مصرف روزانه مناسب باشد و هم برای هدیه دادن، پذیرایی و خرید سازمانی.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<section class="section about-quality-section">
+  <div class="container">
+    <div class="about-quality-card reveal">
+      <div class="about-quality-media">
+        <img
+          src="{% static 'images/prod-5.jpg' %}"
+          alt="آماده‌سازی و بسته‌بندی محصولات قهوه و نوشیدنی گرم"
+        >
+      </div>
+
+      <div class="about-quality-content">
+        <span class="section-eyebrow">تعهد ما</span>
+
+        <h2 class="section-title">
+          ساده می‌فروشیم، اما ساده از کنار کیفیت نمی‌گذریم
+        </h2>
+
+        <p class="about-quality-text">
+          هر محصول باید قبل از هر چیز قابل اعتماد باشد؛ از طعم و عطر تا ظاهر بسته‌بندی و اطلاعاتی که مشتری برای انتخاب نیاز دارد. ما تلاش می‌کنیم خرید شما سریع، روشن و بدون ابهام باشد.
+        </p>
+
+        <div class="about-quality-points">
+          <div class="about-quality-point">
+            <strong>طعم روشن</strong>
+            <span>انتخاب‌هایی متناسب با مصرف روزانه و سلیقه‌های مختلف</span>
+          </div>
+
+          <div class="about-quality-point">
+            <strong>ظاهر مرتب</strong>
+            <span>بسته‌بندی مناسب قفسه، هدیه و خرید آنلاین</span>
+          </div>
+
+          <div class="about-quality-point">
+            <strong>خرید مطمئن</strong>
+            <span>مسیر ساده از مشاهده محصول تا ثبت سفارش</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section-sm about-cta-section">
+  <div class="container">
+    <div class="about-cta-card reveal">
+      <div class="about-cta-content">
+        <span class="section-eyebrow">همراه ما باشید</span>
+
+        <h2 class="about-cta-title">
+          برای انتخاب محصول مناسب یا خرید عمده با ما در تماس باشید
+        </h2>
+
+        <p class="about-cta-text">
+          اگر برای خانه، محل کار، فروشگاه یا هدیه سازمانی به دنبال نوشیدنی گرم هستید، خوشحال می‌شویم راهنمایی‌تان کنیم.
+        </p>
+      </div>
+
+      <div class="about-cta-actions">
+        <a class="btn btn-primary" href="#">تماس با ما</a>
+        <a class="btn btn-outline" href="#">مشاهده محصولات</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

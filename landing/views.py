@@ -9,3 +9,11 @@ class HomeView(View):
 
     def get(self, request):
         return render(request, self.template_name)
+
+
+
+class AboutView(View):
+    template_name = 'landing/about.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
