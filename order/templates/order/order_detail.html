@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}جزئیات سفارش | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero order-detail-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <a href="#">خانه</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="#">حساب کاربری</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="#">سفارش‌ها</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>جزئیات سفارش</span>
+    </nav>
+
+    <div class="order-detail-hero-content">
+      <div>
+        <span class="section-eyebrow">جزئیات سفارش</span>
+        <h1 class="page-title">سفارش شماره #۱۲۸۴</h1>
+        <p class="order-detail-hero-text">
+          اطلاعات کامل سفارش، محصولات خریداری‌شده، وضعیت پرداخت و مشخصات ارسال را در این بخش مشاهده می‌کنید.
+        </p>
+      </div>
+
+      {% comment %} <div class="order-detail-hero-status">
+        <span class="order-status-badge order-status-processing">در حال آماده‌سازی</span>
+        <strong>۹۸۰٬۰۰۰ تومان</strong>
+        <small>مبلغ نهایی سفارش</small>
+      </div> {% endcomment %}
+    </div>
+  </div>
+</section>
+
+<section class="section order-detail-page">
+  <div class="container">
+
+    <div class="order-detail-layout">
+
+      <div class="order-detail-main">
+
+        <article class="card order-overview-card reveal">
+          <div class="order-detail-card-head">
+            <div>
+              <span class="order-detail-label">خلاصه سفارش</span>
+              <h2 class="order-detail-title">اطلاعات کلی سفارش</h2>
+            </div>
+            <span class="order-status-badge order-status-processing">در حال آماده‌سازی</span>
+          </div>
+
+          <div class="order-overview-grid">
+            <div class="order-overview-item">
+              <span>شماره سفارش</span>
+              <strong>#۱۲۸۴</strong>
+            </div>
+
+            <div class="order-overview-item">
+              <span>تاریخ ثبت</span>
+              <strong>۱۴۰۳/۰۸/۱۲</strong>
+            </div>
+
+            <div class="order-overview-item">
+              <span>تعداد کالا</span>
+              <strong>۳ کالا</strong>
+            </div>
+
+            <div class="order-overview-item">
+              <span>روش ارسال</span>
+              <strong>ارسال با پیک</strong>
+            </div>
+
+            <div class="order-overview-item">
+              <span>وضعیت پرداخت</span>
+              <strong class="text-success">پرداخت موفق</strong>
+            </div>
+
+            <div class="order-overview-item">
+              <span>کد پیگیری پرداخت</span>
+              <strong>۷۴۸۲۹۱</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="card order-tracking-card reveal">
+          <div class="order-detail-card-head">
+            <div>
+              <span class="order-detail-label">وضعیت سفارش</span>
+              <h2 class="order-detail-title">مسیر پردازش سفارش</h2>
+            </div>
+          </div>
+
+          <ol class="order-timeline" aria-label="وضعیت پردازش سفارش">
+            <li class="order-timeline-step is-complete">
+              <span class="order-timeline-dot"></span>
+              <div>
+                <strong>ثبت سفارش</strong>
+                <small>سفارش شما با موفقیت ثبت شد.</small>
+              </div>
+            </li>
+
+            <li class="order-timeline-step is-complete">
+              <span class="order-timeline-dot"></span>
+              <div>
+                <strong>پرداخت موفق</strong>
+                <small>پرداخت سفارش تایید شده است.</small>
+              </div>
+            </li>
+
+            <li class="order-timeline-step is-active">
+              <span class="order-timeline-dot"></span>
+              <div>
+                <strong>در حال آماده‌سازی</strong>
+                <small>محصولات در حال بسته‌بندی و آماده‌سازی هستند.</small>
+              </div>
+            </li>
+
+            <li class="order-timeline-step">
+              <span class="order-timeline-dot"></span>
+              <div>
+                <strong>ارسال سفارش</strong>
+                <small>پس از آماده‌سازی، سفارش به پیک تحویل داده می‌شود.</small>
+              </div>
+            </li>
+
+            <li class="order-timeline-step">
+              <span class="order-timeline-dot"></span>
+              <div>
+                <strong>تحویل شده</strong>
+                <small>سفارش در مقصد تحویل داده خواهد شد.</small>
+              </div>
+            </li>
+          </ol>
+        </article>
+
+        <article class="card order-items-card reveal">
+          <div class="order-detail-card-head">
+            <div>
+              <span class="order-detail-label">محصولات سفارش</span>
+              <h2 class="order-detail-title">اقلام خریداری‌شده</h2>
+            </div>
+            <span class="order-items-count">۳ کالا</span>
+          </div>
+
+          <div class="order-items-list">
+
+            <div class="order-item-row">
+              <a class="order-item-image" href="#">
+                <img src="{% static 'images/product_1.png' %}" alt="قهوه عربیکا ویژه">
+              </a>
+
+              <div class="order-item-info">
+                <h3>
+                  <a href="#">قهوه عربیکا ویژه</a>
+                </h3>
+                <p>۲۵۰ گرم · آسیاب متوسط</p>
+              </div>
+
+              <div class="order-item-meta">
+                <span>تعداد</span>
+                <strong>۱ عدد</strong>
+              </div>
+
+              <div class="order-item-price">
+                <span>قیمت واحد</span>
+                <strong>۳۲۰٬۰۰۰ تومان</strong>
+              </div>
+
+              <div class="order-item-total">
+                <span>جمع</span>
+                <strong>۳۲۰٬۰۰۰ تومان</strong>
+              </div>
+            </div>
+
+            <div class="order-item-row">
+              <a class="order-item-image" href="#">
+                <img src="{% static 'images/product_2.png' %}" alt="هات‌چاکلت کلاسیک">
+              </a>
+
+              <div class="order-item-info">
+                <h3>
+                  <a href="#">هات‌چاکلت کلاسیک</a>
+                </h3>
+                <p>۴۰۰ گرم · بسته اقتصادی</p>
+              </div>
+
+              <div class="order-item-meta">
+                <span>تعداد</span>
+                <strong>۲ عدد</strong>
+              </div>
+
+              <div class="order-item-price">
+                <span>قیمت واحد</span>
+                <strong>۳۳۰٬۰۰۰ تومان</strong>
+              </div>
+
+              <div class="order-item-total">
+                <span>جمع</span>
+                <strong>۶۶۰٬۰۰۰ تومان</strong>
+              </div>
+            </div>
+
+          </div>
+        </article>
+
+      </div>
+
+      <aside class="order-detail-side">
+
+        <article class="card order-summary-card reveal">
+          <div class="order-detail-card-head">
+            <div>
+              <span class="order-detail-label">مبلغ سفارش</span>
+              <h2 class="order-detail-title">خلاصه پرداخت</h2>
+            </div>
+          </div>
+
+          <div class="order-price-list">
+            <div class="order-price-row">
+              <span>جمع محصولات</span>
+              <strong>۹۸۰٬۰۰۰ تومان</strong>
+            </div>
+
+            <div class="order-price-row">
+              <span>هزینه ارسال</span>
+              <strong>۰ تومان</strong>
+            </div>
+
+            <div class="order-price-row">
+              <span>تخفیف</span>
+              <strong>۰ تومان</strong>
+            </div>
+
+            <div class="order-price-row">
+              <span>مالیات و هزینه خدمات</span>
+              <strong>۰ تومان</strong>
+            </div>
+
+            <div class="order-price-row order-price-total">
+              <span>مبلغ نهایی</span>
+              <strong>۹۸۰٬۰۰۰ تومان</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="card order-info-card reveal">
+          <div class="order-detail-card-head">
+            <div>
+              <span class="order-detail-label">مشخصات گیرنده</span>
+              <h2 class="order-detail-title">اطلاعات ارسال</h2>
+            </div>
+          </div>
+
+          <dl class="order-info-list">
+            <div>
+              <dt>نام گیرنده</dt>
+              <dd>کاربر عزیز</dd>
+            </div>
+
+            <div>
+              <dt>شماره تماس</dt>
+              <dd>۰۹۱۲۳۴۵۶۷۸۹</dd>
+            </div>
+
+            <div>
+              <dt>آدرس</dt>
+              <dd>تهران، خیابان ولیعصر، بالاتر از میدان ونک، پلاک ۱۲، واحد ۴</dd>
+            </div>
+
+            <div>
+              <dt>کد پستی</dt>
+              <dd>۱۵۹۹۹۱۲۳۴۵</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="card order-info-card reveal">
+          <div class="order-detail-card-head">
+            <div>
+              <span class="order-detail-label">پرداخت</span>
+              <h2 class="order-detail-title">اطلاعات پرداخت</h2>
+            </div>
+          </div>
+
+          <dl class="order-info-list">
+            <div>
+              <dt>روش پرداخت</dt>
+              <dd>پرداخت آنلاین</dd>
+            </div>
+
+            <div>
+              <dt>وضعیت پرداخت</dt>
+              <dd class="text-success">موفق</dd>
+            </div>
+
+            <div>
+              <dt>تاریخ پرداخت</dt>
+              <dd>۱۴۰۳/۰۸/۱۲ - ۱۸:۴۵</dd>
+            </div>
+
+            <div>
+              <dt>کد پیگیری</dt>
+              <dd>۷۴۸۲۹۱</dd>
+            </div>
+          </dl>
+        </article>
+
+      </aside>
+
+    </div>
+
+    <div class="order-detail-actions reveal">
+      <a class="btn btn-outline" href="#">بازگشت به سفارش‌ها</a>
+      <a class="btn btn-primary" href="#">تماس با پشتیبانی</a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
