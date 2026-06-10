@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تماس با ما | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero contact-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <a href="#">صفحه اصلی</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>تماس با ما</span>
+    </nav>
+
+    <div class="contact-hero-content">
+      <span class="section-eyebrow">ارتباط با نام برند</span>
+      <h1 class="page-title">تماس با ما</h1>
+      <p class="section-subtitle">
+        برای سفارش محصول، خرید عمده، پیگیری سفارش یا دریافت مشاوره، از مسیرهای زیر با ما در ارتباط باشید.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section contact-section">
+  <div class="container">
+    <div class="contact-layout">
+
+      <div class="contact-info-panel">
+        <div class="section-heading contact-section-heading">
+          <div>
+            <span class="section-eyebrow">راه‌های ارتباطی</span>
+            <h2 class="section-title">همیشه نزدیک‌تر از یک پیام</h2>
+            <p class="section-subtitle">
+              تیم ما در روزهای کاری آماده پاسخ‌گویی به سوالات، سفارش‌ها و درخواست‌های همکاری شماست.
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-card-list">
+
+          <article class="contact-card">
+            <span class="contact-card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M4.75 6.75h14.5v10.5H4.75V6.75Z" stroke="currentColor" stroke-width="1.8" />
+                <path d="m5.25 7.25 6.75 5.4 6.75-5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="contact-card-body">
+              <h3 class="contact-card-title">ایمیل</h3>
+              <a class="contact-card-value" href="mailto:info@example.com">info@example.com</a>
+            </div>
+          </article>
+
+          <article class="contact-card">
+            <span class="contact-card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M8.1 5.2 9.45 8.1c.2.43.1.94-.25 1.27l-1.05 1c.8 1.65 2.15 3 3.8 3.8l1-1.05c.33-.35.84-.45 1.27-.25l2.9 1.35c.5.23.77.78.64 1.31l-.48 2.01c-.13.55-.62.94-1.18.94C9.82 18.48 5.52 14.18 5.52 7.9c0-.56.39-1.05.94-1.18l2.01-.48c.53-.13 1.08.14 1.31.64Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="contact-card-body">
+              <h3 class="contact-card-title">تلفن تماس</h3>
+              <a class="contact-card-value" href="tel:02100000000">۰۲۱-۰۰۰۰۰۰۰۰</a>
+            </div>
+          </article>
+
+          <article class="contact-card">
+            <span class="contact-card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 20.25a8.25 8.25 0 1 0-7.15-4.13l-.9 3.38 3.45-.9A8.2 8.2 0 0 0 12 20.25Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                <path d="M9.25 8.85c.18 2.65 2.05 4.52 4.7 4.7l.95-1.05c.18-.2.47-.26.72-.15l1.05.47c.32.15.48.52.36.86-.43 1.18-1.25 1.82-2.34 1.82-3.55 0-6.19-2.64-6.19-6.19 0-1.09.64-1.91 1.82-2.34.34-.12.71.04.86.36l.47 1.05c.11.25.05.54-.15.72L9.25 8.85Z" fill="currentColor" />
+              </svg>
+            </span>
+            <div class="contact-card-body">
+              <h3 class="contact-card-title">واتساپ</h3>
+              <a class="contact-card-value" href="https://wa.me/989901235010">۰۹۹۰۱۲۳۵۰۱۰</a>
+            </div>
+          </article>
+
+          <article class="contact-card">
+            <span class="contact-card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="5" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.8" />
+                <circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.8" />
+                <circle cx="16.45" cy="7.55" r="1" fill="currentColor" />
+              </svg>
+            </span>
+            <div class="contact-card-body">
+              <h3 class="contact-card-title">اینستاگرام</h3>
+              <a class="contact-card-value" href="#" target="_blank" rel="noopener">brandname@</a>
+            </div>
+          </article>
+
+          <article class="contact-card contact-card-wide">
+            <span class="contact-card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M18.25 10.25c0 4.75-6.25 9.75-6.25 9.75s-6.25-5-6.25-9.75a6.25 6.25 0 1 1 12.5 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                <circle cx="12" cy="10.25" r="2.15" stroke="currentColor" stroke-width="1.8" />
+              </svg>
+            </span>
+            <div class="contact-card-body">
+              <h3 class="contact-card-title">آدرس</h3>
+              <p class="contact-card-value contact-address">
+                تهران، بزرگراه چمران، خیابان ملاصدرا، خیابان خوارزمی، کوچه فرشاد، پلاک ۳۳/۱
+              </p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <aside class="contact-map-panel" aria-label="موقعیت روی نقشه">
+        <div class="contact-map-card">
+          <div class="contact-map-image-wrap">
+            <img
+              class="contact-map-image"
+              src="{% static 'images/map.png' %}"
+              alt="نمای نقشه موقعیت فروشگاه نام برند"
+              loading="lazy"
+            >
+
+            <div class="contact-map-pin" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M18.25 10.25c0 4.75-6.25 9.75-6.25 9.75s-6.25-5-6.25-9.75a6.25 6.25 0 1 1 12.5 0Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+                <circle cx="12" cy="10.25" r="2.15" stroke="currentColor" stroke-width="1.9" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="contact-map-content">
+            <span class="contact-map-kicker">موقعیت فروشگاه</span>
+            {% comment %} <h2 class="contact-map-title">نام برند روی نقشه</h2> {% endcomment %}
+            <p class="contact-map-text">
+              برای مراجعه حضوری، لطفاً پیش از حضور با شماره تماس فروشگاه هماهنگ کنید.
+            </p>
+
+            <a class="btn btn-primary" href="#" target="_blank" rel="noopener">
+              مشاهده مسیر روی نقشه
+            </a>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-sm contact-form-section">
+  <div class="container">
+    <div class="contact-form-layout">
+
+      <div class="contact-form-intro">
+        <span class="section-eyebrow">ارسال پیام</span>
+        <h2 class="section-title">درخواست خود را ثبت کنید</h2>
+        <p class="section-subtitle">
+          اگر درباره محصولات، خرید عمده یا پیگیری سفارش سوالی دارید، فرم زیر را تکمیل کنید تا در اولین فرصت با شما تماس بگیریم.
+        </p>
+
+        <div class="contact-support-list">
+          <div class="contact-support-item">
+            <span>۰۱</span>
+            <p>پاسخ‌گویی در روزهای کاری</p>
+          </div>
+          <div class="contact-support-item">
+            <span>۰۲</span>
+            <p>مشاوره برای خرید عمده</p>
+          </div>
+          <div class="contact-support-item">
+            <span>۰۳</span>
+            <p>پیگیری سفارش و ارسال</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="form-card contact-form" action="#" method="post">
+        {% csrf_token %}
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="contact-name">نام و نام خانوادگی</label>
+            <input
+              class="form-input"
+              id="contact-name"
+              name="name"
+              type="text"
+              placeholder="مثلاً علی رضایی"
+              autocomplete="name"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="contact-phone">شماره تماس</label>
+            <input
+              class="form-input"
+              id="contact-phone"
+              name="phone"
+              type="tel"
+              placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+              autocomplete="tel"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="contact-subject">موضوع پیام</label>
+            <input
+              class="form-input"
+              id="contact-subject"
+              name="subject"
+              type="text"
+              placeholder="مثلاً خرید عمده"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="contact-type">نوع درخواست</label>
+            <select class="form-select" id="contact-type" name="request_type">
+              <option value="">انتخاب کنید</option>
+              <option value="product">سوال درباره محصول</option>
+              <option value="wholesale">خرید عمده</option>
+              <option value="order">پیگیری سفارش</option>
+              <option value="cooperation">همکاری و نمایندگی</option>
+            </select>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label class="form-label" for="contact-message">متن پیام</label>
+            <textarea
+              class="form-textarea"
+              id="contact-message"
+              name="message"
+              placeholder="درخواست یا سوال خود را بنویسید..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="contact-form-actions">
+          <button class="btn btn-primary" type="submit">
+            ارسال پیام
+          </button>
+          <p class="contact-form-note">
+            اطلاعات شما فقط برای پاسخ‌گویی به همین درخواست استفاده می‌شود.
+          </p>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-sm contact-quick-section">
+  <div class="container">
+    <div class="contact-quick-card">
+      <div>
+        <span class="section-eyebrow">خرید عمده</span>
+        <h2 class="contact-quick-title">برای سفارش سازمانی یا عمده آماده‌ایم.</h2>
+        <p class="contact-quick-text">
+          برای انتخاب محصول مناسب کافه، شرکت، فروشگاه یا بسته‌های هدیه، با ما در ارتباط باشید.
+        </p>
+      </div>
+
+      <a class="btn btn-outline" href="tel:02100000000">
+        تماس سریع
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
