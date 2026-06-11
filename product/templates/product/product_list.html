@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}محصولات | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <a href="{% url 'landing:home' %}">صفحه اصلی</a>
+      <span class="breadcrumb-separator" aria-hidden="true">/</span>
+      <span aria-current="page">محصولات</span>
+    </nav>
+
+    <div class="catalog-hero-content">
+      <span class="section-eyebrow">فروشگاه محصولات</span>
+      <h1 class="page-title">محصولات قهوه، چای و هات‌چاکلت</h1>
+      <p class="section-subtitle">
+        انتخابی آرام و مرتب از نوشیدنی‌های گرم برای خانه، محل کار و هدیه.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section product-section">
+  <div class="container">
+
+    <div class="catalog-layout">
+
+      <aside class="filter-sidebar" id="catalog-filters" aria-label="فیلتر محصولات">
+        <form class="catalog-filter-form" action="/products/" method="get">
+          <div class="filter-head">
+            <h2 class="filter-title">فیلتر محصولات</h2>
+            <a class="text-link filter-clear-link" href="/products/">پاک کردن</a>
+          </div>
+
+          <div class="filter-group">
+            <h3 class="filter-group-title">دسته‌بندی</h3>
+
+            <label class="filter-label" for="category-coffee">
+              <input id="category-coffee" name="category" value="coffee" type="checkbox">
+              <span>قهوه</span>
+            </label>
+
+            <label class="filter-label" for="category-tea">
+              <input id="category-tea" name="category" value="tea" type="checkbox">
+              <span>چای</span>
+            </label>
+
+            <label class="filter-label" for="category-hot-chocolate">
+              <input id="category-hot-chocolate" name="category" value="hot-chocolate" type="checkbox">
+              <span>هات‌چاکلت</span>
+            </label>
+
+            <label class="filter-label" for="category-instant">
+              <input id="category-instant" name="category" value="instant" type="checkbox">
+              <span>پودرهای فوری</span>
+            </label>
+
+            <label class="filter-label" for="category-gift">
+              <input id="category-gift" name="category" value="gift" type="checkbox">
+              <span>بسته‌های هدیه</span>
+            </label>
+          </div>
+
+          <div class="filter-group">
+            <h3 class="filter-group-title">وضعیت کالا</h3>
+
+            <label class="filter-label" for="available-only">
+              <input id="available-only" name="available" value="1" type="checkbox">
+              <span>فقط کالاهای موجود</span>
+            </label>
+          </div>
+
+          <div class="filter-group">
+            <h3 class="filter-group-title">محدوده قیمت</h3>
+
+            <div class="price-filter-grid">
+              <div class="form-group">
+                <label class="form-label" for="price-min">از قیمت</label>
+                <input
+                  class="form-input"
+                  id="price-min"
+                  name="price_min"
+                  type="number"
+                  min="0"
+                  placeholder="مثلاً ۲۵۰۰۰۰"
+                >
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="price-max">تا قیمت</label>
+                <input
+                  class="form-input"
+                  id="price-max"
+                  name="price_max"
+                  type="number"
+                  min="0"
+                  placeholder="مثلاً ۱۲۰۰۰۰۰"
+                >
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-block" type="submit">
+            اعمال فیلتر
+          </button>
+        </form>
+      </aside>
+
+      <div class="catalog-main">
+        <div class="catalog-toolbar">
+          <div class="catalog-toolbar-info">
+            <p class="catalog-count">نمایش ۱ تا ۶ از ۱۸ محصول</p>
+            <div class="catalog-active-filters" aria-label="فیلترهای فعال">
+              <a class="filter-chip is-active" href="/products/">همه محصولات</a>
+              <a class="filter-chip" href="/products/?category=coffee">قهوه</a>
+              <a class="filter-chip" href="/products/?category=hot-chocolate">هات‌چاکلت</a>
+              <a class="filter-chip" href="/products/?available=1">موجود</a>
+            </div>
+          </div>
+
+          <div class="catalog-sort">
+            <label class="form-label" for="catalog-sort">مرتب‌سازی</label>
+            <select class="form-select sort-select" id="catalog-sort" name="sort">
+              <option value="newest">جدیدترین</option>
+              <option value="price_asc">ارزان‌ترین</option>
+              <option value="best_selling">پرفروش‌ترین</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="product-grid">
+
+          <article class="product-card">
+            <span class="product-badge">جدید</span>
+
+            <a class="product-image-link" href="/products/arabica-special/">
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  src="{% static 'images/product_1.png' %}"
+                  alt="بسته قهوه عربیکا ویژه"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+
+            <div class="product-info">
+              <span class="product-category">قهوه • ۲۵۰ گرم</span>
+              <h2 class="product-title">
+                <a href="/products/arabica-special/">قهوه عربیکا ویژه</a>
+              </h2>
+
+              <div class="product-meta">
+                <span>مناسب دم‌آوری روزانه</span>
+              </div>
+
+              <div class="product-price-row">
+                <strong class="product-price">
+                  ۳۲۰٬۰۰۰
+                  <span class="product-currency">تومان</span>
+                </strong>
+                <a class="product-small-btn" href="/products/arabica-special/" aria-label="مشاهده قهوه عربیکا ویژه">
+                  ←
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <span class="product-badge">پرفروش</span>
+
+            <a class="product-image-link" href="/products/turkish-coffee/">
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  src="{% static 'images/product_2.png' %}"
+                  alt="بسته قهوه ترک"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+
+            <div class="product-info">
+              <span class="product-category">قهوه • ۲۰۰ گرم</span>
+              <h2 class="product-title">
+                <a href="/products/turkish-coffee/">قهوه ترک نرم</a>
+              </h2>
+
+              <div class="product-meta">
+                <span>طعم عمیق و کلاسیک</span>
+              </div>
+
+              <div class="product-price-row">
+                <strong class="product-price">
+                  ۲۸۵٬۰۰۰
+                  <span class="product-currency">تومان</span>
+                </strong>
+                <a class="product-small-btn" href="/products/turkish-coffee/" aria-label="مشاهده قهوه ترک نرم">
+                  ←
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <a class="product-image-link" href="/products/hot-chocolate-classic/">
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  src="{% static 'images/product_3.png' %}"
+                  alt="قوطی هات‌چاکلت کلاسیک"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+
+            <div class="product-info">
+              <span class="product-category">هات‌چاکلت • ۴۰۰ گرم</span>
+              <h2 class="product-title">
+                <a href="/products/hot-chocolate-classic/">هات‌چاکلت کلاسیک</a>
+              </h2>
+
+              <div class="product-meta">
+                <span>شیرین، گرم و خامه‌ای</span>
+              </div>
+
+              <div class="product-price-row">
+                <strong class="product-price">
+                  ۳۵۰٬۰۰۰
+                  <span class="product-currency">تومان</span>
+                </strong>
+                <a class="product-small-btn" href="/products/hot-chocolate-classic/" aria-label="مشاهده هات‌چاکلت کلاسیک">
+                  ←
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <a class="product-image-link" href="/products/masala-tea/">
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  src="{% static 'images/product_4.png' %}"
+                  alt="بسته چای ماسالا"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+
+            <div class="product-info">
+              <span class="product-category">چای • ۳۰۰ گرم</span>
+              <h2 class="product-title">
+                <a href="/products/masala-tea/">چای ماسالا ادویه‌ای</a>
+              </h2>
+
+              <div class="product-meta">
+                <span>گرم، معطر و متعادل</span>
+              </div>
+
+              <div class="product-price-row">
+                <strong class="product-price">
+                  ۲۹۵٬۰۰۰
+                  <span class="product-currency">تومان</span>
+                </strong>
+                <a class="product-small-btn" href="/products/masala-tea/" aria-label="مشاهده چای ماسالا ادویه‌ای">
+                  ←
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <span class="product-badge">ویژه</span>
+
+            <a class="product-image-link" href="/products/gift-pack/">
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  src="{% static 'images/product_1.png' %}"
+                  alt="بسته هدیه قهوه و هات‌چاکلت"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+
+            <div class="product-info">
+              <span class="product-category">بسته هدیه</span>
+              <h2 class="product-title">
+                <a href="/products/gift-pack/">بسته هدیه نوشیدنی گرم</a>
+              </h2>
+
+              <div class="product-meta">
+                <span>مناسب هدیه و سازمان‌ها</span>
+              </div>
+
+              <div class="product-price-row">
+                <strong class="product-price">
+                  ۷۸۰٬۰۰۰
+                  <span class="product-currency">تومان</span>
+                </strong>
+                <a class="product-small-btn" href="/products/gift-pack/" aria-label="مشاهده بسته هدیه نوشیدنی گرم">
+                  ←
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <a class="product-image-link" href="/products/instant-coffee/">
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  src="{% static 'images/product_2.png' %}"
+                  alt="بسته پودر قهوه فوری"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+
+            <div class="product-info">
+              <span class="product-category">پودر فوری • ۲۰ عددی</span>
+              <h2 class="product-title">
+                <a href="/products/instant-coffee/">قهوه فوری کلاسیک</a>
+              </h2>
+
+              <div class="product-meta">
+                <span>ساده، سریع و خوش‌طعم</span>
+              </div>
+
+              <div class="product-price-row">
+                <strong class="product-price">
+                  ۲۴۰٬۰۰۰
+                  <span class="product-currency">تومان</span>
+                </strong>
+                <a class="product-small-btn" href="/products/instant-coffee/" aria-label="مشاهده قهوه فوری کلاسیک">
+                  ←
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <nav class="pagination" aria-label="صفحه‌بندی محصولات">
+          <a class="pagination-link pagination-prev is-disabled" href="#" aria-disabled="true">قبلی</a>
+          <a class="pagination-link is-active" href="/products/" aria-current="page">۱</a>
+          <a class="pagination-link" href="/products/?page=2">۲</a>
+          <a class="pagination-link" href="/products/?page=3">۳</a>
+          <a class="pagination-link pagination-next" href="/products/?page=2">بعدی</a>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
