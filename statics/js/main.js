@@ -704,7 +704,85 @@
 
     if (!overlay || openButtons.length === 0) return;
 
+    const form = $("[data-search-form]", overlay);
+    const chips = $all("[data-search-chip]", overlay);
+    const resultItems = $all("[data-search-item]", overlay);
+    const emptyState = $("[data-search-empty]", overlay);
+    const resultsLabel = $("[data-search-results-label]", overlay);
+
     let lastFocusedElement = null;
+
+    const focusableSelector = [
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "[tabindex]:not([tabindex='-1'])"
+    ].join(",");
+
+    const normalizeText = (value) => {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/ي/g, "ی")
+        .replace(/ك/g, "ک")
+        .replace(/ة/g, "ه")
+        .replace(/أ|إ|آ/g, "ا")
+        .replace(/۰/g, "0")
+        .replace(/۱/g, "1")
+        .replace(/۲/g, "2")
+        .replace(/۳/g, "3")
+        .replace(/۴/g, "4")
+        .replace(/۵/g, "5")
+        .replace(/۶/g, "6")
+        .replace(/۷/g, "7")
+        .replace(/۸/g, "8")
+        .replace(/۹/g, "9");
+    };
+
+    const getFocusableElements = () => $all(focusableSelector, overlay);
+
+    const setOpenButtonState = (state) => {
+      openButtons.forEach((button) => {
+        button.setAttribute("aria-expanded", state ? "true" : "false");
+      });
+    };
+
+    const updateResults = () => {
+      if (!input || resultItems.length === 0) return;
+
+      const query = normalizeText(input.value);
+      let visibleCount = 0;
+
+      resultItems.forEach((item) => {
+        const searchableText = normalizeText(
+          `${item.textContent || ""} ${item.getAttribute("data-search-keywords") || ""}`
+        );
+
+        const isVisible = query === "" || searchableText.includes(query);
+
+        item.classList.toggle("is-hidden", !isVisible);
+
+        if (isVisible) {
+          visibleCount += 1;
+        }
+      });
+
+      if (emptyState) {
+        emptyState.hidden = visibleCount !== 0;
+      }
+
+      if (resultsLabel) {
+        if (query === "") {
+          resultsLabel.textContent = "چند انتخاب مناسب برای شروع";
+        } else if (visibleCount === 0) {
+          resultsLabel.textContent = "نتیجه‌ای پیدا نشد";
+        } else {
+          resultsLabel.textContent = `${visibleCount} نتیجه پیدا شد`;
+        }
+      }
+    };
 
     const openSearch = () => {
       lastFocusedElement = document.activeElement;
@@ -712,6 +790,9 @@
       overlay.classList.add(CLASS_NAMES.active);
       overlay.setAttribute("aria-hidden", "false");
       document.body.classList.add(CLASS_NAMES.menuOpen);
+      setOpenButtonState(true);
+
+      updateResults();
 
       if (input) {
         window.setTimeout(() => input.focus(), 80);
@@ -722,14 +803,38 @@
       overlay.classList.remove(CLASS_NAMES.active);
       overlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove(CLASS_NAMES.menuOpen);
+      setOpenButtonState(false);
 
       if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
         lastFocusedElement.focus();
       }
     };
 
+    const trapFocus = (event) => {
+      if (!overlay.classList.contains(CLASS_NAMES.active)) return;
+      if (event.key !== "Tab") return;
+
+      const focusable = getFocusableElements();
+
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
     openButtons.forEach((button) => {
       button.addEventListener("click", openSearch);
+      button.setAttribute("aria-expanded", "false");
     });
 
     closeButtons.forEach((button) => {
@@ -742,10 +847,41 @@
       }
     });
 
+    if (input) {
+      input.addEventListener("input", updateResults);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const value = chip.getAttribute("data-search-chip") || chip.textContent || "";
+
+        if (input) {
+          input.value = value.trim();
+          input.focus();
+          updateResults();
+        }
+      });
+    });
+
+    resultItems.forEach((item) => {
+      item.addEventListener("click", closeSearch);
+    });
+
+    if (form && input) {
+      form.addEventListener("submit", (event) => {
+        if (input.value.trim() === "") {
+          event.preventDefault();
+          input.focus();
+        }
+      });
+    }
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && overlay.classList.contains(CLASS_NAMES.active)) {
         closeSearch();
       }
+
+      trapFocus(event);
     });
   }
 

@@ -60,12 +60,18 @@
       {% endwith %}
 
       <div class="header-actions">
-        <a class="header-icon search-icon" href="#featured-products" aria-label="جستجو در محصولات">
+        <button
+          class="header-icon search-icon"
+          type="button"
+          data-search-open
+          aria-label="جستجو در محصولات"
+          aria-expanded="false"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
             <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
-        </a>
+        </button>
         <a class="header-icon account-icon" href="{% url 'accounts:profile-dashboard' %}" aria-label="حساب کاربری">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/>
@@ -199,6 +205,168 @@
       <a class="btn btn-outline" href="{% url 'accounts:profile-dashboard' %}">ورود / ثبت نام</a>
     </div>
   </aside>
+
+
+  <section
+    class="search-overlay"
+    data-search-overlay
+    aria-hidden="true"
+    aria-labelledby="search-modal-title"
+  >
+    <button
+      class="search-overlay-backdrop"
+      type="button"
+      data-search-close
+      aria-label="بستن جستجو"
+    ></button>
+
+    <div class="search-modal" role="dialog" aria-modal="true">
+      <div class="search-modal-head">
+        <div>
+          <span class="search-modal-eyebrow">جستجوی سریع</span>
+          <h2 class="search-modal-title" id="search-modal-title">دنبال چه محصولی هستید؟</h2>
+          <p class="search-modal-text">نام محصول، دسته‌بندی یا وزن مورد نظر را وارد کنید.</p>
+        </div>
+
+        <button class="search-modal-close" type="button" data-search-close aria-label="بستن جستجو">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="search-modal-form" action="{% url 'product:product-list' %}" method="get" data-search-form>
+        <label class="search-input-label" for="global-product-search">جستجو در محصولات</label>
+
+        <div class="search-input-row">
+          <div class="search-input-wrap">
+            <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+
+            <input
+              class="search-modal-input"
+              id="global-product-search"
+              type="search"
+              name="q"
+              data-search-input
+              autocomplete="off"
+              placeholder="مثلاً قهوه ترک، هات‌چاکلت، بسته هدیه..."
+            >
+          </div>
+
+          <button class="btn btn-primary search-submit-btn" type="submit">جستجو</button>
+        </div>
+      </form>
+
+      <div class="search-quick-row" aria-label="جستجوهای پیشنهادی">
+        <button class="search-chip" type="button" data-search-chip="قهوه">قهوه</button>
+        <button class="search-chip" type="button" data-search-chip="چای">چای</button>
+        <button class="search-chip" type="button" data-search-chip="هات‌چاکلت">هات‌چاکلت</button>
+        <button class="search-chip" type="button" data-search-chip="پودر فوری">پودر فوری</button>
+        <button class="search-chip" type="button" data-search-chip="بسته هدیه">بسته هدیه</button>
+      </div>
+
+      <div class="search-results-head">
+        <h3 class="search-results-title">پیشنهادهای محبوب</h3>
+        <span class="search-results-count" data-search-results-label>چند انتخاب مناسب برای شروع</span>
+      </div>
+
+      <div class="search-results-grid" data-search-results>
+        <a
+          class="search-result-card"
+          href="{% url 'product:product-list' %}?q=قهوه ترک"
+          data-search-item
+          data-search-keywords="قهوه قهوه ترک ترک قوطی ۵۰۰ گرمی 500"
+        >
+          <span class="search-result-image">
+            <img src="{% static 'images/product_1.png' %}" alt="قهوه ترک قوطی ۵۰۰ گرمی">
+          </span>
+
+          <span class="search-result-content">
+            <span class="search-result-category">قهوه • ۵۰۰ گرم</span>
+            <strong class="search-result-title">قهوه ترک قوطی ۵۰۰ گرمی</strong>
+            <span class="search-result-footer">
+              <span class="search-result-price">۱٬۸۸۵٬۰۰۰ تومان</span>
+              <span class="search-result-link">مشاهده</span>
+            </span>
+          </span>
+        </a>
+
+        <a
+          class="search-result-card"
+          href="{% url 'product:product-list' %}?q=قهوه سینگل اوریجین"
+          data-search-item
+          data-search-keywords="قهوه سینگل اوریجین نیکاراگوئه ۲۵۰ گرمی 250"
+        >
+          <span class="search-result-image">
+            <img src="{% static 'images/product_2.png' %}" alt="قهوه سینگل اوریجین نیکاراگوئه ۲۵۰ گرمی">
+          </span>
+
+          <span class="search-result-content">
+            <span class="search-result-category">قهوه • ۲۵۰ گرم</span>
+            <strong class="search-result-title">قهوه سینگل اوریجین نیکاراگوئه</strong>
+            <span class="search-result-footer">
+              <span class="search-result-price">۱٬۰۴۹٬۹۹۸ تومان</span>
+              <span class="search-result-link">مشاهده</span>
+            </span>
+          </span>
+        </a>
+
+        <a
+          class="search-result-card"
+          href="{% url 'product:product-list' %}?q=هات چاکلت"
+          data-search-item
+          data-search-keywords="هات چاکلت کلاسیک قوطی ۸۰۰ گرمی شکلات 800"
+        >
+          <span class="search-result-image">
+            <img src="{% static 'images/product_3.png' %}" alt="هات چاکلت کلاسیک قوطی ۸۰۰ گرمی">
+          </span>
+
+          <span class="search-result-content">
+            <span class="search-result-category">هات‌چاکلت • ۸۰۰ گرم</span>
+            <strong class="search-result-title">هات‌چاکلت کلاسیک قوطی ۸۰۰ گرمی</strong>
+            <span class="search-result-footer">
+              <span class="search-result-price">۹۳۰٬۰۰۰ تومان</span>
+              <span class="search-result-link">مشاهده</span>
+            </span>
+          </span>
+        </a>
+
+        <a
+          class="search-result-card"
+          href="{% url 'product:product-list' %}?q=چای"
+          data-search-item
+          data-search-keywords="چای سیاه ممتاز بسته چای ایرانی"
+        >
+          <span class="search-result-image">
+            <img src="{% static 'images/product_4.png' %}" alt="چای سیاه ممتاز بسته‌ای">
+          </span>
+
+          <span class="search-result-content">
+            <span class="search-result-category">چای • بسته‌ای</span>
+            <strong class="search-result-title">چای سیاه ممتاز</strong>
+            <span class="search-result-footer">
+              <span class="search-result-price">۴۸۰٬۰۰۰ تومان</span>
+              <span class="search-result-link">مشاهده</span>
+            </span>
+          </span>
+        </a>
+      </div>
+
+      <div class="search-empty-state" data-search-empty hidden>
+        <span class="search-empty-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <strong>محصولی با این عبارت پیدا نشد</strong>
+        <span>عبارت کوتاه‌تری وارد کنید یا دسته‌بندی‌های پیشنهادی را امتحان کنید.</span>
+      </div>
+    </div>
+  </section>
 
   <script src="{% static 'js/main.js' %}" defer></script>
   {% block extra_js %}{% endblock %}
