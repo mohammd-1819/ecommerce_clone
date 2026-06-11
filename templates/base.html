@@ -38,7 +38,7 @@
 
           <a
             class="nav-link{% if namespace == 'products' or url_name == 'product-list' %} is-active{% endif %}"
-            href="#featured-products"
+            href="{% url 'product:product-list' %}"
           >
             محصولات
           </a>
@@ -131,7 +131,7 @@
           <h2 class="footer-title">دسترسی سریع</h2>
           <nav class="footer-links" aria-label="دسترسی سریع">
             <a href="{% url 'landing:home' %}">صفحه اصلی</a>
-            <a href="#featured-products">محصولات</a>
+            <a href="{% url 'product:product-list' %}">محصولات</a>
             <a href="{% url 'landing:about' %}">درباره ما</a>
           </nav>
         </div>
@@ -189,13 +189,13 @@
 
     <nav class="mobile-nav" aria-label="منوی موبایل">
       <a class="nav-link is-active" href="{% url 'landing:home' %}">صفحه اصلی</a>
-      <a class="nav-link" href="#featured-products">محصولات</a>
+      <a class="nav-link" href="{% url 'product:product-list' %}">محصولات</a>
       <a class="nav-link" href="{% url 'landing:about' %}">درباره ما</a>
       <a class="nav-link" href="{% url 'landing:contact' %}">تماس با ما</a>
     </nav>
 
     <div class="mobile-menu-actions">
-      <a class="btn btn-primary" href="#featured-products">مشاهده محصولات</a>
+      <a class="btn btn-primary" href="{% url 'product:product-list' %}">مشاهده محصولات</a>
       <a class="btn btn-outline" href="{% url 'accounts:profile-dashboard' %}">ورود / ثبت نام</a>
     </div>
   </aside>

@@ -52,7 +52,7 @@
       <div class="cart-items" data-cart-items>
 
         <article class="cart-item" data-cart-item data-price="1520000">
-          <a class="cart-item-image" href="#" aria-label="مشاهده وایت چاکلت فوطی ۸۰۰ گرمی">
+          <a class="cart-item-image" href="{% url 'product:product-detail' %}" aria-label="مشاهده وایت چاکلت فوطی ۸۰۰ گرمی">
             <img src="{% static 'images/product_1.png' %}" alt="وایت چاکلت فوطی ۸۰۰ گرمی">
           </a>
 
@@ -61,7 +61,7 @@
               <p class="cart-item-category">هات‌چاکلت • ۸۰۰ گرم</p>
 
               <h2 class="cart-item-title">
-                <a href="#">وایت چاکلت فوطی ۸۰۰ گرمی</a>
+                <a href="{% url 'product:product-detail' %}">وایت چاکلت فوطی ۸۰۰ گرمی</a>
               </h2>
 
               <p class="cart-item-note">
@@ -132,7 +132,7 @@
         </article>
 
         <article class="cart-item" data-cart-item data-price="340000">
-          <a class="cart-item-image" href="#" aria-label="مشاهده قهوه عربیکا ویژه">
+          <a class="cart-item-image" href="{% url 'product:product-detail' %}" aria-label="مشاهده قهوه عربیکا ویژه">
             <img src="{% static 'images/product_2.png' %}" alt="بسته قهوه عربیکا ویژه">
           </a>
 
@@ -141,7 +141,7 @@
               <p class="cart-item-category">قهوه • ۲۵۰ گرم</p>
 
               <h2 class="cart-item-title">
-                <a href="#">قهوه عربیکا ویژه</a>
+                <a href="{% url 'product:product-detail' %}">قهوه عربیکا ویژه</a>
               </h2>
 
               <p class="cart-item-note">
@@ -247,11 +247,11 @@
             هزینه ارسال در این مرحله محاسبه نمی‌شود و هنگام تحویل سفارش دریافت خواهد شد.
           </p>
 
-          <a class="btn btn-primary cart-submit-btn" href="#">
+          <a class="btn btn-primary cart-submit-btn" href="{% url 'cart:cart-checkout' %}">
             ثبت سفارش و ادامه خرید
           </a>
 
-          <a class="text-link cart-continue-link" href="#">
+          <a class="text-link cart-continue-link" href="{% url 'product:product-list' %}">
             ادامه مشاهده محصولات
           </a>
         </div>
@@ -275,7 +275,7 @@
           هنوز محصولی به سبد خرید اضافه نکرده‌اید. می‌توانید از میان قهوه، چای و هات‌چاکلت‌های منتخب شروع کنید.
         </p>
 
-        <a class="btn btn-primary" href="#">
+        <a class="btn btn-primary" href="{% url 'product:product-list' %}">
           مشاهده محصولات
         </a>
       </div>

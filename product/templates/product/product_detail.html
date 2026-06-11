@@ -1,0 +1,672 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}قهوه عربیکا ویژه | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero product-detail-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <a href="{% url 'landing:home' %}">خانه</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="{% url 'product:product-list' %}">محصولات</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>قهوه عربیکا ویژه</span>
+    </nav>
+  </div>
+</section>
+
+<section class="section product-detail">
+  <div class="container">
+    <div class="product-detail-grid">
+
+      <div class="product-gallery" data-product-gallery>
+        <div class="product-main-image">
+          <img
+            src="{% static 'images/product_1.png' %}"
+            alt="بسته قهوه عربیکا ویژه"
+            data-product-main-image
+          >
+        </div>
+
+        <div class="product-thumbs" aria-label="تصاویر محصول">
+          <button
+            class="product-thumb is-active"
+            type="button"
+            data-product-thumb
+            data-image="{% static 'images/product_2.png' %}"
+            aria-label="نمای اصلی قهوه عربیکا ویژه"
+          >
+            <img src="{% static 'images/product_2.png' %}" alt="نمای اصلی بسته قهوه عربیکا">
+          </button>
+
+          <button
+            class="product-thumb"
+            type="button"
+            data-product-thumb
+            data-image="{% static 'images/product_3.png' %}"
+            aria-label="نمای کناری بسته قهوه عربیکا ویژه"
+          >
+            <img src="{% static 'images/product_3.png' %}" alt="نمای کناری بسته قهوه عربیکا">
+          </button>
+
+          <button
+            class="product-thumb"
+            type="button"
+            data-product-thumb
+            data-image="{% static 'images/product_4.png' %}"
+            aria-label="جزئیات بسته‌بندی قهوه عربیکا ویژه"
+          >
+            <img src="{% static 'images/product_4.png' %}" alt="جزئیات بسته‌بندی قهوه عربیکا">
+          </button>
+
+          <button
+            class="product-thumb"
+            type="button"
+            data-product-thumb
+            data-image="{% static 'images/product_1.png' %}"
+            aria-label="نمای نوشیدنی آماده قهوه عربیکا ویژه"
+          >
+            <img src="{% static 'images/product_1.png' %}" alt="فنجان قهوه آماده">
+          </button>
+        </div>
+      </div>
+
+      <article
+        class="product-detail-content"
+        data-product-variants
+        data-default-variant="arabica-400"
+      >
+        <div class="product-detail-head">
+          <span class="product-detail-badge">قهوه دانه</span>
+
+          <h1 class="product-detail-title">قهوه عربیکا ویژه</h1>
+
+          <div class="product-detail-meta">
+            <span>دسته‌بندی: قهوه</span>
+            <span>کد محصول: CB-AR-400</span>
+            <a href="#product-comments">۳ دیدگاه</a>
+          </div>
+        </div>
+
+        <p class="product-detail-desc">
+          ترکیبی خوش‌عطر و متعادل از دانه‌های عربیکا، مناسب برای مصرف روزانه، اسپرسو،
+          موکاپات و نوشیدنی‌های بر پایه شیر. بسته‌بندی ساده و مرتب، طعم گرم و انتخابی
+          مطمئن برای خانه و محل کار.
+        </p>
+
+        <div class="product-variant-panel">
+          <div class="product-variant-head">
+            <h2 class="product-variant-title">انتخاب وزن</h2>
+            <span class="product-variant-selected" data-selected-variant-label>
+              ۴۰۰ گرم
+            </span>
+          </div>
+
+          <div class="product-variant-options" role="radiogroup" aria-label="انتخاب وزن محصول">
+            <button
+              class="product-variant-option is-active"
+              type="button"
+              role="radio"
+              aria-checked="true"
+              data-variant-option
+              data-variant-id="arabica-400"
+              data-variant-title="۴۰۰ گرم"
+              data-variant-price="۳۲۰٬۰۰۰"
+              data-variant-price-raw="320000"
+              data-variant-sku="CB-AR-400"
+              data-variant-available="true"
+            >
+              <span class="variant-weight">۴۰۰ گرم</span>
+              <span class="variant-price">۳۲۰٬۰۰۰ تومان</span>
+            </button>
+
+            <button
+              class="product-variant-option"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-variant-option
+              data-variant-id="arabica-600"
+              data-variant-title="۶۰۰ گرم"
+              data-variant-price="۴۶۰٬۰۰۰"
+              data-variant-price-raw="460000"
+              data-variant-sku="CB-AR-600"
+              data-variant-available="true"
+            >
+              <span class="variant-weight">۶۰۰ گرم</span>
+              <span class="variant-price">۴۶۰٬۰۰۰ تومان</span>
+            </button>
+
+            <button
+              class="product-variant-option is-unavailable"
+              type="button"
+              role="radio"
+              aria-checked="false"
+              data-variant-option
+              data-variant-id="arabica-1000"
+              data-variant-title="۱ کیلوگرم"
+              data-variant-price="۷۲۰٬۰۰۰"
+              data-variant-price-raw="720000"
+              data-variant-sku="CB-AR-1000"
+              data-variant-available="false"
+            >
+              <span class="variant-weight">۱ کیلوگرم</span>
+              <span class="variant-price">ناموجود</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="product-detail-price-row">
+          <div>
+            <span class="product-price-label">قیمت محصول</span>
+            <p class="product-detail-price">
+              <span data-product-price>۳۲۰٬۰۰۰</span>
+              <span class="product-currency">تومان</span>
+            </p>
+          </div>
+
+          <p class="product-stock-status is-available" data-product-stock-status>
+            آماده ارسال
+          </p>
+        </div>
+
+        <form class="add-to-cart-form" method="post" action="#">
+          {# {% csrf_token %} #}
+
+          <input type="hidden" name="product_id" value="coffee-arabica-special">
+          <input type="hidden" name="variant_id" value="arabica-400" data-selected-variant-input>
+
+          <div class="product-detail-actions">
+            <div class="quantity-control" data-quantity>
+              <button
+                class="quantity-btn"
+                type="button"
+                aria-label="کم کردن تعداد"
+                data-quantity-decrease
+              >
+                −
+              </button>
+
+              <input
+                class="quantity-input"
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                max="10"
+                inputmode="numeric"
+                aria-label="تعداد محصول"
+                data-quantity-input
+              >
+
+              <button
+                class="quantity-btn"
+                type="button"
+                aria-label="زیاد کردن تعداد"
+                data-quantity-increase
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              class="btn btn-primary product-add-to-cart-btn"
+              type="submit"
+              data-add-to-cart-button
+            >
+              افزودن به سبد خرید
+            </button>
+          </div>
+
+          <p class="product-unavailable-note hidden" data-product-unavailable-note>
+            این وزن در حال حاضر موجود نیست. لطفاً وزن دیگری را انتخاب کنید.
+          </p>
+        </form>
+
+        <div class="product-trust-row">
+          <div class="product-trust-item">
+            <span class="product-trust-icon" aria-hidden="true">✓</span>
+            <span>بسته‌بندی مرتب</span>
+          </div>
+
+          <div class="product-trust-item">
+            <span class="product-trust-icon" aria-hidden="true">✓</span>
+            <span>پرداخت امن</span>
+          </div>
+
+          <div class="product-trust-item">
+            <span class="product-trust-icon" aria-hidden="true">✓</span>
+            <span>ارسال مطمئن</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-sm product-detail-info">
+  <div class="container">
+    <div class="product-info-grid">
+
+      <section class="product-info-card">
+        <div class="section-heading product-info-heading">
+          <div>
+            <span class="section-eyebrow">معرفی محصول</span>
+            <h2 class="section-title">توضیحات محصول</h2>
+          </div>
+        </div>
+
+        <div class="product-description-content">
+          <p>
+            قهوه عربیکا ویژه برای کسانی انتخاب مناسبی است که طعم متعادل، عطر دلنشین
+            و حس نوشیدن یک قهوه روزانه‌ی خوش‌ساخت را دوست دارند. این محصول با تمرکز
+            بر وضوح طعم و تجربه‌ای آرام طراحی شده و برای استفاده در خانه، محل کار و
+            پذیرایی‌های ساده مناسب است.
+          </p>
+
+          <p>
+            بسته‌بندی محصول به‌گونه‌ای انتخاب شده که نگهداری دانه‌ها ساده‌تر باشد و
+            ظاهر محصول نیز در قفسه آشپزخانه یا فضای کاری، مرتب و گرم به نظر برسد.
+          </p>
+        </div>
+      </section>
+
+      <section class="product-info-card">
+        <div class="section-heading product-info-heading">
+          <div>
+            <span class="section-eyebrow">جزئیات</span>
+            <h2 class="section-title">مشخصات محصول</h2>
+          </div>
+        </div>
+
+        <dl class="product-attributes">
+          <div class="product-attribute-row">
+            <dt>نوع محصول</dt>
+            <dd>قهوه دانه</dd>
+          </div>
+
+          <div class="product-attribute-row">
+            <dt>وزن انتخاب‌شده</dt>
+            <dd data-selected-weight-attribute>۴۰۰ گرم</dd>
+          </div>
+
+          <div class="product-attribute-row">
+            <dt>ترکیب</dt>
+            <dd>۱۰۰٪ عربیکا</dd>
+          </div>
+
+          <div class="product-attribute-row">
+            <dt>درجه برشته‌کاری</dt>
+            <dd>متوسط</dd>
+          </div>
+
+          <div class="product-attribute-row">
+            <dt>طعم‌یادها</dt>
+            <dd>شکلاتی، مغزی، ملایم</dd>
+          </div>
+
+          <div class="product-attribute-row">
+            <dt>مناسب برای</dt>
+            <dd>اسپرسو، موکاپات، فرنچ‌پرس</dd>
+          </div>
+
+          <div class="product-attribute-row">
+            <dt>شرایط نگهداری</dt>
+            <dd>دور از نور مستقیم و رطوبت</dd>
+          </div>
+        </dl>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<section class="section product-comments-section" id="product-comments">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="section-eyebrow">تجربه خریداران</span>
+        <h2 class="section-title">دیدگاه‌ها</h2>
+        <p class="section-subtitle">
+          نظر خریداران درباره این محصول، بدون امتیازدهی و فقط بر اساس تجربه استفاده نمایش داده می‌شود.
+        </p>
+      </div>
+
+      <button
+        class="btn btn-outline"
+        type="button"
+        data-comment-modal-open
+      >
+        ثبت دیدگاه
+      </button>
+    </div>
+
+    <div class="product-comments-layout">
+
+      <div class="product-comments-list" data-comments-list>
+        <article class="product-comment-card">
+          <header class="product-comment-head">
+            <div class="product-comment-avatar" aria-hidden="true">
+              م
+            </div>
+
+            <div>
+              <h3 class="product-comment-name">مریم کاظمی</h3>
+              <time class="product-comment-date" datetime="2025-01-01">۱۴۰۳/۱۰/۱۲</time>
+            </div>
+          </header>
+
+          <p class="product-comment-text">
+            عطر قهوه خیلی خوب بود و برای استفاده روزانه انتخاب تمیزی به نظر می‌رسد.
+            بسته‌بندی هم مرتب و ساده بود.
+          </p>
+        </article>
+
+        <article class="product-comment-card">
+          <header class="product-comment-head">
+            <div class="product-comment-avatar" aria-hidden="true">
+              ع
+            </div>
+
+            <div>
+              <h3 class="product-comment-name">علی رضایی</h3>
+              <time class="product-comment-date" datetime="2025-01-08">۱۴۰۳/۱۰/۱۹</time>
+            </div>
+          </header>
+
+          <p class="product-comment-text">
+            طعم متعادل و ملایمی دارد. برای موکاپات استفاده کردم و نتیجه قابل قبول بود.
+            اگر تلخی خیلی زیاد نمی‌خواهید، گزینه خوبی است.
+          </p>
+        </article>
+
+        <article class="product-comment-card">
+          <header class="product-comment-head">
+            <div class="product-comment-avatar" aria-hidden="true">
+              س
+            </div>
+
+            <div>
+              <h3 class="product-comment-name">سارا محمدی</h3>
+              <time class="product-comment-date" datetime="2025-01-14">۱۴۰۳/۱۰/۲۵</time>
+            </div>
+          </header>
+
+          <p class="product-comment-text">
+            بسته ۴۰۰ گرمی برای مصرف خانه اندازه مناسبی داشت. ارسال منظم بود و محصول
+            سالم به دستم رسید.
+          </p>
+        </article>
+      </div>
+
+      <div class="empty-state product-comments-empty hidden" data-comments-empty>
+        <div class="empty-state-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 9.5H16.5M7.5 13H13.5M21 11.5C21 15.6421 16.9706 19 12 19C10.8907 19 9.82825 18.8328 8.84603 18.5261L4 20L5.26581 16.6234C3.85902 15.2797 3 13.4902 3 11.5C3 7.35786 7.02944 4 12 4C16.9706 4 21 7.35786 21 11.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h3 class="empty-state-title">هنوز دیدگاهی ثبت نشده است</h3>
+        <p class="empty-state-text">
+          اولین نفری باشید که تجربه خود را درباره این محصول می‌نویسد.
+        </p>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          data-comment-modal-open
+        >
+          ثبت اولین دیدگاه
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section product-section related-products-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="section-eyebrow">پیشنهادهای مشابه</span>
+        <h2 class="section-title">محصولات مرتبط</h2>
+      </div>
+
+      <a class="{% url 'product:product-list' %}" href="/products/">مشاهده همه محصولات</a>
+    </div>
+
+    <div class="product-grid">
+      <article class="product-card">
+        <span class="product-badge">پرفروش</span>
+
+        <a class="product-image-link" href="/products/sample-product/">
+          <div class="product-image-wrap">
+            <img
+              class="product-image"
+              src="{% static 'images/product_2.png' %}"
+              alt="بسته قهوه اسپرسو ویژه"
+            >
+          </div>
+        </a>
+
+        <div class="product-info">
+          <span class="product-category">قهوه • ۲۵۰ گرم</span>
+          <h3 class="product-title">
+            <a href="/products/sample-product/">قهوه اسپرسو ویژه</a>
+          </h3>
+
+          <div class="product-meta">
+            <span>برشته‌کاری متوسط</span>
+          </div>
+
+          <div class="product-price-row">
+            <span class="product-price">
+              ۲۸۰٬۰۰۰
+              <span class="product-currency">تومان</span>
+            </span>
+
+            <a class="product-small-btn" href="/products/sample-product/" aria-label="مشاهده قهوه اسپرسو ویژه">
+              ←
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <a class="product-image-link" href="/products/sample-product/">
+          <div class="product-image-wrap">
+            <img
+              class="product-image"
+              src="{% static 'images/product_3.png' %}"
+              alt="قوطی هات چاکلت کلاسیک"
+            >
+          </div>
+        </a>
+
+        <div class="product-info">
+          <span class="product-category">هات‌چاکلت • ۵۰۰ گرم</span>
+          <h3 class="product-title">
+            <a href="/products/sample-product/">هات‌چاکلت کلاسیک</a>
+          </h3>
+
+          <div class="product-meta">
+            <span>طعم شکلاتی و گرم</span>
+          </div>
+
+          <div class="product-price-row">
+            <span class="product-price">
+              ۳۶۰٬۰۰۰
+              <span class="product-currency">تومان</span>
+            </span>
+
+            <a class="product-small-btn" href="/products/sample-product/" aria-label="مشاهده هات چاکلت کلاسیک">
+              ←
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <span class="product-badge">ویژه</span>
+
+        <a class="product-image-link" href="/products/sample-product/">
+          <div class="product-image-wrap">
+            <img
+              class="product-image"
+              src="{% static 'images/product_4.png' %}"
+              alt="بسته قهوه ترکیبی ملایم"
+            >
+          </div>
+        </a>
+
+        <div class="product-info">
+          <span class="product-category">قهوه • ۴۰۰ گرم</span>
+          <h3 class="product-title">
+            <a href="/products/sample-product/">قهوه ترکیبی ملایم</a>
+          </h3>
+
+          <div class="product-meta">
+            <span>مناسب مصرف روزانه</span>
+          </div>
+
+          <div class="product-price-row">
+            <span class="product-price">
+              ۳۱۰٬۰۰۰
+              <span class="product-currency">تومان</span>
+            </span>
+
+            <a class="product-small-btn" href="/products/sample-product/" aria-label="مشاهده قهوه ترکیبی ملایم">
+              ←
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <a class="product-image-link" href="/products/sample-product/">
+          <div class="product-image-wrap">
+            <img
+              class="product-image"
+              src="{% static 'images/product_1.png' %}"
+              alt="بسته هدیه قهوه و هات چاکلت"
+            >
+          </div>
+        </a>
+
+        <div class="product-info">
+          <span class="product-category">بسته هدیه</span>
+          <h3 class="product-title">
+            <a href="/products/sample-product/">بسته هدیه گرم</a>
+          </h3>
+
+          <div class="product-meta">
+            <span>مناسب هدیه و پذیرایی</span>
+          </div>
+
+          <div class="product-price-row">
+            <span class="product-price">
+              ۶۸۰٬۰۰۰
+              <span class="product-currency">تومان</span>
+            </span>
+
+            <a class="product-small-btn" href="/products/sample-product/" aria-label="مشاهده بسته هدیه گرم">
+              ←
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div
+  class="comment-modal-overlay"
+  data-comment-modal-overlay
+  aria-hidden="true"
+></div>
+
+<section
+  class="comment-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="comment-modal-title"
+  aria-hidden="true"
+  data-comment-modal
+>
+  <div class="comment-modal-card">
+    <header class="comment-modal-head">
+      <div>
+        <span class="section-eyebrow">ثبت تجربه خرید</span>
+        <h2 class="comment-modal-title" id="comment-modal-title">ثبت دیدگاه</h2>
+      </div>
+
+      <button
+        class="comment-modal-close"
+        type="button"
+        aria-label="بستن فرم ثبت دیدگاه"
+        data-comment-modal-close
+      >
+        ×
+      </button>
+    </header>
+
+    <form class="comment-form" method="post" action="#" data-comment-form>
+      {# {% csrf_token %} #}
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="comment_first_name">نام</label>
+          <input
+            class="form-input"
+            id="comment_first_name"
+            name="first_name"
+            type="text"
+            autocomplete="given-name"
+            placeholder="مثلاً مریم"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="comment_last_name">نام خانوادگی</label>
+          <input
+            class="form-input"
+            id="comment_last_name"
+            name="last_name"
+            type="text"
+            autocomplete="family-name"
+            placeholder="مثلاً کاظمی"
+            required
+          >
+        </div>
+
+        <div class="form-group form-group-full">
+          <label class="form-label" for="comment_text">متن دیدگاه</label>
+          <textarea
+            class="form-textarea"
+            id="comment_text"
+            name="text"
+            rows="5"
+            placeholder="تجربه خود را درباره این محصول بنویسید..."
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="comment-form-actions">
+        <button class="btn btn-outline" type="button" data-comment-modal-close>
+          انصراف
+        </button>
+
+        <button class="btn btn-primary" type="submit">
+          ثبت دیدگاه
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

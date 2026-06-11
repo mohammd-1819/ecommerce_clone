@@ -16,8 +16,8 @@
                 <h1 class="hero-title">قهوه‌ای برای لحظه‌های گرم‌تر</h1>
                 <p class="hero-description">در new danidor قهوه، چای و هات‌چاکلت با بسته‌بندی مرتب و طعمی متعادل انتخاب می‌شوند؛ ساده، خوش‌طعم و مناسب خانه و محل کار.</p>
                 <div class="hero-actions">
-                  <a class="btn btn-primary" href="#featured-products">مشاهده محصولات</a>
-                  <a class="btn btn-outline" href="#about">درباره برند</a>
+                  <a class="btn btn-primary" href="{% url 'product:product-list' %}">مشاهده محصولات</a>
+                  <a class="btn btn-outline" href="{% url 'landing:about' %}">درباره برند</a>
                 </div>
               </div>
               <div class="hero-visual reveal" aria-hidden="true">
@@ -43,8 +43,8 @@
                 <h2 class="hero-title">چای و دمنوش برای عصرهای خلوت</h2>
                 <p class="hero-description">برای زمان‌هایی که می‌خواهید روز آرام‌تر پیش برود، ترکیب‌های سبک و خوش‌عطر ما انتخابی مطمئن و بی‌دردسر هستند.</p>
                 <div class="hero-actions">
-                  <a class="btn btn-primary" href="#categories">دیدن دسته‌بندی‌ها</a>
-                  <a class="btn btn-outline" href="#featured-products">محصولات منتخب</a>
+                  <a class="btn btn-primary" href="{% url 'product:product-list' %}">دیدن دسته‌بندی‌ها</a>
+                  <a class="btn btn-outline" href="{% url 'product:product-list' %}">محصولات منتخب</a>
                 </div>
               </div>
               <div class="hero-visual" aria-hidden="true">
@@ -68,8 +68,8 @@
                 <h2 class="hero-title">هات‌چاکلت برای شروعی شیرین‌تر</h2>
                 <p class="hero-description">هات‌چاکلت‌های بسته‌بندی‌شده با طعمی نرم و دلنشین؛ مناسب هدیه، میز کار و شب‌های آرام خانه.</p>
                 <div class="hero-actions">
-                  <a class="btn btn-primary" href="#featured-products">خرید هات‌چاکلت</a>
-                  <a class="btn btn-outline" href="#footer">راه‌های ارتباطی</a>
+                  <a class="btn btn-primary" href="{% url 'product:product-list' %}">خرید هات‌چاکلت</a>
+                  <a class="btn btn-outline" href="{% url 'landing:contact' %}">راه‌های ارتباطی</a>
                 </div>
               </div>
               <div class="hero-visual" aria-hidden="true">
@@ -113,11 +113,11 @@
             <span class="section-eyebrow">دسته‌بندی‌ها</span>
             <h2 class="section-title" id="categories-title">برای هر سلیقه یک انتخاب گرم</h2>
           </div>
-          <a class="text-link" href="#featured-products">مشاهده همه محصولات</a>
+          <a class="text-link" href="{% url 'product:product-list' %}">مشاهده همه محصولات</a>
         </div>
 
         <div class="category-grid">
-          <a class="category-card reveal" href="#">
+          <a class="category-card reveal" href="/">
             <span class="category-icon-wrap" aria-hidden="true">
               <span class="category-blob"></span>
               <img class="category-img" src="{% static 'images/cat-1.png' %}" alt="">
@@ -125,7 +125,7 @@
             <h3 class="category-title">قهوه</h3>
             <p class="category-meta">دانه، آسیاب‌شده و فوری</p>
           </a>
-          <a class="category-card reveal" href="#">
+          <a class="category-card reveal" href="/">
             <span class="category-icon-wrap" aria-hidden="true">
               <span class="category-blob"></span>
               <img class="category-img" src="{% static 'images/cat-4.png' %}" alt="">
@@ -133,7 +133,7 @@
             <h3 class="category-title">چای</h3>
             <p class="category-meta">انتخاب‌های روزانه و خوش‌عطر</p>
           </a>
-          <a class="category-card reveal" href="#">
+          <a class="category-card reveal" href="/">
             <span class="category-icon-wrap" aria-hidden="true">
               <span class="category-blob"></span>
               <img class="category-img" src="{% static 'images/cat-3.png' %}" alt="">
@@ -141,7 +141,7 @@
             <h3 class="category-title">هات‌چاکلت</h3>
             <p class="category-meta">طعم نرم و گرم</p>
           </a>
-          <a class="category-card reveal" href="#">
+          <a class="category-card reveal" href="/">
             <span class="category-icon-wrap" aria-hidden="true">
               <span class="category-blob"></span>
               <img class="category-img" src="{% static 'images/cat-2.png' %}" alt="">
@@ -161,89 +161,89 @@
             <h2 class="section-title" id="featured-products-title">چند انتخاب محبوب برای شروع</h2>
             <p class="section-subtitle">کارت‌های محصول عمداً خلوت طراحی شده‌اند تا عکس، نام و قیمت سریع دیده شوند.</p>
           </div>
-          <a class="text-link" href="#">رفتن به فروشگاه</a>
+          <a class="text-link" href="{% url 'product:product-list' %}">رفتن به فروشگاه</a>
         </div>
 
         <div class="product-grid">
           <article class="product-card reveal">
             <span class="product-badge">پرفروش</span>
-            <a class="product-image-link" href="#">
+            <a class="product-image-link" href="{% url 'product:product-detail' %}">
               <span class="product-image-wrap">
                 <img class="product-image" src="{% static 'images/product_1.png' %}" alt="بسته قهوه بلِند ویژه new danidor">
               </span>
             </a>
             <div class="product-info">
               <span class="product-category">قهوه • ۲۵۰ گرم</span>
-              <h3 class="product-title"><a href="#">قهوه بلِند ویژه</a></h3>
+              <h3 class="product-title"><a href="{% url 'product:product-detail' %}">قهوه بلِند ویژه</a></h3>
               <div class="product-meta">
                 <span>رُست متوسط</span>
                 <span>مناسب روزانه</span>
               </div>
               <div class="product-price-row">
                 <span class="product-price">۳۲۰٬۰۰۰ <span class="product-currency">تومان</span></span>
-                <a class="product-small-btn" href="#" aria-label="مشاهده قهوه بلِند ویژه">←</a>
+                <a class="product-small-btn" href="{% url 'product:product-detail' %}" aria-label="مشاهده قهوه بلِند ویژه">←</a>
               </div>
             </div>
           </article>
 
           <article class="product-card reveal">
             <span class="product-badge">جدید</span>
-            <a class="product-image-link" href="#">
+            <a class="product-image-link" href="{% url 'product:product-detail' %}">
               <span class="product-image-wrap">
                 <img class="product-image" src="{% static 'images/product_2.png' %}" alt="بسته قهوه عربیکا new danidor">
               </span>
             </a>
             <div class="product-info">
               <span class="product-category">قهوه • ۲۵۰ گرم</span>
-              <h3 class="product-title"><a href="#">قهوه عربیکا ملایم</a></h3>
+              <h3 class="product-title"><a href="{% url 'product:product-detail' %}">قهوه عربیکا ملایم</a></h3>
               <div class="product-meta">
                 <span>عطر بالا</span>
                 <span>اسیدیته متعادل</span>
               </div>
               <div class="product-price-row">
                 <span class="product-price">۳۸۵٬۰۰۰ <span class="product-currency">تومان</span></span>
-                <a class="product-small-btn" href="#" aria-label="مشاهده قهوه عربیکا ملایم">←</a>
+                <a class="product-small-btn" href="{% url 'product:product-detail' %}" aria-label="مشاهده قهوه عربیکا ملایم">←</a>
               </div>
             </div>
           </article>
 
           <article class="product-card reveal">
-            <a class="product-image-link" href="#">
+            <a class="product-image-link" href="{% url 'product:product-detail' %}">
               <span class="product-image-wrap">
                 <img class="product-image" src="{% static 'images/product_3.png' %}" alt="بسته هات‌چاکلت کلاسیک new danidor">
               </span>
             </a>
             <div class="product-info">
               <span class="product-category">هات‌چاکلت • ۴۰۰ گرم</span>
-              <h3 class="product-title"><a href="#">هات‌چاکلت کلاسیک</a></h3>
+              <h3 class="product-title"><a href="{% url 'product:product-detail' %}">هات‌چاکلت کلاسیک</a></h3>
               <div class="product-meta">
                 <span>بافت نرم</span>
                 <span>طعم کاکائویی</span>
               </div>
               <div class="product-price-row">
                 <span class="product-price">۲۹۰٬۰۰۰ <span class="product-currency">تومان</span></span>
-                <a class="product-small-btn" href="#" aria-label="مشاهده هات‌چاکلت کلاسیک">←</a>
+                <a class="product-small-btn" href="{% url 'product:product-detail' %}" aria-label="مشاهده هات‌چاکلت کلاسیک">←</a>
               </div>
             </div>
           </article>
 
           <article class="product-card reveal">
             <span class="product-badge">ویژه</span>
-            <a class="product-image-link" href="#">
+            <a class="product-image-link" href="{% url 'product:product-detail' %}">
               <span class="product-image-wrap">
                 <img class="product-image" src="{% static 'images/product_4.png' %}" alt="بسته هدیه قهوه و هات‌چاکلت new danidor">
               </span>
             </a>
             <div class="product-info">
               <span class="product-category">بسته هدیه • ترکیبی</span>
-              <h3 class="product-title"><a href="#">پک هدیه گرم</a></h3>
+              <h3 class="product-title"><a href="{% url 'product:product-detail' %}">پک هدیه گرم</a></h3>
               <div class="product-meta">
                 <span>قهوه</span>
                 <span>هات‌چاکلت</span>
               </div>
               <div class="product-price-row">
                 <span class="product-price">۶۴۰٬۰۰۰ <span class="product-currency">تومان</span></span>
-                <a class="product-small-btn" href="#" aria-label="مشاهده پک هدیه گرم">←</a>
+                <a class="product-small-btn" href="{% url 'product:product-detail' %}" aria-label="مشاهده پک هدیه گرم">←</a>
               </div>
             </div>
           </article>
@@ -263,7 +263,7 @@
             <li>چیدمان خلوت و محصول‌محور</li>
             <li>طراحی گرم، مینیمال و قابل اعتماد</li>
           </ul>
-          <a class="btn btn-primary" href="#">بیشتر درباره ما بدانید</a>
+          <a class="btn btn-primary" href="{% url 'landing:about' %}">بیشتر درباره ما بدانید</a>
         </div>
 
         <div class="about-visual reveal" aria-hidden="true">

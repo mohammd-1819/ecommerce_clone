@@ -100,6 +100,25 @@
     checkoutDiscountRow: "[data-checkout-discount-row]",
     checkoutDiscountAmount: "[data-checkout-discount-amount]",
     checkoutFinalTotal: "[data-checkout-final-total]",
+
+
+    productVariants: "[data-product-variants]",
+    variantOption: "[data-variant-option]",
+    selectedVariantLabel: "[data-selected-variant-label]",
+    selectedVariantInput: "[data-selected-variant-input]",
+    selectedWeightAttribute: "[data-selected-weight-attribute]",
+    productPrice: "[data-product-price]",
+    productStockStatus: "[data-product-stock-status]",
+    productUnavailableNote: "[data-product-unavailable-note]",
+    addToCartButton: "[data-add-to-cart-button]",
+
+    commentModalOpen: "[data-comment-modal-open]",
+    commentModalClose: "[data-comment-modal-close]",
+    commentModal: "[data-comment-modal]",
+    commentModalOverlay: "[data-comment-modal-overlay]",
+    commentForm: "[data-comment-form]",
+    commentsList: "[data-comments-list]",
+    commentsEmpty: "[data-comments-empty]",
   };
 
   const CLASS_NAMES = {
@@ -107,7 +126,8 @@
     active: "is-active",
     visible: "is-visible",
     menuOpen: "menu-open",
-    addressModalOpen: "address-modal-open"
+    addressModalOpen: "address-modal-open",
+    commentModalOpen: "comment-modal-open"
   };
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -602,21 +622,52 @@
 
       if (!mainImage || thumbs.length === 0) return;
 
-      thumbs.forEach((thumb) => {
-        thumb.addEventListener("click", () => {
-          const newSrc = thumb.getAttribute("data-image-src");
-          const newAlt = thumb.getAttribute("data-image-alt");
+      function updateMainImage(thumb) {
+        const thumbImage = thumb.querySelector("img");
 
-          if (newSrc) {
-            mainImage.setAttribute("src", newSrc);
-          }
+        const newSrc =
+          thumb.getAttribute("data-image-src") ||
+          thumb.getAttribute("data-image") ||
+          (thumbImage ? thumbImage.getAttribute("src") : "");
+
+        const newAlt =
+          thumb.getAttribute("data-image-alt") ||
+          (thumbImage ? thumbImage.getAttribute("alt") : "");
+
+        if (!newSrc) return;
+
+        mainImage.style.opacity = "0";
+
+        window.setTimeout(() => {
+          mainImage.setAttribute("src", newSrc);
 
           if (newAlt) {
             mainImage.setAttribute("alt", newAlt);
           }
 
-          thumbs.forEach((item) => item.classList.remove(CLASS_NAMES.active));
-          thumb.classList.add(CLASS_NAMES.active);
+          mainImage.style.opacity = "1";
+        }, 120);
+
+        thumbs.forEach((item) => {
+          const isActive = item === thumb;
+
+          item.classList.toggle(CLASS_NAMES.active, isActive);
+          item.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+      }
+
+      thumbs.forEach((thumb) => {
+        thumb.setAttribute("aria-selected", thumb.classList.contains(CLASS_NAMES.active) ? "true" : "false");
+
+        thumb.addEventListener("click", () => {
+          updateMainImage(thumb);
+        });
+
+        thumb.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+
+          event.preventDefault();
+          updateMainImage(thumb);
         });
       });
     });
@@ -1245,6 +1296,280 @@ function initCheckoutCouponMock() {
   });
 }
 
+
+function initProductVariants() {
+  const root = $(SELECTORS.productVariants);
+
+  if (!root) return;
+
+  const options = $all(SELECTORS.variantOption, root);
+  const selectedLabel = $(SELECTORS.selectedVariantLabel, root);
+  const selectedInput = $(SELECTORS.selectedVariantInput, root);
+  const selectedWeightAttribute = $(SELECTORS.selectedWeightAttribute);
+  const priceEl = $(SELECTORS.productPrice, root);
+  const stockStatus = $(SELECTORS.productStockStatus, root);
+  const unavailableNote = $(SELECTORS.productUnavailableNote, root);
+  const addToCartButton = $(SELECTORS.addToCartButton, root);
+
+  if (options.length === 0) return;
+
+  function setButtonAvailability(isAvailable) {
+    if (!addToCartButton) return;
+
+    addToCartButton.disabled = !isAvailable;
+    addToCartButton.classList.toggle("is-disabled", !isAvailable);
+
+    if (isAvailable) {
+      addToCartButton.textContent = "افزودن به سبد خرید";
+      addToCartButton.setAttribute("aria-disabled", "false");
+    } else {
+      addToCartButton.textContent = "ناموجود";
+      addToCartButton.setAttribute("aria-disabled", "true");
+    }
+  }
+
+  function setStockStatus(isAvailable) {
+    if (!stockStatus) return;
+
+    stockStatus.classList.toggle("is-available", isAvailable);
+    stockStatus.classList.toggle("is-unavailable", !isAvailable);
+    stockStatus.textContent = isAvailable ? "آماده ارسال" : "فعلاً ناموجود";
+  }
+
+  function updateVariant(option) {
+    if (!option) return;
+
+    const variantId = option.dataset.variantId || "";
+    const variantTitle = option.dataset.variantTitle || "";
+    const variantPrice = option.dataset.variantPrice || "";
+    const isAvailable = option.dataset.variantAvailable === "true";
+
+    options.forEach((item) => {
+      const isActive = item === option;
+
+      item.classList.toggle(CLASS_NAMES.active, isActive);
+      item.setAttribute("aria-checked", isActive ? "true" : "false");
+    });
+
+    if (selectedLabel) {
+      selectedLabel.textContent = variantTitle;
+    }
+
+    if (selectedInput) {
+      selectedInput.value = variantId;
+    }
+
+    if (selectedWeightAttribute) {
+      selectedWeightAttribute.textContent = variantTitle;
+    }
+
+    if (priceEl) {
+      priceEl.textContent = variantPrice;
+    }
+
+    if (unavailableNote) {
+      unavailableNote.classList.toggle("hidden", isAvailable);
+    }
+
+    setStockStatus(isAvailable);
+    setButtonAvailability(isAvailable);
+  }
+
+  const activeOption =
+    options.find((option) => option.classList.contains(CLASS_NAMES.active)) ||
+    options.find((option) => option.dataset.variantId === root.dataset.defaultVariant) ||
+    options[0];
+
+  updateVariant(activeOption);
+
+  options.forEach((option) => {
+    option.addEventListener("click", () => {
+      updateVariant(option);
+    });
+
+    option.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+
+      event.preventDefault();
+      updateVariant(option);
+    });
+  });
+}
+
+function initCommentModal() {
+  const modal = $(SELECTORS.commentModal);
+  const overlay = $(SELECTORS.commentModalOverlay);
+  const openButtons = $all(SELECTORS.commentModalOpen);
+  const closeButtons = $all(SELECTORS.commentModalClose);
+  const form = $(SELECTORS.commentForm);
+
+  if (!modal || !overlay || openButtons.length === 0) return;
+
+  let lastFocusedElement = null;
+
+  const focusableSelector = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "textarea:not([disabled])",
+    "select:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])"
+  ].join(",");
+
+  function getFocusableElements() {
+    return $all(focusableSelector, modal);
+  }
+
+  function openModal() {
+    lastFocusedElement = document.activeElement;
+
+    modal.classList.add(CLASS_NAMES.active);
+    overlay.classList.add(CLASS_NAMES.active);
+    document.body.classList.add(CLASS_NAMES.commentModalOpen);
+
+    modal.setAttribute("aria-hidden", "false");
+    overlay.setAttribute("aria-hidden", "false");
+
+    const focusableElements = getFocusableElements();
+
+    if (focusableElements.length > 0) {
+      focusableElements[0].focus();
+    }
+  }
+
+  function closeModal() {
+    modal.classList.remove(CLASS_NAMES.active);
+    overlay.classList.remove(CLASS_NAMES.active);
+    document.body.classList.remove(CLASS_NAMES.commentModalOpen);
+
+    modal.setAttribute("aria-hidden", "true");
+    overlay.setAttribute("aria-hidden", "true");
+
+    if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+      lastFocusedElement.focus();
+    }
+  }
+
+  function trapFocus(event) {
+    if (!modal.classList.contains(CLASS_NAMES.active)) return;
+    if (event.key !== "Tab") return;
+
+    const focusableElements = getFocusableElements();
+
+    if (focusableElements.length === 0) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    }
+
+    if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  function getPersianToday() {
+    try {
+      return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(new Date());
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function createCommentCard(firstName, lastName, text) {
+    const commentsList = $(SELECTORS.commentsList);
+    const commentsEmpty = $(SELECTORS.commentsEmpty);
+
+    if (!commentsList) return;
+
+    const fullName = `${firstName} ${lastName}`.trim();
+    const avatarText = firstName.trim().charAt(0) || "ک";
+    const today = getPersianToday();
+
+    const card = document.createElement("article");
+    card.className = "product-comment-card";
+
+    card.innerHTML = `
+      <header class="product-comment-head">
+        <div class="product-comment-avatar" aria-hidden="true">${avatarText}</div>
+
+        <div>
+          <h3 class="product-comment-name"></h3>
+          <time class="product-comment-date"></time>
+        </div>
+      </header>
+
+      <p class="product-comment-text"></p>
+    `;
+
+    const nameEl = $(".product-comment-name", card);
+    const dateEl = $(".product-comment-date", card);
+    const textEl = $(".product-comment-text", card);
+
+    if (nameEl) nameEl.textContent = fullName;
+    if (dateEl) dateEl.textContent = today;
+    if (textEl) textEl.textContent = text;
+
+    commentsList.prepend(card);
+    commentsList.classList.remove("hidden");
+
+    if (commentsEmpty) {
+      commentsEmpty.classList.add("hidden");
+    }
+  }
+
+  openButtons.forEach((button) => {
+    button.addEventListener("click", openModal);
+  });
+
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", closeModal);
+  });
+
+  overlay.addEventListener("click", closeModal);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains(CLASS_NAMES.active)) {
+      closeModal();
+    }
+
+    trapFocus(event);
+  });
+
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const firstNameInput = form.querySelector("[name='first_name']");
+      const lastNameInput = form.querySelector("[name='last_name']");
+      const textInput = form.querySelector("[name='text']");
+
+      const firstName = firstNameInput ? firstNameInput.value.trim() : "";
+      const lastName = lastNameInput ? lastNameInput.value.trim() : "";
+      const text = textInput ? textInput.value.trim() : "";
+
+      if (!firstName || !lastName || !text) {
+        form.reportValidity();
+        return;
+      }
+
+      createCommentCard(firstName, lastName, text);
+      form.reset();
+      closeModal();
+    });
+  }
+}
+
+
+
   ready(function () {
     initHeaderScroll();
     initMobileMenu();
@@ -1257,6 +1582,8 @@ function initCheckoutCouponMock() {
     initOrderTabs();
     initReveal();
     initQuantityControls();
+    initProductVariants();
+    initCommentModal();
     initCartPage();
     initProductGallery();
     initAccordions();

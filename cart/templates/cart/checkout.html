@@ -9,7 +9,7 @@
 
     <!-- Checkout Steps -->
     <nav class="checkout-steps" aria-label="مراحل تکمیل خرید">
-      <a class="checkout-step is-complete" href="/cart/">
+      <a class="checkout-step is-complete" href="{% url 'cart:cart-detail' %}">
         <span class="checkout-step-dot" aria-hidden="true"></span>
         <span>سبد خرید</span>
       </a>
@@ -256,12 +256,12 @@
                 <h2 class="checkout-section-title">محصولات انتخاب‌شده</h2>
               </div>
 
-              <a class="text-link" href="/cart/">ویرایش سبد خرید</a>
+              <a class="text-link" href="{% url 'cart:cart-detail' %}">ویرایش سبد خرید</a>
             </div>
 
             <div class="checkout-items">
               <article class="checkout-order-item">
-                <a class="checkout-order-image" href="/products/white-chocolate-foil-800/">
+                <a class="checkout-order-image" href="{% url 'product:product-detail' %}">
                   <img
                     src="{% static 'images/product_1.png' %}"
                     alt="بسته وایت چاکلت فویلی ۸۰۰ گرمی"
@@ -271,7 +271,7 @@
                 <div class="checkout-order-info">
                   <span class="cart-item-category">هات‌چاکلت • ۸۰۰ گرم</span>
                   <h3 class="cart-item-title">
-                    <a href="/products/white-chocolate-foil-800/">وایت چاکلت فویلی ۸۰۰ گرمی</a>
+                    <a href="{% url 'product:product-detail' %}">وایت چاکلت فویلی ۸۰۰ گرمی</a>
                   </h3>
                   <p class="cart-item-note">
                     هزینه ارسال به‌صورت پس‌کرایه و هنگام دریافت سفارش پرداخت می‌شود.
@@ -298,7 +298,7 @@
               </article>
 
               <article class="checkout-order-item">
-                <a class="checkout-order-image" href="/products/arabica-special-coffee/">
+                <a class="checkout-order-image" href="{% url 'product:product-detail' %}">
                   <img
                     src="{% static 'images/product_2.png' %}"
                     alt="بسته قهوه عربیکا ویژه ۲۵۰ گرمی"
@@ -308,7 +308,7 @@
                 <div class="checkout-order-info">
                   <span class="cart-item-category">قهوه • ۲۵۰ گرم</span>
                   <h3 class="cart-item-title">
-                    <a href="/products/arabica-special-coffee/">قهوه عربیکا ویژه</a>
+                    <a href="{% url 'product:product-detail' %}">قهوه عربیکا ویژه</a>
                   </h3>
                   <p class="cart-item-note">
                     مناسب برای مصرف روزانه، محل کار و هدیه‌های کوچک.
@@ -454,7 +454,7 @@
               ثبت و ادامه به پرداخت
             </button>
 
-            <a class="text-link cart-continue-link" href="/cart/">
+            <a class="text-link cart-continue-link" href="{% url 'cart:cart-detail' %}">
               بازگشت به سبد خرید
             </a>
           </div>

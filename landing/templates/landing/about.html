@@ -30,7 +30,7 @@
         </p>
 
         <div class="about-hero-actions">
-          <a class="btn btn-primary" href="#">مشاهده محصولات</a>
+          <a class="btn btn-primary" href="{% url 'product:product-list' %}">مشاهده محصولات</a>
           <a class="btn btn-outline" href="{% url 'landing:contact' %}">تماس با ما</a>
         </div>
       </div>
@@ -242,7 +242,7 @@
 
       <div class="about-cta-actions">
         <a class="btn btn-primary" href="{% url 'landing:contact' %}">تماس با ما</a>
-        <a class="btn btn-outline" href="#">مشاهده محصولات</a>
+        <a class="btn btn-outline" href="{% url 'product:product-list' %}">مشاهده محصولات</a>
       </div>
     </div>
   </div>
