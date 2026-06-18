@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'cart',
     'order',
     'product',
+    'core',http://127.0.0.1:8000/
 ]
 
 MIDDLEWARE = [
