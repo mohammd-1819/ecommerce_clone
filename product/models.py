@@ -20,10 +20,10 @@ class ProductCategory(TimeStampedModel):
 
 
 class Product(TimeStampedModel):
-    class Status(models.TextChoices):
-        DRAFT = "draft", "پیش‌نویس"
-        PUBLISHED = "published", "منتشر شده"
-        ARCHIVED = "archived", "آرشیو شده"
+    
+    class StockStatus(models.TextChoices):
+        AVAILABLE = "available", "موجود"
+        UNAVAILABLE = "unavailable", "نا موجود"
 
     class Badge(models.TextChoices):
         NONE = "", "بدون نشان"
@@ -53,13 +53,13 @@ class Product(TimeStampedModel):
         default=Badge.NONE,
         verbose_name="نشان محصول",
     )
-
-    status = models.CharField(
-        max_length=20,
-        choices=Status.choices,
-        default=Status.DRAFT,
-        verbose_name="وضعیت انتشار",
+    stock_status = models.CharField(
+        max_length=30,
+        choices=StockStatus.choices,
+        default=StockStatus.AVAILABLE,
+        verbose_name="وضعیت موجودی",
     )
+    order_counter = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False, verbose_name="محصول منتخب")
     is_active = models.BooleanField(default=True, verbose_name="فعال")
 
