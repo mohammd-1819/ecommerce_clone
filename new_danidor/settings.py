@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #3rd party
+    "phonenumber_field",
+
     #local
     'landing',
     'accounts',
@@ -121,7 +124,7 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-# AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 PHONENUMBER_DEFAULT_REGION = "IR"
 PHONENUMBER_DB_FORMAT = "E164"  # store as +98...
