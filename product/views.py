@@ -1,5 +1,5 @@
 from django.db.models import Exists, OuterRef, Prefetch, Subquery
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
 from .models import (
     Product,
     ProductVariant,
@@ -9,6 +9,10 @@ from .models import (
     ProductCategory,
 )
 from .filters import ProductFilter
+from .forms import ProductReviewForm
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
 
 
@@ -137,8 +141,15 @@ class ProductDetailView(DetailView):
             .prefetch_related(
                 Prefetch("variants", queryset=active_variants),
                 Prefetch("images", queryset=product_images),
-                Prefetch("attributes", queryset=ProductAttribute.objects.order_by("created_at")),
-                Prefetch("reviews", queryset=approved_reviews, to_attr="approved_reviews"),
+                Prefetch(
+                    "attributes",
+                    queryset=ProductAttribute.objects.order_by("created_at"),
+                ),
+                Prefetch(
+                    "reviews",
+                    queryset=approved_reviews,
+                    to_attr="approved_reviews",
+                ),
             )
         )
 
@@ -148,7 +159,11 @@ class ProductDetailView(DetailView):
         product = self.object
 
         variants = list(product.variants.all())
-        default_variant = product.default_variant
+
+        default_variant = (
+            next((variant for variant in variants if variant.is_default), None)
+            or variants[0] if variants else None
+        )
 
         gallery_images = list(product.images.all())
 
@@ -163,11 +178,15 @@ class ProductDetailView(DetailView):
             .prefetch_related(
                 Prefetch(
                     "variants",
-                    queryset=ProductVariant.objects.filter(is_active=True).select_related("weight"),
+                    queryset=ProductVariant.objects
+                    .filter(is_active=True)
+                    .select_related("weight"),
                 )
             )
             .order_by("-is_featured", "-created_at")[:4]
         )
+
+        approved_reviews = getattr(product, "approved_reviews", [])
 
         context.update(
             {
@@ -175,10 +194,58 @@ class ProductDetailView(DetailView):
                 "default_variant": default_variant,
                 "gallery_images": gallery_images,
                 "attributes": product.attributes.all(),
-                "reviews": getattr(product, "approved_reviews", []),
-                "review_count": len(getattr(product, "approved_reviews", [])),
+                "reviews": approved_reviews,
+                "review_count": len(approved_reviews),
                 "related_products": related_products,
             }
         )
 
         return context
+
+
+class ProductReviewCreateView(CreateView):
+    model = ProductReview
+    form_class = ProductReviewForm
+    http_method_names = ["post"]
+
+    def dispatch(self, request, *args, **kwargs):
+        self.product = get_object_or_404(
+            Product,
+            slug=kwargs["slug"],
+            is_active=True,
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        review = form.save(commit=False)
+        review.product = self.product
+        review.status = ProductReview.Status.PENDING
+
+        if self.request.user.is_authenticated:
+            review.user = self.request.user
+
+        review.save()
+
+        messages.success(
+            self.request,
+            "دیدگاه شما ثبت شد و پس از تأیید نمایش داده می‌شود."
+        )
+
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            "ثبت دیدگاه انجام نشد. لطفاً نام، نام خانوادگی و متن دیدگاه را درست وارد کنید."
+        )
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return (
+            reverse(
+                "product:product-detail",
+                kwargs={"slug": self.product.slug},
+            )
+            + "#product-comments"
+        )

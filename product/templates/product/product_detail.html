@@ -347,7 +347,17 @@
       </button>
     </div>
 
+
     <div class="product-comments-layout">
+            {% if messages %}
+              <div class="form-messages">
+                {% for message in messages %}
+                  <div class="form-message form-message-{{ message.tags }}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
 
       {% if reviews %}
         <div class="product-comments-list" data-comments-list>
@@ -531,7 +541,7 @@
       </button>
     </header>
 
-    <form class="comment-form" method="post" action="#" data-comment-form>
+    <form class="comment-form" method="post" action="{% url 'product:product-review-create' product.slug %}" >
       {% csrf_token %}
 
       <input type="hidden" name="product_id" value="{{ product.pk }}">
