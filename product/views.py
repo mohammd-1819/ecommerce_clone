@@ -1,8 +1,15 @@
 from django.db.models import Exists, OuterRef, Prefetch, Subquery
-from django.views.generic import ListView, View
-
+from django.views.generic import ListView, DetailView
+from .models import (
+    Product,
+    ProductVariant,
+    ProductImage,
+    ProductAttribute,
+    ProductReview,
+    ProductCategory,
+)
 from .filters import ProductFilter
-from .models import Product, ProductCategory, ProductVariant
+
 
 
 class ProductListView(ListView):
@@ -96,8 +103,82 @@ class ProductListView(ListView):
         return context
 
 
-class ProductDetailView(View):
-    template_name = 'product/product_detail.html'
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = "product/product_detail.html"
+    context_object_name = "product"
+    slug_url_kwarg = "slug"
 
-    def get(self, request):
-        return render(request, self.template_name)
+    def get_queryset(self):
+        active_variants = (
+            ProductVariant.objects
+            .filter(is_active=True)
+            .select_related("weight")
+            .order_by("weight__value_grams")
+        )
+
+        product_images = (
+            ProductImage.objects
+            .select_related("variant")
+            .order_by("-is_main", "created_at")
+        )
+
+        approved_reviews = (
+            ProductReview.objects
+            .filter(status=ProductReview.Status.APPROVED)
+            .select_related("user")
+            .order_by("-created_at")
+        )
+
+        return (
+            Product.objects
+            .filter(is_active=True)
+            .select_related("category")
+            .prefetch_related(
+                Prefetch("variants", queryset=active_variants),
+                Prefetch("images", queryset=product_images),
+                Prefetch("attributes", queryset=ProductAttribute.objects.order_by("created_at")),
+                Prefetch("reviews", queryset=approved_reviews, to_attr="approved_reviews"),
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        product = self.object
+
+        variants = list(product.variants.all())
+        default_variant = product.default_variant
+
+        gallery_images = list(product.images.all())
+
+        related_products = (
+            Product.objects
+            .filter(
+                is_active=True,
+                category=product.category,
+            )
+            .exclude(pk=product.pk)
+            .select_related("category")
+            .prefetch_related(
+                Prefetch(
+                    "variants",
+                    queryset=ProductVariant.objects.filter(is_active=True).select_related("weight"),
+                )
+            )
+            .order_by("-is_featured", "-created_at")[:4]
+        )
+
+        context.update(
+            {
+                "variants": variants,
+                "default_variant": default_variant,
+                "gallery_images": gallery_images,
+                "attributes": product.attributes.all(),
+                "reviews": getattr(product, "approved_reviews", []),
+                "review_count": len(getattr(product, "approved_reviews", [])),
+                "related_products": related_products,
+            }
+        )
+
+        return context

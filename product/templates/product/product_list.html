@@ -184,7 +184,7 @@
                 <span class="product-badge">{{ product.get_badge_display }}</span>
               {% endif %}
 
-              <a class="product-image-link" href="{{ product_detail_url }}">
+              <a class="product-image-link" href="{% url 'product:product-detail' product.slug %}">
                 <div class="product-image-wrap">
                   {% if product.main_image %}
                     <img
@@ -213,7 +213,7 @@
                 </span>
 
                 <h2 class="product-title">
-                  <a href="{{ product_detail_url }}">{{ product.title }}</a>
+                  <a href="{% url 'product:product-detail' product.slug %}">{{ product.title }}</a>
                 </h2>
 
                 <div class="product-meta">

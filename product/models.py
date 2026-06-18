@@ -223,6 +223,10 @@ class ProductReview(TimeStampedModel):
         verbose_name = "دیدگاه محصول"
         verbose_name_plural = "دیدگاه‌های محصول"
         ordering = ["-created_at"]
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
 
     def __str__(self):
         return f"{self.product.title} - {self.full_name}"
