@@ -13,7 +13,7 @@ from .models import Cart, CartItem
 
 
 
-
+SESSION_CART_ID = "anonymous_cart_id"
 MAX_CART_ITEM_QUANTITY = 20
 TAX_PERCENT = 10
 
@@ -83,28 +83,58 @@ def _merge_cart_items(source_cart, target_cart):
     return target_cart
 
 
+def _get_session_cart_id(request):
+    cart_id = request.session.get(SESSION_CART_ID)
+
+    try:
+        return int(cart_id)
+    except (TypeError, ValueError):
+        return None
+
+
+def _remember_anonymous_cart(request, cart):
+    request.session[SESSION_CART_ID] = cart.pk
+    request.session.modified = True
+
+
+def _forget_anonymous_cart(request):
+    if SESSION_CART_ID in request.session:
+        request.session.pop(SESSION_CART_ID, None)
+        request.session.modified = True
+
+
 def get_active_cart(request, *, create=False, lock=False):
     """
     Returns the current active cart for both authenticated and anonymous users.
 
-    Authenticated user:
-      - use user's active cart
-      - if the browser has an anonymous active cart, merge it into the user cart
-
-    Anonymous user:
-      - use session_key active cart
-      - create it only when create=True
+    Why we store anonymous_cart_id in the session:
+    Django may change the session_key during login, so looking up the anonymous
+    cart only by session_key can fail after authentication.
     """
     cart_qs = Cart.objects
     if lock:
         cart_qs = cart_qs.select_for_update()
 
     session_key = request.session.session_key
+    session_cart_id = _get_session_cart_id(request)
 
     if request.user.is_authenticated:
         anonymous_cart = None
 
-        if session_key:
+        # First try by cart id stored in session.
+        if session_cart_id:
+            anonymous_cart = (
+                cart_qs.filter(
+                    pk=session_cart_id,
+                    status=Cart.Status.ACTIVE,
+                    user__isnull=True,
+                )
+                .prefetch_related("items")
+                .first()
+            )
+
+        # Fallback for older anonymous carts created before this fix.
+        if not anonymous_cart and session_key:
             anonymous_cart = (
                 cart_qs.filter(
                     status=Cart.Status.ACTIVE,
@@ -124,19 +154,27 @@ def get_active_cart(request, *, create=False, lock=False):
             .first()
         )
 
+        # Existing user cart + anonymous cart: merge anonymous into user cart.
         if user_cart and anonymous_cart:
-            return _merge_cart_items(anonymous_cart, user_cart)
+            merged_cart = _merge_cart_items(anonymous_cart, user_cart)
+            _forget_anonymous_cart(request)
+            return merged_cart
 
+        # No user cart, but there is an anonymous cart: assign it to the user.
         if anonymous_cart and not user_cart:
             anonymous_cart.user = request.user
             anonymous_cart.session_key = ""
             anonymous_cart.save(update_fields=["user", "session_key", "updated_at"])
+            _forget_anonymous_cart(request)
             return anonymous_cart
 
+        # Existing user cart only.
         if user_cart:
+            _forget_anonymous_cart(request)
             return user_cart
 
         if create:
+            _forget_anonymous_cart(request)
             return Cart.objects.create(
                 user=request.user,
                 status=Cart.Status.ACTIVE,
@@ -144,31 +182,50 @@ def get_active_cart(request, *, create=False, lock=False):
 
         return None
 
-    # Anonymous user
+    # Anonymous user.
     if not session_key:
         if not create:
             return None
         session_key = _ensure_session_key(request)
 
-    anonymous_cart = (
-        cart_qs.filter(
-            status=Cart.Status.ACTIVE,
-            user__isnull=True,
-            session_key=session_key,
+    anonymous_cart = None
+
+    # Prefer cart id from session.
+    if session_cart_id:
+        anonymous_cart = (
+            cart_qs.filter(
+                pk=session_cart_id,
+                status=Cart.Status.ACTIVE,
+                user__isnull=True,
+            )
+            .prefetch_related("items")
+            .first()
         )
-        .prefetch_related("items")
-        .first()
-    )
+
+    # Fallback to session_key.
+    if not anonymous_cart:
+        anonymous_cart = (
+            cart_qs.filter(
+                status=Cart.Status.ACTIVE,
+                user__isnull=True,
+                session_key=session_key,
+            )
+            .prefetch_related("items")
+            .first()
+        )
 
     if anonymous_cart:
+        _remember_anonymous_cart(request, anonymous_cart)
         return anonymous_cart
 
     if create:
-        return Cart.objects.create(
+        anonymous_cart = Cart.objects.create(
             user=None,
             session_key=session_key,
             status=Cart.Status.ACTIVE,
         )
+        _remember_anonymous_cart(request, anonymous_cart)
+        return anonymous_cart
 
     return None
 
