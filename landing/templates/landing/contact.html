@@ -173,76 +173,155 @@
         </div>
       </div>
 
-      <form class="form-card contact-form" action="#" method="post">
-        {% csrf_token %}
+      <div class="contact-form-panel">
 
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label" for="contact-name">نام و نام خانوادگی</label>
-            <input
-              class="form-input"
-              id="contact-name"
-              name="name"
-              type="text"
-              placeholder="مثلاً علی رضایی"
-              autocomplete="name"
-            >
+        {% if messages %}
+          <div class="contact-messages">
+            {% for message in messages %}
+              <div class="contact-message contact-message-{{ message.tags }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form
+          class="form-card contact-form"
+          action="{% url 'landing:contact' %}"
+          method="post"
+          novalidate
+        >
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="form-errors form-errors-global">
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="{{ form.first_name.id_for_label }}">
+                {{ form.first_name.label }}
+              </label>
+              {{ form.first_name }}
+
+              {% if form.first_name.errors %}
+                <div class="form-errors">
+                  {% for error in form.first_name.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="{{ form.last_name.id_for_label }}">
+                {{ form.last_name.label }}
+              </label>
+              {{ form.last_name }}
+
+              {% if form.last_name.errors %}
+                <div class="form-errors">
+                  {% for error in form.last_name.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="{{ form.phone.id_for_label }}">
+                {{ form.phone.label }}
+              </label>
+              {{ form.phone }}
+
+              {% if form.phone.errors %}
+                <div class="form-errors">
+                  {% for error in form.phone.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="{{ form.email.id_for_label }}">
+                {{ form.email.label }}
+              </label>
+              {{ form.email }}
+
+              {% if form.email.errors %}
+                <div class="form-errors">
+                  {% for error in form.email.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="{{ form.subject.id_for_label }}">
+                {{ form.subject.label }}
+              </label>
+              {{ form.subject }}
+
+              {% if form.subject.errors %}
+                <div class="form-errors">
+                  {% for error in form.subject.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="{{ form.request_type.id_for_label }}">
+                {{ form.request_type.label }}
+              </label>
+              {{ form.request_type }}
+
+              {% if form.request_type.errors %}
+                <div class="form-errors">
+                  {% for error in form.request_type.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group form-group-full">
+              <label class="form-label" for="{{ form.message.id_for_label }}">
+                {{ form.message.label }}
+              </label>
+              {{ form.message }}
+
+              {% if form.message.errors %}
+                <div class="form-errors">
+                  {% for error in form.message.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="contact-phone">شماره تماس</label>
-            <input
-              class="form-input"
-              id="contact-phone"
-              name="phone"
-              type="tel"
-              placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-              autocomplete="tel"
-            >
-          </div>
+          <div class="contact-form-actions">
+            <button class="btn btn-primary" type="submit">
+              ارسال پیام
+            </button>
 
-          <div class="form-group">
-            <label class="form-label" for="contact-subject">موضوع پیام</label>
-            <input
-              class="form-input"
-              id="contact-subject"
-              name="subject"
-              type="text"
-              placeholder="مثلاً خرید عمده"
-            >
+            <p class="contact-form-note">
+              اطلاعات شما فقط برای پاسخ‌گویی به همین درخواست استفاده می‌شود.
+            </p>
           </div>
+        </form>
 
-          <div class="form-group">
-            <label class="form-label" for="contact-type">نوع درخواست</label>
-            <select class="form-select" id="contact-type" name="request_type">
-              <option value="">انتخاب کنید</option>
-              <option value="product">سوال درباره محصول</option>
-              <option value="wholesale">خرید عمده</option>
-              <option value="order">پیگیری سفارش</option>
-              <option value="cooperation">همکاری و نمایندگی</option>
-            </select>
-          </div>
-
-          <div class="form-group form-group-full">
-            <label class="form-label" for="contact-message">متن پیام</label>
-            <textarea
-              class="form-textarea"
-              id="contact-message"
-              name="message"
-              placeholder="درخواست یا سوال خود را بنویسید..."
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="contact-form-actions">
-          <button class="btn btn-primary" type="submit">
-            ارسال پیام
-          </button>
-          <p class="contact-form-note">
-            اطلاعات شما فقط برای پاسخ‌گویی به همین درخواست استفاده می‌شود.
-          </p>
-        </div>
-      </form>
+      </div>
 
     </div>
   </div>

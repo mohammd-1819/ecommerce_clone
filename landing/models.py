@@ -43,6 +43,10 @@ class ContactRequest(TimeStampedModel):
         verbose_name = "درخواست تماس"
         verbose_name_plural = "درخواست‌های تماس"
         ordering = ["-created_at"]
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
 
     def __str__(self):
         return f"{self.full_name} - {self.subject}"
