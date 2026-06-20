@@ -1,0 +1,906 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}تکمیل خرید | نام برند{% endblock %}
+
+{% block content %}
+<section class="cart-page checkout-page section-sm">
+  <div class="container">
+
+    <!-- Checkout Steps -->
+    <nav class="checkout-steps" aria-label="مراحل تکمیل خرید">
+      <a class="checkout-step is-complete" href="{% url 'cart:cart-detail' %}">
+        <span class="checkout-step-dot" aria-hidden="true"></span>
+        <span>سبد خرید</span>
+      </a>
+
+      <span class="checkout-step-line" aria-hidden="true"></span>
+
+      <span class="checkout-step is-active" aria-current="step">
+        <span class="checkout-step-dot" aria-hidden="true"></span>
+        <span>آدرس و نحوه دریافت</span>
+      </span>
+
+      <span class="checkout-step-line" aria-hidden="true"></span>
+
+      <span class="checkout-step">
+        <span class="checkout-step-dot" aria-hidden="true"></span>
+        <span>درگاه پرداخت</span>
+      </span>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="cart-header checkout-header">
+      <div>
+        <span class="section-eyebrow">تکمیل خرید</span>
+        <h1 class="cart-title">آدرس و نحوه دریافت سفارش</h1>
+        <p class="cart-subtitle">
+          اطلاعات ارسال را بررسی کنید و سپس سفارش خود را برای پرداخت نهایی ثبت کنید.
+        </p>
+      </div>
+    </header>
+
+    <form
+      class="checkout-form"
+      method="post"
+      action="{% url 'order:checkout-detail' %}"
+      data-checkout-form
+    >
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="form-errors">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="checkout-layout checkout-grid">
+
+        <!-- Main Checkout Content -->
+        <div class="checkout-main">
+
+          <!-- Address Selection -->
+          <section class="checkout-section card">
+            <div class="checkout-section-head">
+              <div>
+                <span class="checkout-section-kicker">آدرس گیرنده</span>
+                <h2 class="checkout-section-title">سفارش شما به این آدرس ارسال می‌شود</h2>
+              </div>
+
+              <button
+                class="btn btn-outline btn-sm"
+                type="button"
+                data-address-modal-open
+                data-address-mode="create"
+              >
+                افزودن آدرس جدید
+              </button>
+            </div>
+
+            {% if form.shipping_address.errors %}
+              <p class="form-error">{{ form.shipping_address.errors|striptags }}</p>
+            {% endif %}
+
+            <div class="checkout-address-list" role="radiogroup" aria-label="انتخاب آدرس ارسال">
+              {% if addresses %}
+                {% with selected_address_id=form.shipping_address.value|stringformat:"s" %}
+                  {% for address in addresses %}
+                    {% with address_id=address.pk|stringformat:"s" %}
+                      <label
+                        class="checkout-address-card {% if selected_address_id == address_id or not selected_address_id and forloop.first %}is-active{% endif %}"
+                        data-checkout-choice
+                      >
+                        <input
+                          class="checkout-choice-input"
+                          type="radio"
+                          name="shipping_address"
+                          value="{{ address.pk }}"
+                          {% if selected_address_id == address_id or not selected_address_id and forloop.first %}checked{% endif %}
+                          required
+                        >
+
+                        <span class="checkout-choice-mark" aria-hidden="true"></span>
+
+                        <span class="checkout-choice-body">
+                          <span class="checkout-address-title">
+                            {{ address.title|default:"آدرس من" }}
+                          </span>
+
+                          <span class="checkout-address-text">
+                            {% if address.province %}{{ address.province }}{% endif %}
+                            {% if address.city %}، {{ address.city }}{% endif %}
+                            {% if address.postal_address %}، {{ address.postal_address }}{% endif %}
+                            {% if address.plaque_number %}، پلاک {{ address.plaque_number }}{% endif %}
+                            {% if address.unit %}، واحد {{ address.unit }}{% endif %}
+                          </span>
+
+                          <span class="checkout-address-meta">
+                            <span>گیرنده: {{ address.full_name|default:"-" }}</span>
+                            <span>شماره تماس: {{ address.phone_number|default:"-" }}</span>
+                            {% if address.zip_code %}
+                              <span>کد پستی: {{ address.zip_code }}</span>
+                            {% endif %}
+                          </span>
+                        </span>
+
+                        <button
+                          class="checkout-address-edit"
+                          type="button"
+                          data-address-modal-open
+                          data-address-mode="edit"
+                          data-address-id="{{ address.pk }}"
+                          data-recipient-name="{{ address.full_name|default_if_none:'' }}"
+                          data-recipient-phone="{{ address.phone_number|default_if_none:'' }}"
+                          data-province="{{ address.province|default_if_none:'' }}"
+                          data-city="{{ address.city|default_if_none:'' }}"
+                          data-postal-code="{{ address.zip_code|default_if_none:'' }}"
+                          data-address-line="{{ address.postal_address|default_if_none:'' }}"
+                          aria-label="ویرایش {{ address.title|default:'آدرس' }}"
+                        >
+                          تغییر یا ویرایش آدرس
+                        </button>
+                      </label>
+                    {% endwith %}
+                  {% endfor %}
+                {% endwith %}
+              {% else %}
+                <div class="empty-state">
+                  <p>هنوز آدرسی برای حساب شما ثبت نشده است.</p>
+                  <p>برای ادامه خرید، ابتدا یک آدرس اضافه کنید.</p>
+                </div>
+              {% endif %}
+            </div>
+          </section>
+
+          <!-- Shipping Method -->
+          <section class="checkout-section card">
+            <div class="checkout-section-head">
+              <div>
+                <span class="checkout-section-kicker">نحوه دریافت</span>
+                <h2 class="checkout-section-title">روش ارسال سفارش</h2>
+              </div>
+            </div>
+
+            {% if form.shipping_method.errors %}
+              <p class="form-error">{{ form.shipping_method.errors|striptags }}</p>
+            {% endif %}
+
+            {% with selected_shipping_method=form.shipping_method.value|default:"post" %}
+              <div class="shipping-methods" role="radiogroup" aria-label="انتخاب روش ارسال">
+                <label
+                  class="checkout-method-card {% if selected_shipping_method == 'post' %}is-active{% endif %}"
+                  data-checkout-choice
+                >
+                  <input
+                    class="checkout-choice-input"
+                    type="radio"
+                    name="shipping_method"
+                    value="post"
+                    {% if selected_shipping_method == 'post' %}checked{% endif %}
+                    required
+                  >
+
+                  <span class="checkout-choice-mark" aria-hidden="true"></span>
+
+                  <span class="checkout-method-body">
+                    <span class="checkout-method-title">ارسال با پست</span>
+                    <span class="checkout-method-text">
+                      تحویل حدود ۲ تا ۴ روز کاری، هزینه ارسال به‌صورت پس‌کرایه دریافت می‌شود.
+                    </span>
+                  </span>
+
+                  <span class="checkout-method-price">پس‌کرایه</span>
+                </label>
+
+                <label
+                  class="checkout-method-card {% if selected_shipping_method == 'courier' %}is-active{% endif %}"
+                  data-checkout-choice
+                >
+                  <input
+                    class="checkout-choice-input"
+                    type="radio"
+                    name="shipping_method"
+                    value="courier"
+                    {% if selected_shipping_method == 'courier' %}checked{% endif %}
+                  >
+
+                  <span class="checkout-choice-mark" aria-hidden="true"></span>
+
+                  <span class="checkout-method-body">
+                    <span class="checkout-method-title">ارسال سریع شهری</span>
+                    <span class="checkout-method-text">
+                      مناسب سفارش‌های داخل تهران؛ زمان و هزینه ارسال پس از ثبت سفارش هماهنگ می‌شود.
+                    </span>
+                  </span>
+
+                  <span class="checkout-method-price">هماهنگی</span>
+                </label>
+              </div>
+            {% endwith %}
+          </section>
+
+          <!-- Order Items -->
+          <section class="checkout-section card">
+            <div class="checkout-section-head">
+              <div>
+                <span class="checkout-section-kicker">اقلام سفارش</span>
+                <h2 class="checkout-section-title">محصولات انتخاب‌شده</h2>
+              </div>
+
+              <a class="text-link" href="{% url 'cart:cart-detail' %}">ویرایش سبد خرید</a>
+            </div>
+
+            <div class="checkout-items">
+              {% for item in cart_items %}
+                <article class="checkout-order-item">
+                  <a class="checkout-order-image" href="#">
+                    {% if item.variant.product.main_image %}
+                      <img
+                        src="{{ item.variant.product.main_image.url }}"
+                        alt="{{ item.variant.product.title }}"
+                      >
+                    {% else %}
+                      <img
+                        src="{% static 'images/product_1.png' %}"
+                        alt="{{ item.variant.product.title }}"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <div class="checkout-order-info">
+                    <span class="cart-item-category">
+                      {{ item.variant.product.category.title }}
+                      {% if item.variant.weight %}
+                        • {{ item.variant.weight.title }}
+                      {% endif %}
+                    </span>
+
+                    <h3 class="cart-item-title">
+                      <a href="#">{{ item.variant.product.title }}</a>
+                    </h3>
+
+                    <p class="cart-item-note">
+                      هزینه ارسال به‌صورت پس‌کرایه و هنگام دریافت سفارش پرداخت می‌شود.
+                    </p>
+                  </div>
+
+                  <div class="checkout-order-detail">
+                    <span class="cart-item-label">تعداد</span>
+                    <strong>{{ item.quantity|intcomma }}</strong>
+                  </div>
+
+                  <div class="checkout-order-detail">
+                    <span class="cart-item-label">قیمت واحد</span>
+                    <strong>{{ item.unit_price_toman|intcomma }} تومان</strong>
+                  </div>
+
+                  <div class="checkout-order-detail">
+                    <span class="cart-item-label">جمع این کالا</span>
+                    <strong>{{ item.line_total_toman|intcomma }} تومان</strong>
+                  </div>
+                </article>
+              {% empty %}
+                <div class="empty-state">
+                  <p>سبد خرید شما خالی است.</p>
+                  <a class="text-link" href="{% url 'cart:cart-detail' %}">بازگشت به سبد خرید</a>
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+
+          <!-- Payment Method -->
+          <section class="checkout-section card">
+            <div class="checkout-section-head">
+              <div>
+                <span class="checkout-section-kicker">روش پرداخت</span>
+                <h2 class="checkout-section-title">انتخاب روش پرداخت</h2>
+              </div>
+            </div>
+
+            {% if form.payment_method.errors %}
+              <p class="form-error">{{ form.payment_method.errors|striptags }}</p>
+            {% endif %}
+
+            <div class="payment-methods" role="radiogroup" aria-label="انتخاب روش پرداخت">
+              {% if payment_methods %}
+                {% with selected_payment_method=form.payment_method.value %}
+                  {% for method in payment_methods %}
+                    <label
+                      class="checkout-method-card {% if selected_payment_method == method.code or not selected_payment_method and forloop.first %}is-active{% endif %}"
+                      data-checkout-choice
+                    >
+                      <input
+                        class="checkout-choice-input"
+                        type="radio"
+                        name="payment_method"
+                        value="{{ method.code }}"
+                        {% if selected_payment_method == method.code or not selected_payment_method and forloop.first %}checked{% endif %}
+                        required
+                      >
+
+                      <span class="checkout-choice-mark" aria-hidden="true"></span>
+
+                      <span class="checkout-method-body">
+                        <span class="checkout-method-title">{{ method.title }}</span>
+
+                        {% if method.description %}
+                          <span class="checkout-method-text">{{ method.description }}</span>
+                        {% elif method.is_online %}
+                          <span class="checkout-method-text">
+                            پس از ثبت سفارش به درگاه بانکی منتقل می‌شوید.
+                          </span>
+                        {% else %}
+                          <span class="checkout-method-text">
+                            پرداخت این سفارش به‌صورت غیرآنلاین انجام می‌شود.
+                          </span>
+                        {% endif %}
+                      </span>
+
+                      <span class="checkout-method-price">
+                        {% if method.is_online %}
+                          درگاه امن
+                        {% else %}
+                          پرداخت غیرآنلاین
+                        {% endif %}
+                      </span>
+                    </label>
+                  {% endfor %}
+                {% endwith %}
+              {% else %}
+                <div class="empty-state">
+                  <p>در حال حاضر روش پرداخت فعالی وجود ندارد.</p>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group form-field form-group-full checkout-note-field">
+              <label class="form-label" for="order_note">توضیحات سفارش</label>
+              <textarea
+                class="form-textarea"
+                id="order_note"
+                name="order_note"
+                placeholder="اگر نکته‌ای درباره زمان تحویل یا بسته‌بندی دارید، اینجا بنویسید."
+              >{{ form.order_note.value|default_if_none:'' }}</textarea>
+
+              {% if form.order_note.errors %}
+                <p class="form-error">{{ form.order_note.errors|striptags }}</p>
+              {% endif %}
+            </div>
+          </section>
+        </div>
+
+        <!-- Summary Sidebar -->
+        <aside class="checkout-summary cart-summary" aria-label="خلاصه سفارش">
+          <div class="cart-summary-card">
+            <div class="cart-summary-head">
+              <h2>خلاصه سفارش</h2>
+              <span>{{ summary.items_count|intcomma }} کالا</span>
+            </div>
+
+            <div class="cart-summary-row">
+              <span>جمع قیمت کالاها</span>
+              <strong data-checkout-subtotal>
+                {{ summary.subtotal_toman|intcomma }} تومان
+              </strong>
+            </div>
+
+            <div class="cart-summary-row">
+              <span>مالیات</span>
+              <strong data-checkout-tax>
+                {{ summary.tax_toman|intcomma }} تومان
+              </strong>
+            </div>
+
+            <div class="cart-summary-row">
+              <span>هزینه ارسال</span>
+              <strong class="cart-summary-shipping" data-checkout-shipping>
+                {% if summary.shipping_price_toman %}
+                  {{ summary.shipping_price_toman|intcomma }} تومان
+                {% else %}
+                  پس‌کرایه
+                {% endif %}
+              </strong>
+            </div>
+
+            <div
+              class="checkout-coupon"
+              data-checkout-coupon
+              data-coupon-url="{% url 'order:coupon-apply' %}"
+            >
+              <label class="checkout-coupon-label" for="checkout_coupon">
+                کد تخفیف
+              </label>
+
+              <div class="checkout-coupon-control">
+                <input
+                  class="form-input checkout-coupon-input"
+                  id="checkout_coupon"
+                  name="coupon_code"
+                  type="text"
+                  value="{{ coupon_form.coupon_code.value|default_if_none:'' }}"
+                  placeholder="مثلاً WARM10"
+                  autocomplete="off"
+                  data-checkout-coupon-input
+                >
+
+                <button
+                  class="btn btn-outline checkout-coupon-btn"
+                  type="button"
+                  data-checkout-coupon-apply
+                >
+                  اعمال
+                </button>
+              </div>
+
+              <p class="checkout-coupon-message" data-checkout-coupon-message>
+                {% if summary.coupon %}
+                  کد تخفیف {{ summary.coupon.code }} اعمال شده است.
+                {% else %}
+                  اگر کد تخفیف دارید، اینجا وارد کنید.
+                {% endif %}
+              </p>
+            </div>
+
+            <div
+              class="cart-summary-row checkout-discount-row {% if not summary.discount_toman %}hidden{% endif %}"
+              data-checkout-discount-row
+            >
+              <span>تخفیف</span>
+              <strong data-checkout-discount-amount>
+                - {{ summary.discount_toman|intcomma }} تومان
+              </strong>
+            </div>
+
+            <div class="cart-summary-divider" aria-hidden="true"></div>
+
+            <div class="cart-summary-total">
+              <span>مبلغ قابل پرداخت</span>
+              <strong
+                data-checkout-final-total
+                data-base-total="{{ summary.total_toman }}"
+              >
+                {{ summary.total_toman|intcomma }} تومان
+              </strong>
+            </div>
+
+            <p class="cart-summary-note">
+              هزینه ارسال در این مرحله محاسبه نمی‌شود و هنگام تحویل سفارش دریافت خواهد شد.
+            </p>
+
+            <button
+              class="btn btn-primary cart-submit-btn"
+              type="submit"
+              {% if not addresses or not payment_methods or not cart_items %}disabled{% endif %}
+            >
+              ثبت و ادامه به پرداخت
+            </button>
+
+            <a class="text-link cart-continue-link" href="{% url 'cart:cart-detail' %}">
+              بازگشت به سبد خرید
+            </a>
+          </div>
+        </aside>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Address Modal -->
+<div
+  class="address-modal"
+  data-address-modal
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="address_modal_title"
+>
+  <div class="address-modal-backdrop" data-address-modal-close></div>
+
+  <div class="address-modal-dialog">
+    <div class="address-modal-head">
+      <div>
+        <h2 class="address-modal-title" id="address_modal_title" data-address-modal-title>
+          افزودن آدرس جدید
+        </h2>
+        <p class="address-modal-description">
+          آدرس را دقیق وارد کنید تا سفارش بدون تأخیر ارسال شود.
+        </p>
+      </div>
+
+      <button
+        class="address-modal-close"
+        type="button"
+        data-address-modal-close
+        aria-label="بستن پنجره آدرس"
+      >
+        ×
+      </button>
+    </div>
+
+    {% comment %} {# 
+      This modal needs separate address create/update views.
+      The checkout views we wrote only select an existing address.
+    #} {% endcomment %}
+    <form
+      class="address-form"
+      action="{% url 'order:address-save' %}"
+      method="post"
+      data-address-form
+    >
+      {% csrf_token %}
+
+      <input type="hidden" name="address_id" data-address-id-input>
+
+      <p
+      class="checkout-coupon-message"
+      data-address-form-message
+      hidden
+    ></p>
+
+      <div class="form-grid address-form-grid">
+        <div class="form-group form-field">
+          <label class="form-label" for="address_recipient_name">نام گیرنده</label>
+          <input
+            class="form-input"
+            id="address_recipient_name"
+            name="recipient_name"
+            type="text"
+            data-address-field="recipient_name"
+            required
+          >
+        </div>
+
+        <div class="form-group form-field">
+          <label class="form-label" for="address_recipient_phone">شماره تماس گیرنده</label>
+          <input
+            class="form-input"
+            id="address_recipient_phone"
+            name="recipient_phone"
+            type="tel"
+            dir="ltr"
+            data-address-field="recipient_phone"
+            required
+          >
+        </div>
+
+        <div class="form-group form-field">
+          <label class="form-label" for="address_province">استان</label>
+          <input
+            class="form-input"
+            id="address_province"
+            name="province"
+            type="text"
+            data-address-field="province"
+            required
+          >
+        </div>
+
+        <div class="form-group form-field">
+          <label class="form-label" for="address_city">شهر</label>
+          <input
+            class="form-input"
+            id="address_city"
+            name="city"
+            type="text"
+            data-address-field="city"
+            required
+          >
+        </div>
+
+        <div class="form-group form-field">
+          <label class="form-label" for="address_postal_code">کد پستی</label>
+          <input
+            class="form-input"
+            id="address_postal_code"
+            name="postal_code"
+            type="text"
+            dir="ltr"
+            data-address-field="postal_code"
+          >
+        </div>
+
+        <div class="form-group form-field form-group-full">
+          <label class="form-label" for="address_line">آدرس کامل</label>
+          <textarea
+            class="form-textarea"
+            id="address_line"
+            name="address_line"
+            data-address-field="address_line"
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="address-modal-actions">
+        <button class="btn btn-primary" type="submit">
+          <span data-address-submit-text>ذخیره آدرس</span>
+        </button>
+
+        <button class="btn btn-outline" type="button" data-address-modal-close>
+          انصراف
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const couponRoot = document.querySelector("[data-checkout-coupon]");
+    if (!couponRoot) return;
+
+    const couponUrl = couponRoot.dataset.couponUrl;
+    const input = couponRoot.querySelector("[data-checkout-coupon-input]");
+    const button = couponRoot.querySelector("[data-checkout-coupon-apply]");
+    const message = couponRoot.querySelector("[data-checkout-coupon-message]");
+    const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+
+    const subtotalEl = document.querySelector("[data-checkout-subtotal]");
+    const taxEl = document.querySelector("[data-checkout-tax]");
+    const shippingEl = document.querySelector("[data-checkout-shipping]");
+    const discountRow = document.querySelector("[data-checkout-discount-row]");
+    const discountAmountEl = document.querySelector("[data-checkout-discount-amount]");
+    const finalTotalEl = document.querySelector("[data-checkout-final-total]");
+
+    function setMessage(text, isError) {
+      if (!message) return;
+
+      message.textContent = text || "";
+
+      message.classList.remove("is-success", "is-error");
+      message.classList.add(isError ? "is-error" : "is-success");
+    }
+
+    function applySummary(summary) {
+      if (!summary) return;
+
+      if (subtotalEl) subtotalEl.textContent = summary.subtotal_display;
+      if (taxEl) taxEl.textContent = summary.tax_display;
+      if (shippingEl) shippingEl.textContent = summary.shipping_display;
+
+      if (discountRow && discountAmountEl) {
+        if (summary.discount_toman > 0) {
+          discountRow.classList.remove("hidden");
+          discountAmountEl.textContent = summary.discount_display;
+        } else {
+          discountRow.classList.add("hidden");
+          discountAmountEl.textContent = "- ۰ تومان";
+        }
+      }
+
+      if (finalTotalEl) {
+        finalTotalEl.textContent = summary.total_display;
+        finalTotalEl.dataset.baseTotal = summary.total_toman;
+      }
+    }
+
+    button.addEventListener("click", function () {
+      const code = input.value.trim();
+
+      const formData = new FormData();
+      formData.append("coupon_code", code);
+
+      button.disabled = true;
+
+      fetch(couponUrl, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": csrfInput ? csrfInput.value : "",
+          "X-Requested-With": "XMLHttpRequest",
+          "Accept": "application/json"
+        }
+      })
+        .then(async function (response) {
+          let data = {};
+
+          try {
+            data = await response.json();
+          } catch (error) {
+            data = {};
+          }
+
+          if (!response.ok) {
+            throw data;
+          }
+
+          return data;
+        })
+        .then(function (data) {
+          applySummary(data.summary);
+          setMessage(data.message || "کد تخفیف اعمال شد.", false);
+        })
+        .catch(function (data) {
+          applySummary(data.summary);
+          setMessage(data.message || "امکان اعمال کد تخفیف وجود ندارد.", true);
+        })
+        .finally(function () {
+          button.disabled = false;
+        });
+    });
+  })();
+</script>
+{% endblock %}
+
+
+{% block extra_js %}
+  <script>
+  (function () {
+    const modal = document.querySelector("[data-address-modal]");
+    const form = document.querySelector("[data-address-form]");
+
+    if (!modal || !form) return;
+
+    const openButtons = document.querySelectorAll("[data-address-modal-open]");
+    const closeButtons = modal.querySelectorAll("[data-address-modal-close]");
+
+    const titleEl = modal.querySelector("[data-address-modal-title]");
+    const submitTextEl = modal.querySelector("[data-address-submit-text]");
+    const messageEl = modal.querySelector("[data-address-form-message]");
+    const idInput = modal.querySelector("[data-address-id-input]");
+
+    const fields = {
+      recipient_name: modal.querySelector('[data-address-field="recipient_name"]'),
+      recipient_phone: modal.querySelector('[data-address-field="recipient_phone"]'),
+      province: modal.querySelector('[data-address-field="province"]'),
+      city: modal.querySelector('[data-address-field="city"]'),
+      postal_code: modal.querySelector('[data-address-field="postal_code"]'),
+      address_line: modal.querySelector('[data-address-field="address_line"]')
+    };
+
+    function showMessage(text, isError) {
+      if (!messageEl) return;
+
+      messageEl.hidden = false;
+      messageEl.textContent = text || "";
+
+      messageEl.classList.remove("is-success", "is-error");
+      messageEl.classList.add(isError ? "is-error" : "is-success");
+    }
+
+    function hideMessage() {
+      if (!messageEl) return;
+
+      messageEl.hidden = true;
+      messageEl.textContent = "";
+      messageEl.classList.remove("is-success", "is-error");
+    }
+
+    function setFieldValue(fieldName, value) {
+      if (!fields[fieldName]) return;
+      fields[fieldName].value = value || "";
+    }
+
+    function resetForm() {
+      form.reset();
+      hideMessage();
+
+      if (idInput) {
+        idInput.value = "";
+      }
+
+      Object.keys(fields).forEach(function (key) {
+        setFieldValue(key, "");
+      });
+    }
+
+    function openModal(button) {
+      const mode = button.dataset.addressMode || "create";
+
+      resetForm();
+
+      if (mode === "edit") {
+        if (titleEl) titleEl.textContent = "ویرایش آدرس";
+        if (submitTextEl) submitTextEl.textContent = "ذخیره تغییرات";
+
+        if (idInput) {
+          idInput.value = button.dataset.addressId || "";
+        }
+
+        setFieldValue("recipient_name", button.dataset.recipientName);
+        setFieldValue("recipient_phone", button.dataset.recipientPhone);
+        setFieldValue("province", button.dataset.province);
+        setFieldValue("city", button.dataset.city);
+        setFieldValue("postal_code", button.dataset.postalCode);
+        setFieldValue("address_line", button.dataset.addressLine);
+      } else {
+        if (titleEl) titleEl.textContent = "افزودن آدرس جدید";
+        if (submitTextEl) submitTextEl.textContent = "ذخیره آدرس";
+      }
+
+      modal.setAttribute("aria-hidden", "false");
+      modal.classList.add("is-open");
+      document.body.classList.add("modal-open");
+
+      const firstInput = modal.querySelector("input:not([type='hidden']), textarea");
+      if (firstInput) {
+        setTimeout(function () {
+          firstInput.focus();
+        }, 50);
+      }
+    }
+
+    function closeModal() {
+      modal.setAttribute("aria-hidden", "true");
+      modal.classList.remove("is-open");
+      document.body.classList.remove("modal-open");
+    }
+
+    openButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        openModal(button);
+      });
+    });
+
+    closeButtons.forEach(function (button) {
+      button.addEventListener("click", closeModal);
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && modal.getAttribute("aria-hidden") === "false") {
+        closeModal();
+      }
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      hideMessage();
+
+      const submitButton = form.querySelector("button[type='submit']");
+      const csrfInput = form.querySelector("input[name='csrfmiddlewaretoken']");
+      const formData = new FormData(form);
+
+      if (submitButton) {
+        submitButton.disabled = true;
+      }
+
+      fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": csrfInput ? csrfInput.value : "",
+          "X-Requested-With": "XMLHttpRequest",
+          "Accept": "application/json"
+        }
+      })
+        .then(async function (response) {
+          let data = {};
+
+          try {
+            data = await response.json();
+          } catch (error) {
+            data = {};
+          }
+
+          if (!response.ok) {
+            throw data;
+          }
+
+          return data;
+        })
+        .then(function (data) {
+          showMessage(data.message || "آدرس با موفقیت ذخیره شد.", false);
+
+          /*
+            Reload is intentional:
+            - the new/edited address card is rendered by Django
+            - a newly created address becomes selected through CheckoutSession
+          */
+          window.location.reload();
+        })
+        .catch(function (data) {
+          showMessage(
+            data.message || "امکان ذخیره آدرس وجود ندارد. لطفاً اطلاعات را بررسی کنید.",
+            true
+          );
+        })
+        .finally(function () {
+          if (submitButton) {
+            submitButton.disabled = false;
+          }
+        });
+    });
+  })();
+</script>
+{%endblock%}

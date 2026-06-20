@@ -494,8 +494,3 @@ class RemoveFromCartView(View):
         return redirect(_safe_redirect_url(request))
 
 
-class CechkoutView(View):
-    template_name = 'cart/checkout.html'
-
-    def get(self, request):
-        return render(request, self.template_name)
