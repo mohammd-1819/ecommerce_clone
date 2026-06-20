@@ -148,81 +148,102 @@
                 </button>
               {% endfor %}
             </div>
-          </div>
+            </div>
 
-          <div class="product-detail-price-row">
-            <div>
-              <span class="product-price-label">قیمت محصول</span>
+            <div class="product-detail-price-row">
+              <div>
+                <span class="product-price-label">قیمت محصول</span>
 
-              <p class="product-detail-price">
-                <span data-product-price>{{ default_variant.final_price_toman|toman }}</span>
-                <span class="product-currency">تومان</span>
+                <p class="product-detail-price">
+                  <span data-product-price>{{ default_variant.final_price_toman|toman }}</span>
+                  <span class="product-currency">تومان</span>
+                </p>
+              </div>
+
+              <p
+                class="product-stock-status {% if default_variant.is_in_stock %}is-available{% else %}is-unavailable{% endif %}"
+                data-product-stock-status
+              >
+                {% if default_variant.is_in_stock %}
+                  آماده ارسال
+                {% else %}
+                  ناموجود
+                {% endif %}
               </p>
             </div>
 
-            <p class="product-stock-status is-available" data-product-stock-status>
-              آماده ارسال
-            </p>
-          </div>
-
-          <form class="add-to-cart-form" method="post" action="#">
-            {% csrf_token %}
-
-            <input type="hidden" name="product_id" value="{{ product.pk }}">
-
-            <input
-              type="hidden"
-              name="variant_id"
-              value="{{ default_variant.pk }}"
-              data-selected-variant-input
+            <form
+              class="add-to-cart-form"
+              method="post"
+              action="{% url 'cart:cart-add' %}"
+              data-add-to-cart-form
             >
+              {% csrf_token %}
 
-            <div class="product-detail-actions">
-              <div class="quantity-control" data-quantity>
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <input type="hidden" name="product_id" value="{{ product.pk }}">
+
+              <input
+                type="hidden"
+                name="variant_id"
+                value="{{ default_variant.pk }}"
+                data-selected-variant-input
+              >
+
+              <div class="product-detail-actions">
+                <div class="quantity-control" data-quantity>
+                  <button
+                    class="quantity-btn"
+                    type="button"
+                    aria-label="کم کردن تعداد"
+                    data-quantity-decrease
+                  >
+                    −
+                  </button>
+
+                  <input
+                    class="quantity-input"
+                    type="number"
+                    name="quantity"
+                    value="1"
+                    min="1"
+                    max="20"
+                    inputmode="numeric"
+                    aria-label="تعداد محصول"
+                    data-quantity-input
+                  >
+
+                  <button
+                    class="quantity-btn"
+                    type="button"
+                    aria-label="زیاد کردن تعداد"
+                    data-quantity-increase
+                  >
+                    +
+                  </button>
+                </div>
+
                 <button
-                  class="quantity-btn"
-                  type="button"
-                  aria-label="کم کردن تعداد"
-                  data-quantity-decrease
+                  class="btn btn-primary product-add-to-cart-btn"
+                  type="submit"
+                  data-add-to-cart-button
+                  {% if not default_variant.is_in_stock %}disabled{% endif %}
                 >
-                  −
-                </button>
-
-                <input
-                  class="quantity-input"
-                  type="number"
-                  name="quantity"
-                  value="1"
-                  min="1"
-                  max="10"
-                  inputmode="numeric"
-                  aria-label="تعداد محصول"
-                  data-quantity-input
-                >
-
-                <button
-                  class="quantity-btn"
-                  type="button"
-                  aria-label="زیاد کردن تعداد"
-                  data-quantity-increase
-                >
-                  +
+                  {% if default_variant.is_in_stock %}
+                    افزودن به سبد خرید
+                  {% else %}
+                    ناموجود
+                  {% endif %}
                 </button>
               </div>
 
-              <button
-                class="btn btn-primary product-add-to-cart-btn"
-                type="submit"
-                data-add-to-cart-button
+              <p
+                class="product-unavailable-note{% if default_variant.is_in_stock %} hidden{% endif %}"
+                data-product-unavailable-note
               >
-                افزودن به سبد خرید
-              </button>
-            </div>
-
-            <p class="product-unavailable-note hidden" data-product-unavailable-note>
-              این وزن در حال حاضر موجود نیست. لطفاً وزن دیگری را انتخاب کنید.
-            </p>
-          </form>
+                این وزن در حال حاضر موجود نیست. لطفاً وزن دیگری را انتخاب کنید.
+              </p>
+            </form>
 
         {% else %}
 
@@ -600,3 +621,94 @@
 </section>
 
 {% endblock %}
+
+{% block extra_js %}
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const variantOptions = document.querySelectorAll("[data-variant-option]");
+    const selectedVariantInput = document.querySelector("[data-selected-variant-input]");
+    const priceEl = document.querySelector("[data-product-price]");
+    const stockStatusEl = document.querySelector("[data-product-stock-status]");
+    const addToCartButton = document.querySelector("[data-add-to-cart-button]");
+    const unavailableNote = document.querySelector("[data-product-unavailable-note]");
+    const quantityInput = document.querySelector("[data-quantity-input]");
+    const quantityIncrease = document.querySelector("[data-quantity-increase]");
+    const quantityDecrease = document.querySelector("[data-quantity-decrease]");
+
+    function setVariant(option) {
+      const variantId = option.dataset.variantId;
+      const variantPrice = option.dataset.variantPrice;
+      const isAvailable = option.dataset.variantAvailable === "true";
+
+      variantOptions.forEach(function (item) {
+        item.classList.remove("is-active");
+        item.setAttribute("aria-checked", "false");
+      });
+
+      option.classList.add("is-active");
+      option.setAttribute("aria-checked", "true");
+
+      if (selectedVariantInput) {
+        selectedVariantInput.value = variantId;
+      }
+
+      if (priceEl) {
+        priceEl.textContent = variantPrice;
+      }
+
+      if (stockStatusEl) {
+        stockStatusEl.classList.toggle("is-available", isAvailable);
+        stockStatusEl.classList.toggle("is-unavailable", !isAvailable);
+        stockStatusEl.textContent = isAvailable ? "آماده ارسال" : "ناموجود";
+      }
+
+      if (addToCartButton) {
+        addToCartButton.disabled = !isAvailable;
+        addToCartButton.textContent = isAvailable ? "افزودن به سبد خرید" : "ناموجود";
+      }
+
+      if (unavailableNote) {
+        unavailableNote.classList.toggle("hidden", isAvailable);
+      }
+    }
+
+    variantOptions.forEach(function (option) {
+      option.addEventListener("click", function () {
+        setVariant(option);
+      });
+    });
+
+    if (quantityIncrease && quantityInput) {
+      quantityIncrease.addEventListener("click", function () {
+        const max = parseInt(quantityInput.max || "20", 10);
+        const current = parseInt(quantityInput.value || "1", 10);
+
+        quantityInput.value = Math.min(current + 1, max);
+      });
+    }
+
+    if (quantityDecrease && quantityInput) {
+      quantityDecrease.addEventListener("click", function () {
+        const min = parseInt(quantityInput.min || "1", 10);
+        const current = parseInt(quantityInput.value || "1", 10);
+
+        quantityInput.value = Math.max(current - 1, min);
+      });
+    }
+
+    if (quantityInput) {
+      quantityInput.addEventListener("change", function () {
+        const min = parseInt(quantityInput.min || "1", 10);
+        const max = parseInt(quantityInput.max || "20", 10);
+        let value = parseInt(quantityInput.value || "1", 10);
+
+        if (Number.isNaN(value)) {
+          value = min;
+        }
+
+        quantityInput.value = Math.min(Math.max(value, min), max);
+      });
+    }
+  });
+</script>
+{% endblock%}

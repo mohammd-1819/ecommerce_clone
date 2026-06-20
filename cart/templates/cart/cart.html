@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}سبد خرید | نام برند{% endblock %}
 
@@ -41,245 +41,263 @@
       </div>
 
       <span class="cart-count-pill" data-cart-count-label>
-        ۲ کالا
+        {{ items_count|intcomma }} کالا
       </span>
     </header>
 
-    <!-- Filled Cart State -->
-    <div class="cart-layout" data-cart-filled>
+    {% if not is_cart_empty %}
 
-      <!-- Cart Items -->
-      <div class="cart-items" data-cart-items>
+      <!-- Filled Cart State -->
+      <div class="cart-layout" data-cart-filled>
 
-        <article class="cart-item" data-cart-item data-price="1520000">
-          <a class="cart-item-image" href="{% url 'product:product-detail' %}" aria-label="مشاهده وایت چاکلت فوطی ۸۰۰ گرمی">
-            <img src="{% static 'images/product_1.png' %}" alt="وایت چاکلت فوطی ۸۰۰ گرمی">
-          </a>
+        <!-- Cart Items -->
+        <div class="cart-items" data-cart-items>
 
-          <div class="cart-item-content">
-            <div class="cart-item-main">
-              <p class="cart-item-category">هات‌چاکلت • ۸۰۰ گرم</p>
+          {% for item in cart_items %}
+            {% with variant=item.variant product=item.variant.product %}
 
-              <h2 class="cart-item-title">
-                <a href="{% url 'product:product-detail' %}">وایت چاکلت فوطی ۸۰۰ گرمی</a>
-              </h2>
+              {% with product_title=product.title %}
+                {% with item_title=product_title|default:variant %}
 
-              <p class="cart-item-note">
-                هزینه ارسال به‌صورت <strong>پس‌کرایه</strong> و هنگام دریافت سفارش پرداخت می‌شود.
-              </p>
+                  <article
+                    class="cart-item"
+                    data-cart-item
+                    data-price="{{ item.unit_price_toman }}"
+                    data-variant-id="{{ variant.id }}"
+                  >
+                    <a
+                      class="cart-item-image"
+                      href="{% if product.get_absolute_url %}{{ product.get_absolute_url }}{% else %}#{% endif %}"
+                      aria-label="مشاهده {{ item_title }}"
+                    >
+                      {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ item_title }}">
+                      {% elif product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ item_title }}">
+                      {% else %}
+                        <img src="{% static 'images/product-placeholder.png' %}" alt="{{ item_title }}">
+                      {% endif %}
+                    </a>
+
+                    <div class="cart-item-content">
+                      <div class="cart-item-main">
+                        <p class="cart-item-category">
+                          {% if product.category %}
+                            {{ product.category }}
+                          {% endif %}
+
+                          {% if variant.title %}
+                            {% if product.category %} • {% endif %}
+                            {{ variant.title }}
+                          {% elif variant.name %}
+                            {% if product.category %} • {% endif %}
+                            {{ variant.name }}
+                          {% endif %}
+                        </p>
+
+                        <h2 class="cart-item-title">
+                          <a href="{% if product.get_absolute_url %}{{ product.get_absolute_url }}{% else %}#{% endif %}">
+                            {{ item_title }}
+                          </a>
+                        </h2>
+
+                        <p class="cart-item-note">
+                          هزینه ارسال به‌صورت <strong>پس‌کرایه</strong> و هنگام دریافت سفارش پرداخت می‌شود.
+                        </p>
+                      </div>
+
+                      <div class="cart-item-price-block">
+                        <span class="cart-item-label">قیمت واحد</span>
+                        <strong class="cart-item-price">
+                          {{ item.unit_price_toman|intcomma }}
+                          <span>تومان</span>
+                        </strong>
+                      </div>
+
+                      <div class="cart-item-quantity">
+                        <span class="cart-item-label">تعداد</span>
+
+                        <div class="quantity-control" data-quantity>
+
+                          <!-- Increase quantity -->
+                          <form
+                            method="post"
+                            action="{% url 'cart:cart-update' variant.id %}"
+                            class="cart-quantity-form"
+                          >
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                            <button
+                              class="quantity-btn"
+                              type="submit"
+                              name="action"
+                              value="increase"
+                              aria-label="افزایش تعداد"
+                              data-quantity-increase
+                            >
+                              +
+                            </button>
+                          </form>
+
+                          <!-- Set exact quantity -->
+                          <form
+                            method="post"
+                            action="{% url 'cart:cart-update' variant.id %}"
+                            class="cart-quantity-input-form"
+                          >
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                            <input
+                              class="quantity-input"
+                              type="number"
+                              name="quantity"
+                              value="{{ item.quantity }}"
+                              min="0"
+                              max="20"
+                              inputmode="numeric"
+                              aria-label="تعداد محصول"
+                              data-quantity-input
+                              onchange="this.form.submit()"
+                            >
+                          </form>
+
+                          <!-- Decrease quantity -->
+                          <form
+                            method="post"
+                            action="{% url 'cart:cart-update' variant.id %}"
+                            class="cart-quantity-form"
+                          >
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                            <button
+                              class="quantity-btn"
+                              type="submit"
+                              name="action"
+                              value="decrease"
+                              aria-label="کاهش تعداد"
+                              data-quantity-decrease
+                            >
+                              −
+                            </button>
+                          </form>
+
+                        </div>
+                      </div>
+
+                      <div class="cart-item-total-block">
+                        <span class="cart-item-label">جمع این کالا</span>
+                        <strong class="cart-item-total" data-cart-item-total>
+                          {{ item.line_total_toman|intcomma }} تومان
+                        </strong>
+                      </div>
+
+                      <form
+                        method="post"
+                        action="{% url 'cart:cart-remove' variant.id %}"
+                        class="cart-remove-form"
+                      >
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                        <button
+                          class="cart-remove-btn"
+                          type="submit"
+                          aria-label="حذف {{ item_title }} از سبد خرید"
+                          data-cart-remove
+                        >
+                          <span aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                              <path d="M9 3h6m-9 4h12m-10 0 .7 13h6.6L16 7M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </span>
+                          حذف
+                        </button>
+                      </form>
+                    </div>
+                  </article>
+
+                {% endwith %}
+              {% endwith %}
+
+            {% endwith %}
+          {% endfor %}
+
+        </div>
+
+        <!-- Cart Summary -->
+        <aside class="cart-summary" aria-label="خلاصه سفارش">
+          <div class="cart-summary-card">
+            <div class="cart-summary-head">
+              <h2>خلاصه سفارش</h2>
+              <span>{{ items_count|intcomma }} کالا</span>
             </div>
 
-            <div class="cart-item-price-block">
-              <span class="cart-item-label">قیمت واحد</span>
-              <strong class="cart-item-price">
-                ۱٬۵۲۰٬۰۰۰
-                <span>تومان</span>
-              </strong>
+            <div class="cart-summary-row">
+              <span>جمع قیمت کالاها</span>
+              <strong data-cart-subtotal>{{ subtotal_toman|intcomma }} تومان</strong>
             </div>
 
-            <div class="cart-item-quantity">
-              <span class="cart-item-label">تعداد</span>
-
-              <div class="quantity-control" data-quantity>
-                <button
-                  class="quantity-btn"
-                  type="button"
-                  aria-label="افزایش تعداد"
-                  data-quantity-increase>
-                  +
-                </button>
-
-                <input
-                  class="quantity-input"
-                  type="number"
-                  value="1"
-                  min="1"
-                  max="20"
-                  inputmode="numeric"
-                  aria-label="تعداد محصول"
-                  data-quantity-input>
-
-                <button
-                  class="quantity-btn"
-                  type="button"
-                  aria-label="کاهش تعداد"
-                  data-quantity-decrease>
-                  −
-                </button>
-              </div>
+            <div class="cart-summary-row">
+              <span>مالیات {{ tax_percent }}٪</span>
+              <strong data-cart-tax>{{ tax_toman|intcomma }} تومان</strong>
             </div>
 
-            <div class="cart-item-total-block">
-              <span class="cart-item-label">جمع این کالا</span>
-              <strong class="cart-item-total" data-cart-item-total>
-                ۱٬۵۲۰٬۰۰۰ تومان
-              </strong>
+            <div class="cart-summary-row">
+              <span>هزینه ارسال</span>
+              <strong class="cart-summary-shipping">پس‌کرایه</strong>
             </div>
 
-            <button
-              class="cart-remove-btn"
-              type="button"
-              aria-label="حذف وایت چاکلت فوطی ۸۰۰ گرمی از سبد خرید"
-              data-cart-remove>
-              <span aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 3h6m-9 4h12m-10 0 .7 13h6.6L16 7M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-              حذف
-            </button>
+            <div class="cart-summary-divider"></div>
+
+            <div class="cart-summary-total">
+              <span>مبلغ قابل پرداخت</span>
+              <strong data-cart-final>{{ final_toman|intcomma }} تومان</strong>
+            </div>
+
+            <p class="cart-summary-note">
+              هزینه ارسال در این مرحله محاسبه نمی‌شود و هنگام تحویل سفارش دریافت خواهد شد.
+            </p>
+
+            <a class="btn btn-primary cart-submit-btn" href="{% url 'cart:cart-checkout' %}">
+              ثبت سفارش و ادامه خرید
+            </a>
+
+            <a class="text-link cart-continue-link" href="{% url 'product:product-list' %}">
+              ادامه مشاهده محصولات
+            </a>
           </div>
-        </article>
-
-        <article class="cart-item" data-cart-item data-price="340000">
-          <a class="cart-item-image" href="{% url 'product:product-detail' %}" aria-label="مشاهده قهوه عربیکا ویژه">
-            <img src="{% static 'images/product_2.png' %}" alt="بسته قهوه عربیکا ویژه">
-          </a>
-
-          <div class="cart-item-content">
-            <div class="cart-item-main">
-              <p class="cart-item-category">قهوه • ۲۵۰ گرم</p>
-
-              <h2 class="cart-item-title">
-                <a href="{% url 'product:product-detail' %}">قهوه عربیکا ویژه</a>
-              </h2>
-
-              <p class="cart-item-note">
-                مناسب برای مصرف روزانه، محل کار و هدیه‌های کوچک.
-              </p>
-            </div>
-
-            <div class="cart-item-price-block">
-              <span class="cart-item-label">قیمت واحد</span>
-              <strong class="cart-item-price">
-                ۳۴۰٬۰۰۰
-                <span>تومان</span>
-              </strong>
-            </div>
-
-            <div class="cart-item-quantity">
-              <span class="cart-item-label">تعداد</span>
-
-              <div class="quantity-control" data-quantity>
-                <button
-                  class="quantity-btn"
-                  type="button"
-                  aria-label="افزایش تعداد"
-                  data-quantity-increase>
-                  +
-                </button>
-
-                <input
-                  class="quantity-input"
-                  type="number"
-                  value="2"
-                  min="1"
-                  max="20"
-                  inputmode="numeric"
-                  aria-label="تعداد محصول"
-                  data-quantity-input>
-
-                <button
-                  class="quantity-btn"
-                  type="button"
-                  aria-label="کاهش تعداد"
-                  data-quantity-decrease>
-                  −
-                </button>
-              </div>
-            </div>
-
-            <div class="cart-item-total-block">
-              <span class="cart-item-label">جمع این کالا</span>
-              <strong class="cart-item-total" data-cart-item-total>
-                ۶۸۰٬۰۰۰ تومان
-              </strong>
-            </div>
-
-            <button
-              class="cart-remove-btn"
-              type="button"
-              aria-label="حذف قهوه عربیکا ویژه از سبد خرید"
-              data-cart-remove>
-              <span aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 3h6m-9 4h12m-10 0 .7 13h6.6L16 7M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-              حذف
-            </button>
-          </div>
-        </article>
+        </aside>
 
       </div>
 
-      <!-- Cart Summary -->
-      <aside class="cart-summary" aria-label="خلاصه سفارش">
-        <div class="cart-summary-card">
-          <div class="cart-summary-head">
-            <h2>خلاصه سفارش</h2>
-            <span>۲ کالا</span>
+    {% else %}
+
+      <!-- Empty Cart State -->
+      <div class="cart-empty-state" data-cart-empty>
+        <div class="empty-state-card">
+          <div class="empty-state-icon" aria-hidden="true">
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
+              <path d="M6.5 7.5h14l-1.7 8.2a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.7L5.8 4.8H3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.5 21a.4.4 0 1 0 0-.8.4.4 0 0 0 0 .8ZM17 21a.4.4 0 1 0 0-.8.4.4 0 1 0 0 .8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
           </div>
 
-          <div class="cart-summary-row">
-            <span>جمع قیمت کالاها</span>
-            <strong data-cart-subtotal>۲٬۲۰۰٬۰۰۰ تومان</strong>
-          </div>
+          <h2>سبد خرید شما خالی است</h2>
 
-          <div class="cart-summary-row">
-            <span>مالیات ۱۰٪</span>
-            <strong data-cart-tax>۲۲۰٬۰۰۰ تومان</strong>
-          </div>
-
-          <div class="cart-summary-row">
-            <span>هزینه ارسال</span>
-            <strong class="cart-summary-shipping">پس‌کرایه</strong>
-          </div>
-
-          <div class="cart-summary-divider"></div>
-
-          <div class="cart-summary-total">
-            <span>مبلغ قابل پرداخت</span>
-            <strong data-cart-final>۲٬۴۲۰٬۰۰۰ تومان</strong>
-          </div>
-
-          <p class="cart-summary-note">
-            هزینه ارسال در این مرحله محاسبه نمی‌شود و هنگام تحویل سفارش دریافت خواهد شد.
+          <p>
+            هنوز محصولی به سبد خرید اضافه نکرده‌اید. می‌توانید از میان قهوه، چای و هات‌چاکلت‌های منتخب شروع کنید.
           </p>
 
-          <a class="btn btn-primary cart-submit-btn" href="{% url 'cart:cart-checkout' %}">
-            ثبت سفارش و ادامه خرید
-          </a>
-
-          <a class="text-link cart-continue-link" href="{% url 'product:product-list' %}">
-            ادامه مشاهده محصولات
+          <a class="btn btn-primary" href="{% url 'product:product-list' %}">
+            مشاهده محصولات
           </a>
         </div>
-      </aside>
-
-    </div>
-
-    <!-- Empty Cart State -->
-    <div class="cart-empty-state hidden" data-cart-empty>
-      <div class="empty-state-card">
-        <div class="empty-state-icon" aria-hidden="true">
-          <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-            <path d="M6.5 7.5h14l-1.7 8.2a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.7L5.8 4.8H3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9.5 21a.4.4 0 1 0 0-.8.4.4 0 0 0 0 .8ZM17 21a.4.4 0 1 0 0-.8.4.4 0 0 0 0 .8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <h2>سبد خرید شما خالی است</h2>
-
-        <p>
-          هنوز محصولی به سبد خرید اضافه نکرده‌اید. می‌توانید از میان قهوه، چای و هات‌چاکلت‌های منتخب شروع کنید.
-        </p>
-
-        <a class="btn btn-primary" href="{% url 'product:product-list' %}">
-          مشاهده محصولات
-        </a>
       </div>
-    </div>
+
+    {% endif %}
 
   </div>
 </section>
