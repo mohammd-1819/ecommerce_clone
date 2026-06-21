@@ -1,6 +1,5 @@
 from django import forms
-
-from .models import UserAddress
+from .models import UserAddress, UserProfile
 
 
 class UserAddressForm(forms.Form):
@@ -101,3 +100,92 @@ class UserAddressForm(forms.Form):
 
         address.save()
         return address
+
+
+
+
+class UserProfileEditForm(forms.ModelForm):
+    full_name = forms.CharField(
+        max_length=200,
+        required=True,
+        label="نام و نام خانوادگی",
+        widget=forms.TextInput(attrs={
+            "class": "form-input",
+            "id": "profile-full-name",
+            "placeholder": "نام و نام خانوادگی خود را وارد کنید",
+            "autocomplete": "name",
+        })
+    )
+
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        label="نام کاربری",
+        widget=forms.TextInput(attrs={
+            "class": "form-input",
+            "id": "profile-username",
+            "placeholder": "نام کاربری",
+            "autocomplete": "username",
+        })
+    )
+
+    email = forms.EmailField(
+        required=False,
+        label="ایمیل",
+        widget=forms.EmailInput(attrs={
+            "class": "form-input",
+            "id": "profile-email",
+            "placeholder": "example@email.com",
+            "autocomplete": "email",
+        })
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = ["full_name", "username", "email"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+
+        profile = self.instance
+
+        self.fields["full_name"].initial = profile.get_full_name()
+        self.fields["username"].initial = self.user.username
+        self.fields["email"].initial = profile.email
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+
+        if not username:
+            raise forms.ValidationError("نام کاربری نمی‌تواند خالی باشد.")
+
+        return username
+
+    def clean_full_name(self):
+        full_name = self.cleaned_data["full_name"].strip()
+
+        if not full_name:
+            raise forms.ValidationError("نام و نام خانوادگی نمی‌تواند خالی باشد.")
+
+        return full_name
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+
+        full_name = self.cleaned_data["full_name"]
+        username = self.cleaned_data["username"]
+        email = self.cleaned_data["email"]
+
+        name_parts = full_name.split(maxsplit=1)
+        profile.first_name = name_parts[0]
+        profile.last_name = name_parts[1] if len(name_parts) > 1 else ""
+        profile.email = email
+
+        self.user.username = username
+
+        if commit:
+            self.user.save(update_fields=["username"])
+            profile.save()
+
+        return profile

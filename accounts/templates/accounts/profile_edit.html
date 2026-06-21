@@ -38,15 +38,25 @@
             </div>
           </div>
 
+          {% if messages %}
+            <div class="profile-messages">
+              {% for message in messages %}
+                <div class="profile-message profile-message-{{ message.tags }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
           <div class="profile-edit-overview">
             <div class="profile-edit-user">
               <div class="profile-edit-avatar" aria-hidden="true">
-                ک
+                {{ avatar_letter }}
               </div>
 
               <div class="profile-edit-user-info">
-                <h3 class="profile-edit-name">کاربر عزیز</h3>
-                <p class="profile-edit-username">@user_name</p>
+                <h3 class="profile-edit-name">{{ full_name }}</h3>
+                <p class="profile-edit-username">@{{ username }}</p>
               </div>
             </div>
 
@@ -61,7 +71,7 @@
 
               <div>
                 <span class="profile-edit-phone-label">شماره موبایل</span>
-                <strong class="profile-edit-phone-number">۰۹۱۲۳۴۵۶۷۸۹</strong>
+                <strong class="profile-edit-phone-number">{{ phone_number }}</strong>
                 <p class="profile-edit-phone-note">
                   تغییر شماره موبایل از این بخش امکان‌پذیر نیست.
                 </p>
@@ -69,60 +79,70 @@
             </div>
           </div>
 
-          <form class="profile-edit-form" method="post" action="#">
-            {# {% csrf_token %} #}
+          <form class="profile-edit-form" method="post" action="{% url 'accounts:profile-edit' %}">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                  <p class="form-error">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
 
             <div class="form-grid profile-edit-form-grid">
 
               <div class="form-group">
-                <label class="form-label" for="profile-full-name">نام و نام خانوادگی</label>
-                <input
-                  class="form-input"
-                  id="profile-full-name"
-                  name="full_name"
-                  type="text"
-                  value="کاربر عزیز"
-                  placeholder="نام و نام خانوادگی خود را وارد کنید"
-                  autocomplete="name"
-                  required
-                >
+                <label class="form-label" for="{{ form.full_name.id_for_label }}">
+                  نام و نام خانوادگی
+                </label>
+
+                {{ form.full_name }}
+
+                {% if form.full_name.errors %}
+                  {% for error in form.full_name.errors %}
+                    <p class="form-error">{{ error }}</p>
+                  {% endfor %}
+                {% endif %}
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="profile-username">نام کاربری</label>
-                <input
-                  class="form-input"
-                  id="profile-username"
-                  name="username"
-                  type="text"
-                  value="user_name"
-                  placeholder="نام کاربری"
-                  autocomplete="username"
-                  required
-                >
+                <label class="form-label" for="{{ form.username.id_for_label }}">
+                  نام کاربری
+                </label>
+
+                {{ form.username }}
+
+                {% if form.username.errors %}
+                  {% for error in form.username.errors %}
+                    <p class="form-error">{{ error }}</p>
+                  {% endfor %}
+                {% endif %}
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="profile-email">ایمیل</label>
-                <input
-                  class="form-input"
-                  id="profile-email"
-                  name="email"
-                  type="email"
-                  value="user@example.com"
-                  placeholder="example@email.com"
-                  autocomplete="email"
-                >
+                <label class="form-label" for="{{ form.email.id_for_label }}">
+                  ایمیل
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                  {% for error in form.email.errors %}
+                    <p class="form-error">{{ error }}</p>
+                  {% endfor %}
+                {% endif %}
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="profile-phone">شماره موبایل</label>
+
                 <div class="profile-readonly-field">
                   <input
                     class="form-input profile-phone-input"
                     id="profile-phone"
                     type="text"
-                    value="۰۹۱۲۳۴۵۶۷۸۹"
+                    value="{{ phone_number }}"
                     readonly
                     aria-describedby="profile-phone-help"
                   >

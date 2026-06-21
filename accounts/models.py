@@ -3,7 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
-
+from django.conf import settings
+from core.models import TimeStampedModel
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -80,3 +81,46 @@ class UserAddress(models.Model):
     class Meta:
         verbose_name = 'آدرس کاربر'
         verbose_name_plural = 'آدرس های کاربر'
+
+
+
+class UserProfile(TimeStampedModel):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile",
+        verbose_name=_("کاربر")
+    )
+
+    first_name = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        verbose_name=_("نام")
+    )
+
+    last_name = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        verbose_name=_("نام خانوادگی")
+    )
+
+    email = models.EmailField(
+        max_length=254,
+        blank=True,
+        default="",
+        verbose_name=_("ایمیل")
+    )
+
+
+    def __str__(self):
+        full_name = self.get_full_name()
+        return full_name or str(self.user.phone_number)
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
+    class Meta:
+        verbose_name = _("پروفایل کاربر")
+        verbose_name_plural = _("پروفایل کاربران")

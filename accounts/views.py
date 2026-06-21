@@ -9,11 +9,10 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView
-from .forms import UserAddressForm
-from .models import UserAddress
+from django.views.generic import TemplateView, ListView, UpdateView
+from .forms import UserAddressForm, UserProfileEditForm
+from .models import UserAddress, UserProfile
 from product.models import ProductReview
-
 
 
 class UserOrderListView(LoginRequiredMixin, TemplateView):
@@ -281,16 +280,65 @@ class ProfileProductReviewListView(LoginRequiredMixin, ListView):
 
 
 
+
+
+class UserProfileEditView(LoginRequiredMixin, UpdateView):
+    model = UserProfile
+    form_class = UserProfileEditForm
+    template_name = "accounts/profile_edit.html"
+    context_object_name = "profile"
+    success_url = reverse_lazy("accounts:profile-edit")
+
+    def get_object(self, queryset=None):
+        profile, created = UserProfile.objects.get_or_create(
+            user=self.request.user
+        )
+        return profile
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        profile = self.object
+        full_name = profile.get_full_name()
+        username = self.request.user.username
+
+        context["full_name"] = full_name or "کاربر عزیز"
+        context["username"] = username or "user_name"
+        context["phone_number"] = str(self.request.user.phone_number)
+
+        context["avatar_letter"] = (
+            full_name[0]
+            if full_name
+            else "ک"
+        )
+
+        return context
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            "اطلاعات حساب کاربری با موفقیت ذخیره شد."
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            "لطفاً خطاهای فرم را بررسی و اصلاح کنید."
+        )
+        return super().form_invalid(form)
+
+
+
+
 class ProfileDashboardView(View):
     template_name = 'accounts/profile_dashboard.html'
 
     def get(self, request):
         return render(request, self.template_name)
 
-
-
-class ProfileEditView(View):
-    template_name = 'accounts/profile_edit.html'
-
-    def get(self, request):
-        return render(request, self.template_name)
