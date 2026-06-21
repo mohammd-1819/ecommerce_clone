@@ -1983,7 +1983,6 @@ function initOtpLogin() {
        * Static-template mock:
        * Remove event.preventDefault() later when backend OTP verification is ready.
        */
-      event.preventDefault();
 
       setHelpState(codeHelp, "success");
       setMessage("ورود با موفقیت انجام شد. در نسخه نهایی، کاربر وارد حساب می‌شود.", "success");

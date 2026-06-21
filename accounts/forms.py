@@ -1,5 +1,8 @@
 from django import forms
 from .models import UserAddress, UserProfile
+from django.core.exceptions import ValidationError
+from phonenumber_field.formfields import PhoneNumberField
+import re
 
 
 class UserAddressForm(forms.Form):
@@ -189,3 +192,115 @@ class UserProfileEditForm(forms.ModelForm):
             profile.save()
 
         return profile
+
+
+
+
+def to_english_digits(value):
+    if not value:
+        return ""
+
+    persian_digits = "۰۱۲۳۴۵۶۷۸۹"
+    arabic_digits = "٠١٢٣٤٥٦٧٨٩"
+
+    value = str(value)
+
+    for index, digit in enumerate(persian_digits):
+        value = value.replace(digit, str(index))
+
+    for index, digit in enumerate(arabic_digits):
+        value = value.replace(digit, str(index))
+
+    return value
+
+
+def to_english_digits(value):
+    if not value:
+        return ""
+
+    value = str(value)
+
+    persian_digits = "۰۱۲۳۴۵۶۷۸۹"
+    arabic_digits = "٠١٢٣٤٥٦٧٨٩"
+
+    for index, digit in enumerate(persian_digits):
+        value = value.replace(digit, str(index))
+
+    for index, digit in enumerate(arabic_digits):
+        value = value.replace(digit, str(index))
+
+    return value
+
+
+def normalize_iran_mobile(value):
+    """
+    Accept:
+    09030313808
+    989030313808
+    +989030313808
+    9030313808
+
+    Return:
+    09030313808
+    """
+    phone = to_english_digits(value)
+    phone = phone.strip()
+    phone = phone.replace(" ", "")
+    phone = phone.replace("-", "")
+
+    # Remove leading +
+    if phone.startswith("+"):
+        phone = phone[1:]
+
+    # +989030313808 or 989030313808 -> 09030313808
+    if phone.startswith("98") and len(phone) == 12:
+        phone = "0" + phone[2:]
+
+    # 9030313808 -> 09030313808
+    elif phone.startswith("9") and len(phone) == 10:
+        phone = "0" + phone
+
+    # Keep only digits after normalization
+    phone = re.sub(r"\D", "", phone)
+
+    if not re.fullmatch(r"09\d{9}", phone):
+        raise forms.ValidationError(
+            "شماره موبایل باید کامل و معتبر باشد. مثال: 09030313808"
+        )
+
+    return phone
+
+
+class OTPPhoneForm(forms.Form):
+    phone = forms.CharField(
+        required=True,
+        max_length=20,
+        error_messages={
+            "required": "شماره موبایل الزامی است.",
+        },
+    )
+
+    def clean_phone(self):
+        return normalize_iran_mobile(self.cleaned_data["phone"])
+
+
+class OTPVerifyForm(forms.Form):
+    otp_code = forms.CharField(
+        required=True,
+        min_length=5,
+        max_length=5,
+        error_messages={
+            "required": "کد تایید الزامی است.",
+            "min_length": "کد تایید باید ۵ رقم باشد.",
+            "max_length": "کد تایید باید ۵ رقم باشد.",
+        },
+    )
+
+    def clean_otp_code(self):
+        otp_code = to_english_digits(self.cleaned_data["otp_code"])
+        otp_code = re.sub(r"\D", "", otp_code)
+
+        if not re.fullmatch(r"\d{5}", otp_code):
+            raise forms.ValidationError("کد تایید باید ۵ رقم باشد.")
+
+        return otp_code

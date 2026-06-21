@@ -47,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     otp_code = models.CharField(max_length=5, null=True, blank=True)
     otp_expiry = models.DateTimeField(null=True, blank=True)
-    otp_max_try = models.IntegerField(default=5)
+    otp_max_try = models.IntegerField(default=3)
     otp_max_out = models.DateTimeField(null=True, blank=True)
 
     USERNAME_FIELD = "phone_number"

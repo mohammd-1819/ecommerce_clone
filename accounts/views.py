@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch, Sum, Value, IntegerField
@@ -13,7 +13,21 @@ from django.views.generic import TemplateView, ListView, UpdateView
 from .forms import UserAddressForm, UserProfileEditForm
 from .models import UserAddress, UserProfile
 from product.models import ProductReview
+import secrets
+from datetime import timedelta
+from django.db import transaction
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views import View
+from .forms import OTPPhoneForm, OTPVerifyForm
+from django.conf import settings
+from django.contrib.auth import get_user_model, login
+from django.utils import timezone
+import string
+import math
 
+
+
+User = get_user_model()
 
 class UserOrderListView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile_orders.html"
@@ -336,16 +350,395 @@ class UserProfileEditView(LoginRequiredMixin, UpdateView):
 
 
 
-class ProfileDashboardView(View):
-    template_name = 'accounts/profile_dashboard.html'
+OTP_LENGTH = 5
+OTP_EXPIRY_MINUTES = 5
+OTP_REQUEST_LIMIT = 3
+OTP_BAN_MINUTES = 20
 
-    def get(self, request):
-        return render(request, self.template_name)
+OTP_SESSION_USER_ID = "otp_login_user_id"
+OTP_SESSION_PHONE = "otp_login_phone"
 
 
+def generate_otp_code(length=OTP_LENGTH):
+    return "".join(secrets.choice(string.digits) for _ in range(length))
 
-class LoginView(View):
-    template_name = 'accounts/login.html'
+def phone_to_local(phone_number):
+    phone = str(phone_number)
 
-    def get(self, request):
-        return render(request, self.template_name)
+    if phone.startswith("+98"):
+        return "0" + phone[3:]
+
+    return phone
+
+
+OTP_LENGTH = 5
+OTP_EXPIRY_MINUTES = 5
+OTP_REQUEST_LIMIT = 3
+OTP_BAN_MINUTES = 20
+
+OTP_SESSION_USER_ID = "otp_login_user_id"
+OTP_SESSION_PHONE = "otp_login_phone"
+
+
+def generate_otp_code(length=OTP_LENGTH):
+    return "".join(secrets.choice(string.digits) for _ in range(length))
+
+
+def phone_to_local(phone_number):
+    """
+    Convert saved PhoneNumberField values such as +989030313808
+    back to local display format: 09030313808
+    """
+    phone = str(phone_number or "").strip()
+
+    if phone.startswith("+98"):
+        return "0" + phone[3:]
+
+    if phone.startswith("98") and len(phone) == 12:
+        return "0" + phone[2:]
+
+    return phone
+
+
+class OTPLoginView(TemplateView):
+    template_name = "accounts/login.html"
+    success_url = reverse_lazy("accounts:profile-dashboard")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.get_success_url())
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        next_url = self.request.GET.get("next") or self.request.POST.get("next")
+
+        if next_url and url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={self.request.get_host()},
+            require_https=self.request.is_secure(),
+        ):
+            return next_url
+
+        return self.success_url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        session_phone = self.request.session.get(OTP_SESSION_PHONE, "")
+
+        context.setdefault(
+            "phone_form",
+            OTPPhoneForm(initial={"phone": session_phone}) if session_phone else OTPPhoneForm(),
+        )
+        context.setdefault("verify_form", OTPVerifyForm())
+        context.setdefault("step", "phone")
+        context.setdefault("phone_preview", session_phone)
+        context.setdefault("debug_otp_code", None)
+        context.setdefault("otp_message", "")
+        context.setdefault("otp_message_type", "")
+        context.setdefault(
+            "next_url",
+            self.request.GET.get("next") or self.request.POST.get("next") or "",
+        )
+
+        return context
+
+    def render_login(self, **context):
+        return self.render_to_response(self.get_context_data(**context))
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("otp_action", "").strip()
+
+        if action == "change_phone":
+            return self.change_phone()
+
+        if action in ("send", "resend"):
+            return self.send_otp()
+
+        if action == "verify":
+            return self.verify_otp()
+
+        # Fallback for old templates.
+        if request.POST.get("otp_code"):
+            return self.verify_otp()
+
+        return self.send_otp()
+
+    def change_phone(self):
+        self.request.session.pop(OTP_SESSION_USER_ID, None)
+        self.request.session.pop(OTP_SESSION_PHONE, None)
+
+        return self.render_login(
+            step="phone",
+            phone_form=OTPPhoneForm(),
+            verify_form=OTPVerifyForm(),
+            phone_preview="",
+            debug_otp_code=None,
+            otp_message="شماره موبایل را دوباره وارد کنید.",
+            otp_message_type="info",
+        )
+
+    def get_phone_form_from_request(self):
+        """
+        For send/resend:
+        - first use POST phone
+        - if empty, fallback to session phone
+        This avoids the 'phone required' problem on resend.
+        """
+        raw_phone = self.request.POST.get("phone") or self.request.session.get(OTP_SESSION_PHONE, "")
+        return OTPPhoneForm(data={"phone": raw_phone})
+
+    def get_or_create_user_by_phone(self, phone):
+        """
+        phone must be local format: 09xxxxxxxxx
+        PhoneNumberField(region='IR') can store it normalized internally.
+        """
+        user = User.objects.filter(phone_number=phone).first()
+
+        if user:
+            return user, False
+
+        user = User.objects.create_user(phone_number=phone)
+        return user, True
+
+    def normalize_otp_request_state(self, user, now):
+        """
+        Your model default is otp_max_try=5,
+        but login rule says only 3 OTP requests.
+        """
+        update_fields = []
+
+        if user.otp_max_out and user.otp_max_out <= now:
+            user.otp_max_out = None
+            user.otp_max_try = OTP_REQUEST_LIMIT
+            update_fields.extend(["otp_max_out", "otp_max_try"])
+
+        if user.otp_max_try is None or user.otp_max_try > OTP_REQUEST_LIMIT:
+            user.otp_max_try = OTP_REQUEST_LIMIT
+            update_fields.append("otp_max_try")
+
+        if update_fields:
+            user.save(update_fields=list(set(update_fields)))
+
+    def get_ban_remaining_minutes(self, user, now):
+        if not user.otp_max_out:
+            return 0
+
+        remaining_seconds = max(0, int((user.otp_max_out - now).total_seconds()))
+        return max(1, math.ceil(remaining_seconds / 60))
+
+    def should_show_code_step(self, user, now):
+        return bool(user.otp_code and user.otp_expiry and user.otp_expiry > now)
+
+    def send_otp(self):
+        phone_form = self.get_phone_form_from_request()
+
+        if not phone_form.is_valid():
+            return self.render_login(
+                step="phone",
+                phone_form=phone_form,
+                verify_form=OTPVerifyForm(),
+                phone_preview="",
+                debug_otp_code=None,
+                otp_message="شماره موبایل را به‌درستی وارد کنید.",
+                otp_message_type="error",
+            )
+
+        phone = phone_form.cleaned_data["phone"]  # Example: 09030313808
+        now = timezone.now()
+
+        user, created = self.get_or_create_user_by_phone(phone)
+
+        if not user.is_active:
+            return self.render_login(
+                step="phone",
+                phone_form=phone_form,
+                verify_form=OTPVerifyForm(),
+                phone_preview=phone,
+                debug_otp_code=None,
+                otp_message="حساب کاربری شما غیرفعال است.",
+                otp_message_type="error",
+            )
+
+        self.normalize_otp_request_state(user, now)
+
+        local_phone = phone_to_local(user.phone_number)
+
+        self.request.session[OTP_SESSION_USER_ID] = user.pk
+        self.request.session[OTP_SESSION_PHONE] = local_phone
+
+        # User is currently banned from requesting a new OTP.
+        if user.otp_max_out and user.otp_max_out > now:
+            remaining_minutes = self.get_ban_remaining_minutes(user, now)
+            show_code_step = self.should_show_code_step(user, now)
+
+            return self.render_login(
+                step="code" if show_code_step else "phone",
+                phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+                verify_form=OTPVerifyForm(),
+                phone_preview=local_phone,
+                debug_otp_code=user.otp_code if show_code_step else None,
+                otp_message=f"تعداد درخواست‌های کد بیش از حد مجاز است. حدود {remaining_minutes} دقیقه دیگر دوباره تلاش کنید.",
+                otp_message_type="error",
+            )
+
+        # No request chance left; start ban.
+        if user.otp_max_try <= 0:
+            user.otp_max_out = now + timedelta(minutes=OTP_BAN_MINUTES)
+            user.save(update_fields=["otp_max_out"])
+
+            show_code_step = self.should_show_code_step(user, now)
+
+            return self.render_login(
+                step="code" if show_code_step else "phone",
+                phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+                verify_form=OTPVerifyForm(),
+                phone_preview=local_phone,
+                debug_otp_code=user.otp_code if show_code_step else None,
+                otp_message="تعداد درخواست‌های کد بیش از حد مجاز است. ۲۰ دقیقه دیگر دوباره تلاش کنید.",
+                otp_message_type="error",
+            )
+
+        otp_code = generate_otp_code()
+
+        user.otp_code = otp_code
+        user.otp_expiry = now + timedelta(minutes=OTP_EXPIRY_MINUTES)
+        user.otp_max_try -= 1
+
+        # After the third request, user cannot request another OTP for 20 minutes.
+        # The current OTP can still be verified.
+        if user.otp_max_try <= 0:
+            user.otp_max_out = now + timedelta(minutes=OTP_BAN_MINUTES)
+
+        user.save(
+            update_fields=[
+                "otp_code",
+                "otp_expiry",
+                "otp_max_try",
+                "otp_max_out",
+            ]
+        )
+
+        return self.render_login(
+            step="code",
+            phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+            verify_form=OTPVerifyForm(),
+            phone_preview=local_phone,
+            debug_otp_code=otp_code,
+            otp_message="کد تایید ساخته شد.",
+            otp_message_type="success",
+            remaining_otp_requests=user.otp_max_try,
+        )
+
+    def verify_otp(self):
+        verify_form = OTPVerifyForm(self.request.POST)
+        user_id = self.request.session.get(OTP_SESSION_USER_ID)
+
+        if not user_id:
+            return self.render_login(
+                step="phone",
+                phone_form=OTPPhoneForm(),
+                verify_form=verify_form,
+                phone_preview="",
+                debug_otp_code=None,
+                otp_message="ابتدا شماره موبایل را وارد کنید.",
+                otp_message_type="error",
+            )
+
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            self.request.session.pop(OTP_SESSION_USER_ID, None)
+            self.request.session.pop(OTP_SESSION_PHONE, None)
+
+            return self.render_login(
+                step="phone",
+                phone_form=OTPPhoneForm(),
+                verify_form=OTPVerifyForm(),
+                phone_preview="",
+                debug_otp_code=None,
+                otp_message="کاربر پیدا نشد. دوباره شماره موبایل را وارد کنید.",
+                otp_message_type="error",
+            )
+
+        local_phone = phone_to_local(user.phone_number)
+
+        if not verify_form.is_valid():
+            return self.render_login(
+                step="code",
+                phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+                verify_form=verify_form,
+                phone_preview=local_phone,
+                debug_otp_code=user.otp_code,
+                otp_message="کد تایید را به‌درستی وارد کنید.",
+                otp_message_type="error",
+            )
+
+        otp_code = verify_form.cleaned_data["otp_code"]
+        now = timezone.now()
+
+        if not user.otp_code or not user.otp_expiry:
+            return self.render_login(
+                step="code",
+                phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+                verify_form=verify_form,
+                phone_preview=local_phone,
+                debug_otp_code=None,
+                otp_message="کد تایید موجود نیست. دوباره کد دریافت کنید.",
+                otp_message_type="error",
+            )
+
+        if user.otp_expiry < now:
+            user.otp_code = None
+            user.otp_expiry = None
+            user.save(update_fields=["otp_code", "otp_expiry"])
+
+            return self.render_login(
+                step="code",
+                phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+                verify_form=verify_form,
+                phone_preview=local_phone,
+                debug_otp_code=None,
+                otp_message="کد تایید منقضی شده است. دوباره کد دریافت کنید.",
+                otp_message_type="error",
+            )
+
+        if user.otp_code != otp_code:
+            return self.render_login(
+                step="code",
+                phone_form=OTPPhoneForm(initial={"phone": local_phone}),
+                verify_form=verify_form,
+                phone_preview=local_phone,
+                debug_otp_code=user.otp_code,
+                otp_message="کد تایید اشتباه است.",
+                otp_message_type="error",
+            )
+
+        # Successful login.
+        user.otp_code = None
+        user.otp_expiry = None
+        user.otp_max_try = OTP_REQUEST_LIMIT
+        user.otp_max_out = None
+        user.save(
+            update_fields=[
+                "otp_code",
+                "otp_expiry",
+                "otp_max_try",
+                "otp_max_out",
+            ]
+        )
+
+        backend = settings.AUTHENTICATION_BACKENDS[0]
+        login(self.request, user, backend=backend)
+
+        self.request.session.pop(OTP_SESSION_USER_ID, None)
+        self.request.session.pop(OTP_SESSION_PHONE, None)
+
+        return redirect(self.get_success_url())
+
+
+class ProfileDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "accounts/profile_dashboard.html"
+    login_url = reverse_lazy("accounts:login")
+    redirect_field_name = "next"

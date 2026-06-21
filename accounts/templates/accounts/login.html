@@ -21,7 +21,12 @@
 
 <section class="section auth-section">
   <div class="container-narrow">
-    <div class="auth-card card" data-otp-login>
+
+    {% comment %} {# 
+      data-otp-login intentionally removed.
+      Your current main.js mock OTP code prevents real backend submit.
+    #} {% endcomment %}
+    <div class="auth-card card">
       <div class="auth-card-head">
         <span class="auth-kicker">ورود سریع</span>
         <h2 class="auth-title">ورود با شماره موبایل</h2>
@@ -30,12 +35,21 @@
         </p>
       </div>
 
-      <form class="auth-form" method="post" action="#" data-otp-form novalidate>
+      <form class="auth-form" method="post" action="{% url 'accounts:login' %}" novalidate>
         {% csrf_token %}
 
-        <div class="auth-step is-active" data-otp-step="phone">
+        {% if next_url %}
+          <input type="hidden" name="next" value="{{ next_url }}">
+        {% endif %}
+
+        <div
+          class="auth-step {% if step == 'phone' %}is-active{% endif %}"
+          data-otp-step="phone"
+          {% if step != 'phone' %}hidden aria-hidden="true"{% else %}aria-hidden="false"{% endif %}
+        >
           <div class="form-group">
             <label class="form-label" for="login-phone">شماره موبایل</label>
+
             <input
               class="form-input auth-input"
               id="login-phone"
@@ -45,30 +59,80 @@
               autocomplete="tel"
               dir="ltr"
               placeholder="09xxxxxxxxx"
-              data-otp-phone
+              value="{% if phone_form.phone.value %}{{ phone_form.phone.value }}{% elif phone_preview %}{{ phone_preview }}{% endif %}"
               required
             >
-            <p class="form-help" data-otp-phone-help>
-              شماره موبایل را با ۰۹ وارد کنید.
-            </p>
+
+            {% if phone_form.phone.errors %}
+              {% for error in phone_form.phone.errors %}
+                <p class="form-help is-error">{{ error }}</p>
+              {% endfor %}
+            {% else %}
+              <p class="form-help">
+                شماره موبایل را با ۰۹ وارد کنید.
+              </p>
+            {% endif %}
           </div>
 
-          <button class="btn btn-primary auth-submit" type="button" data-otp-send>
+          {% if phone_form.non_field_errors %}
+            {% for error in phone_form.non_field_errors %}
+              <p class="form-help is-error">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+
+          <button
+            class="btn btn-primary auth-submit"
+            type="submit"
+            name="otp_action"
+            value="send"
+          >
             دریافت کد ورود
           </button>
         </div>
 
-        <div class="auth-step" data-otp-step="code" hidden aria-hidden="true">
+        <div
+          class="auth-step {% if step == 'code' %}is-active{% endif %}"
+          data-otp-step="code"
+          {% if step != 'code' %}hidden aria-hidden="true"{% else %}aria-hidden="false"{% endif %}
+        >
           <div class="auth-phone-summary">
             <span>کد تایید برای شماره زیر آماده شده است:</span>
-            <strong data-otp-phone-preview>—</strong>
-            <button class="auth-change-phone" type="button" data-otp-change-phone>
+            <strong dir="ltr">
+              {% if phone_preview %}
+                {{ phone_preview }}
+              {% else %}
+                —
+              {% endif %}
+            </strong>
+
+            <button
+              class="auth-change-phone"
+              type="submit"
+              name="otp_action"
+              value="change_phone"
+              formnovalidate
+            >
               تغییر شماره
             </button>
           </div>
 
+          {% comment %} {# Keep phone in POST when user requests resend from code step #} {% endcomment %}
+          {% comment %} <input
+            type="hidden"
+            name="phone"
+            value="{% if phone_form.phone.value %}{{ phone_form.phone.value }}{% elif phone_preview %}{{ phone_preview }}{% endif %}"
+          > {% endcomment %}
+
+          {% if debug_otp_code %}
+            <div class="auth-message is-info" dir="rtl" style="display:block;">
+              کد تست شما:
+              <strong dir="ltr">{{ debug_otp_code }}</strong>
+            </div>
+          {% endif %}
+
           <div class="form-group">
             <label class="form-label" for="login-otp">کد تایید</label>
+
             <input
               class="form-input auth-input auth-code-input"
               id="login-otp"
@@ -77,29 +141,65 @@
               inputmode="numeric"
               autocomplete="one-time-code"
               dir="ltr"
-              maxlength="6"
-              placeholder="------"
-              data-otp-code
+              maxlength="5"
+              placeholder="-----"
+              value="{% if verify_form.otp_code.value %}{{ verify_form.otp_code.value }}{% endif %}"
               required
             >
-            <p class="form-help" data-otp-code-help>
-              کد ارسال‌شده را وارد کنید.
-            </p>
+
+            {% if verify_form.otp_code.errors %}
+              {% for error in verify_form.otp_code.errors %}
+                <p class="form-help is-error">{{ error }}</p>
+              {% endfor %}
+            {% else %}
+              <p class="form-help">
+                کد ۵ رقمی را وارد کنید.
+              </p>
+            {% endif %}
           </div>
 
+          {% if verify_form.non_field_errors %}
+            {% for error in verify_form.non_field_errors %}
+              <p class="form-help is-error">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+
           <div class="auth-resend-row">
-            <span data-otp-timer-text>ارسال دوباره کد تا چند لحظه دیگر فعال می‌شود.</span>
-            <button class="auth-resend-btn" type="button" data-otp-resend disabled>
+            <span>
+              اگر کد را اشتباه وارد کردید یا منقضی شد، می‌توانید دوباره کد بگیرید.
+            </span>
+
+            <button
+              class="auth-resend-btn"
+              type="submit"
+              name="otp_action"
+              value="resend"
+              formnovalidate
+            >
               ارسال دوباره کد
             </button>
           </div>
 
-          <button class="btn btn-primary auth-submit" type="submit" data-otp-verify>
+          <button
+            class="btn btn-primary auth-submit"
+            type="submit"
+            name="otp_action"
+            value="verify"
+          >
             تایید و ورود
           </button>
         </div>
 
-        <div class="auth-message" data-otp-message aria-live="polite"></div>
+        {% if otp_message %}
+          <div
+            class="auth-message {% if otp_message_type %}is-{{ otp_message_type }}{% endif %}"
+            aria-live="polite"
+          >
+            {{ otp_message }}
+          </div>
+        {% else %}
+          <div class="auth-message" aria-live="polite"></div>
+        {% endif %}
       </form>
     </div>
   </div>
