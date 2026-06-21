@@ -9,8 +9,9 @@
       </div>
 
       <div class="profile-user-info">
-        <strong class="profile-user-name">کاربر عزیز</strong>
-        <span class="profile-user-phone">۰۹۱۲۳۴۵۶۷۸۹</span>
+        <span class="profile-user-phone">
+          {{ request.user.phone_number }}
+        </span>
       </div>
     </div>
 
