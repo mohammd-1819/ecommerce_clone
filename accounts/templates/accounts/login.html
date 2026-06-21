@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}ورود به حساب کاربری | نام برند{% endblock %}
+
+{% block content %}
+
+<section class="page-hero auth-page-hero">
+  <div class="container-narrow">
+    <nav class="breadcrumb" aria-label="مسیر صفحه">
+      <a href="#">صفحه اصلی</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>ورود به حساب کاربری</span>
+    </nav>
+
+    <h1 class="page-title">ورود به حساب کاربری</h1>
+    <p class="page-description">
+      برای ورود یا ثبت‌نام، شماره موبایل خود را وارد کنید. کد تایید در همین صفحه نمایش داده می‌شود.
+    </p>
+  </div>
+</section>
+
+<section class="section auth-section">
+  <div class="container-narrow">
+    <div class="auth-card card" data-otp-login>
+      <div class="auth-card-head">
+        <span class="auth-kicker">ورود سریع</span>
+        <h2 class="auth-title">ورود با شماره موبایل</h2>
+        <p class="auth-text">
+          ابتدا شماره موبایل را وارد کنید، سپس کد تایید را در مرحله بعدی ثبت کنید.
+        </p>
+      </div>
+
+      <form class="auth-form" method="post" action="#" data-otp-form novalidate>
+        {% csrf_token %}
+
+        <div class="auth-step is-active" data-otp-step="phone">
+          <div class="form-group">
+            <label class="form-label" for="login-phone">شماره موبایل</label>
+            <input
+              class="form-input auth-input"
+              id="login-phone"
+              name="phone"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="tel"
+              dir="ltr"
+              placeholder="09xxxxxxxxx"
+              data-otp-phone
+              required
+            >
+            <p class="form-help" data-otp-phone-help>
+              شماره موبایل را با ۰۹ وارد کنید.
+            </p>
+          </div>
+
+          <button class="btn btn-primary auth-submit" type="button" data-otp-send>
+            دریافت کد ورود
+          </button>
+        </div>
+
+        <div class="auth-step" data-otp-step="code" hidden aria-hidden="true">
+          <div class="auth-phone-summary">
+            <span>کد تایید برای شماره زیر آماده شده است:</span>
+            <strong data-otp-phone-preview>—</strong>
+            <button class="auth-change-phone" type="button" data-otp-change-phone>
+              تغییر شماره
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-otp">کد تایید</label>
+            <input
+              class="form-input auth-input auth-code-input"
+              id="login-otp"
+              name="otp_code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              dir="ltr"
+              maxlength="6"
+              placeholder="------"
+              data-otp-code
+              required
+            >
+            <p class="form-help" data-otp-code-help>
+              کد ارسال‌شده را وارد کنید.
+            </p>
+          </div>
+
+          <div class="auth-resend-row">
+            <span data-otp-timer-text>ارسال دوباره کد تا چند لحظه دیگر فعال می‌شود.</span>
+            <button class="auth-resend-btn" type="button" data-otp-resend disabled>
+              ارسال دوباره کد
+            </button>
+          </div>
+
+          <button class="btn btn-primary auth-submit" type="submit" data-otp-verify>
+            تایید و ورود
+          </button>
+        </div>
+
+        <div class="auth-message" data-otp-message aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

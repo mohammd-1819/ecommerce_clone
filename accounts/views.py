@@ -342,3 +342,10 @@ class ProfileDashboardView(View):
     def get(self, request):
         return render(request, self.template_name)
 
+
+
+class LoginView(View):
+    template_name = 'accounts/login.html'
+
+    def get(self, request):
+        return render(request, self.template_name)

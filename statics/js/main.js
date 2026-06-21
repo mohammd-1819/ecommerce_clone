@@ -1705,6 +1705,298 @@ function initCommentModal() {
 }
 
 
+function initOtpLogin() {
+  const roots = document.querySelectorAll("[data-otp-login]");
+
+  if (roots.length === 0) return;
+
+  const OTP_TIMER_SECONDS = 45;
+
+  const toEnglishDigits = (value) => {
+    if (!value) return "";
+
+    const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+    const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+
+    return String(value).replace(/[۰-۹٠-٩]/g, (digit) => {
+      const persianIndex = persianDigits.indexOf(digit);
+      if (persianIndex > -1) return String(persianIndex);
+
+      const arabicIndex = arabicDigits.indexOf(digit);
+      if (arabicIndex > -1) return String(arabicIndex);
+
+      return digit;
+    });
+  };
+
+  const normalizePhone = (value) => {
+    return toEnglishDigits(value).replace(/[^\d]/g, "");
+  };
+
+  const normalizeCode = (value) => {
+    return toEnglishDigits(value).replace(/[^\d]/g, "").slice(0, 6);
+  };
+
+  const isValidPhone = (phone) => {
+    return /^09\d{9}$/.test(phone);
+  };
+
+  roots.forEach((root) => {
+    const form = root.querySelector("[data-otp-form]");
+    const phoneStep = root.querySelector('[data-otp-step="phone"]');
+    const codeStep = root.querySelector('[data-otp-step="code"]');
+
+    const phoneInput = root.querySelector("[data-otp-phone]");
+    const phoneHelp = root.querySelector("[data-otp-phone-help]");
+    const sendButton = root.querySelector("[data-otp-send]");
+
+    const codeInput = root.querySelector("[data-otp-code]");
+    const codeHelp = root.querySelector("[data-otp-code-help]");
+    const phonePreview = root.querySelector("[data-otp-phone-preview]");
+    const changePhoneButton = root.querySelector("[data-otp-change-phone]");
+
+    const resendButton = root.querySelector("[data-otp-resend]");
+    const timerText = root.querySelector("[data-otp-timer-text]");
+    const message = root.querySelector("[data-otp-message]");
+
+    if (!form || !phoneStep || !codeStep || !phoneInput || !sendButton || !codeInput) {
+      return;
+    }
+
+    let timerId = null;
+    let secondsLeft = OTP_TIMER_SECONDS;
+
+    const clearMessage = () => {
+      if (!message) return;
+
+      message.textContent = "";
+      message.classList.remove("is-error", "is-success", "is-info");
+    };
+
+    const setMessage = (text, type) => {
+      if (!message) return;
+
+      message.textContent = text;
+      message.classList.remove("is-error", "is-success", "is-info");
+
+      if (type) {
+        message.classList.add(`is-${type}`);
+      }
+    };
+
+    const setHelpState = (element, type) => {
+      if (!element) return;
+
+      element.classList.remove("is-error", "is-success");
+
+      if (type) {
+        element.classList.add(`is-${type}`);
+      }
+    };
+
+    const setStep = (stepName) => {
+      const isPhoneStep = stepName === "phone";
+
+      phoneStep.hidden = !isPhoneStep;
+      phoneStep.setAttribute("aria-hidden", isPhoneStep ? "false" : "true");
+      phoneStep.classList.toggle("is-active", isPhoneStep);
+
+      codeStep.hidden = isPhoneStep;
+      codeStep.setAttribute("aria-hidden", isPhoneStep ? "true" : "false");
+      codeStep.classList.toggle("is-active", !isPhoneStep);
+    };
+
+    const stopTimer = () => {
+      if (timerId) {
+        window.clearInterval(timerId);
+        timerId = null;
+      }
+    };
+
+    const updateTimerText = () => {
+      if (!timerText || !resendButton) return;
+
+      if (secondsLeft > 0) {
+        timerText.textContent = `ارسال دوباره کد تا ${secondsLeft} ثانیه دیگر فعال می‌شود.`;
+        resendButton.disabled = true;
+        return;
+      }
+
+      timerText.textContent = "اگر کدی دریافت نکردید، می‌توانید دوباره درخواست دهید.";
+      resendButton.disabled = false;
+    };
+
+    const startTimer = () => {
+      stopTimer();
+
+      secondsLeft = OTP_TIMER_SECONDS;
+      updateTimerText();
+
+      timerId = window.setInterval(() => {
+        secondsLeft -= 1;
+        updateTimerText();
+
+        if (secondsLeft <= 0) {
+          stopTimer();
+        }
+      }, 1000);
+    };
+
+    const showCodeStep = () => {
+      const phone = normalizePhone(phoneInput.value);
+
+      if (!isValidPhone(phone)) {
+        phoneInput.focus();
+
+        if (phoneHelp) {
+          phoneHelp.textContent = "شماره موبایل باید با ۰۹ شروع شود و ۱۱ رقم باشد.";
+        }
+
+        setHelpState(phoneHelp, "error");
+        setMessage("لطفا شماره موبایل را درست وارد کنید.", "error");
+        return;
+      }
+
+      phoneInput.value = phone;
+
+      if (phonePreview) {
+        phonePreview.textContent = phone;
+      }
+
+      if (phoneHelp) {
+        phoneHelp.textContent = "شماره موبایل تایید شد.";
+      }
+
+      setHelpState(phoneHelp, "success");
+      setHelpState(codeHelp, null);
+      clearMessage();
+
+      setStep("code");
+      startTimer();
+
+      window.setTimeout(() => {
+        codeInput.focus();
+      }, 80);
+    };
+
+    const resetToPhoneStep = () => {
+      stopTimer();
+
+      codeInput.value = "";
+
+      if (codeHelp) {
+        codeHelp.textContent = "کد ارسال‌شده را وارد کنید.";
+      }
+
+      setHelpState(codeHelp, null);
+      clearMessage();
+      setStep("phone");
+
+      window.setTimeout(() => {
+        phoneInput.focus();
+      }, 80);
+    };
+
+    const resendCode = () => {
+      codeInput.value = "";
+
+      if (codeHelp) {
+        codeHelp.textContent = "کد جدید را وارد کنید.";
+      }
+
+      setHelpState(codeHelp, null);
+      setMessage("کد ورود دوباره آماده شد.", "info");
+      startTimer();
+
+      window.setTimeout(() => {
+        codeInput.focus();
+      }, 80);
+    };
+
+    phoneInput.addEventListener("input", () => {
+      phoneInput.value = normalizePhone(phoneInput.value).slice(0, 11);
+
+      if (phoneHelp) {
+        phoneHelp.textContent = "شماره موبایل را با ۰۹ وارد کنید.";
+      }
+
+      setHelpState(phoneHelp, null);
+      clearMessage();
+    });
+
+    codeInput.addEventListener("input", () => {
+      codeInput.value = normalizeCode(codeInput.value);
+
+      if (codeHelp) {
+        codeHelp.textContent = "کد ارسال‌شده را وارد کنید.";
+      }
+
+      setHelpState(codeHelp, null);
+      clearMessage();
+    });
+
+    sendButton.addEventListener("click", showCodeStep);
+
+    phoneInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        showCodeStep();
+      }
+    });
+
+    if (changePhoneButton) {
+      changePhoneButton.addEventListener("click", resetToPhoneStep);
+    }
+
+    if (resendButton) {
+      resendButton.addEventListener("click", resendCode);
+    }
+
+    form.addEventListener("submit", (event) => {
+      const phone = normalizePhone(phoneInput.value);
+      const code = normalizeCode(codeInput.value);
+
+      phoneInput.value = phone;
+      codeInput.value = code;
+
+      if (!isValidPhone(phone)) {
+        event.preventDefault();
+        resetToPhoneStep();
+        setMessage("لطفا شماره موبایل را دوباره بررسی کنید.", "error");
+        return;
+      }
+
+      if (!/^\d{6}$/.test(code)) {
+        event.preventDefault();
+
+        if (codeHelp) {
+          codeHelp.textContent = "کد تایید باید ۶ رقم باشد.";
+        }
+
+        setHelpState(codeHelp, "error");
+        setMessage("کد تایید کامل نیست.", "error");
+        codeInput.focus();
+        return;
+      }
+
+      /*
+       * Static-template mock:
+       * Remove event.preventDefault() later when backend OTP verification is ready.
+       */
+      event.preventDefault();
+
+      setHelpState(codeHelp, "success");
+      setMessage("ورود با موفقیت انجام شد. در نسخه نهایی، کاربر وارد حساب می‌شود.", "success");
+    });
+
+    setStep("phone");
+  });
+}
+
+
+
+
+
 
   ready(function () {
     initHeaderScroll();
@@ -1718,6 +2010,7 @@ function initCommentModal() {
     initOrderTabs();
     initReveal();
     initQuantityControls();
+    initOtpLogin();
     initProductVariants();
     initCommentModal();
     initCartPage();
