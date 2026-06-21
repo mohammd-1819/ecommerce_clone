@@ -24,7 +24,7 @@ from django.contrib.auth import get_user_model, login
 from django.utils import timezone
 import string
 import math
-
+from django.contrib.auth import logout
 
 
 User = get_user_model()
@@ -742,3 +742,16 @@ class ProfileDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile_dashboard.html"
     login_url = reverse_lazy("accounts:login")
     redirect_field_name = "next"
+
+
+
+class LogoutView(LoginRequiredMixin, View):
+    login_url = reverse_lazy("accounts:login")
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        return redirect("accounts:login")
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect("accounts:login")
