@@ -264,12 +264,50 @@ class OrderItem(TimeStampedModel):
         verbose_name="تنوع محصول",
     )
 
+    # Snapshot fields
+    product_title = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="نام محصول در زمان سفارش",
+    )
+    variant_summary = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="مشخصات تنوع در زمان سفارش",
+        help_text="مثلاً: ۲۵۰ گرم • آسیاب متوسط",
+    )
+    unit_price_toman = models.PositiveBigIntegerField(
+        default=0,
+        verbose_name="قیمت واحد در زمان سفارش",
+    )
+
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)], verbose_name="تعداد")
     line_total_toman = models.PositiveBigIntegerField(verbose_name="جمع این کالا")
 
     class Meta:
         verbose_name = "آیتم سفارش"
         verbose_name_plural = "آیتم‌های سفارش"
+
+    @property
+    def display_title(self):
+        if self.product_title:
+            return self.product_title
+
+        if self.product_id and self.product:
+            return self.product.title
+
+        return "محصول حذف‌شده"
+
+    @property
+    def display_meta(self):
+        parts = []
+
+        if self.variant_summary:
+            parts.append(self.variant_summary)
+
+        parts.append(f"تعداد {self.quantity}")
+
+        return " • ".join(parts)
 
     def __str__(self):
         return f"{self.product.title} x {self.quantity}"

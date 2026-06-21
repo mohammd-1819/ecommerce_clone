@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}سفارش‌ها | نام برند{% endblock %}
 
@@ -66,128 +67,85 @@
             aria-labelledby="orders-current-tab"
             data-order-panel="current">
 
-            <article class="order-card">
-              <div class="order-card-header">
-                <div>
-                  <span class="order-label">شماره سفارش</span>
-                  <strong class="order-number">#۱۲۸۴</strong>
-                </div>
-
-                <span class="order-status is-current">در حال آماده‌سازی</span>
-              </div>
-
-              <div class="order-meta-grid">
-                <div class="order-meta-item">
-                  <span>تاریخ ثبت</span>
-                  <strong>۱۴۰۳/۰۸/۱۲</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>تعداد کالا</span>
-                  <strong>۳ کالا</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>مبلغ سفارش</span>
-                  <strong>۹۸۰٬۰۰۰ تومان</strong>
-                </div>
-              </div>
-
-              <div class="order-products">
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">قهوه عربیکا ویژه</h3>
-                    <p class="order-product-meta">۲۵۰ گرم • آسیاب متوسط • تعداد ۱</p>
+            {% for order in current_orders %}
+              <article class="order-card">
+                <div class="order-card-header">
+                  <div>
+                    <span class="order-label">شماره سفارش</span>
+                    <strong class="order-number">#{{ order.code }}</strong>
                   </div>
-                  <span class="order-product-price">۳۲۰٬۰۰۰ تومان</span>
+
+                  <span class="order-status is-current">
+                    {{ order.get_status_display }}
+                  </span>
                 </div>
 
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">هات‌چاکلت کلاسیک</h3>
-                    <p class="order-product-meta">۴۰۰ گرم • تعداد ۲</p>
+                <div class="order-meta-grid">
+                  <div class="order-meta-item">
+                    <span>تاریخ ثبت</span>
+                    <strong>{{ order.created_at|date:"Y/m/d" }}</strong>
                   </div>
-                  <span class="order-product-price">۶۶۰٬۰۰۰ تومان</span>
-                </div>
-              </div>
 
-              <div class="order-card-footer">
-                <div class="order-total">
-                  <span>مبلغ کل</span>
-                  <strong>۹۸۰٬۰۰۰ تومان</strong>
-                </div>
-
-                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
-              </div>
-            </article>
-
-            <article class="order-card">
-              <div class="order-card-header">
-                <div>
-                  <span class="order-label">شماره سفارش</span>
-                  <strong class="order-number">#۱۲۷۹</strong>
-                </div>
-
-                <span class="order-status is-current">ارسال شده</span>
-              </div>
-
-              <div class="order-meta-grid">
-                <div class="order-meta-item">
-                  <span>تاریخ ثبت</span>
-                  <strong>۱۴۰۳/۰۸/۰۸</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>تعداد کالا</span>
-                  <strong>۲ کالا</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>مبلغ سفارش</span>
-                  <strong>۶۷۰٬۰۰۰ تومان</strong>
-                </div>
-              </div>
-
-              <div class="order-products">
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">قهوه اسپرسو ترکیبی</h3>
-                    <p class="order-product-meta">۵۰۰ گرم • آسیاب ریز • تعداد ۱</p>
+                  <div class="order-meta-item">
+                    <span>تعداد کالا</span>
+                    <strong>{{ order.items_count }} کالا</strong>
                   </div>
-                  <span class="order-product-price">۴۹۰٬۰۰۰ تومان</span>
-                </div>
 
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">چای سیاه ممتاز</h3>
-                    <p class="order-product-meta">۲۵۰ گرم • تعداد ۱</p>
+                  <div class="order-meta-item">
+                    <span>مبلغ سفارش</span>
+                    <strong>{{ order.total_toman|intcomma }} تومان</strong>
                   </div>
-                  <span class="order-product-price">۱۸۰٬۰۰۰ تومان</span>
-                </div>
-              </div>
-
-              <div class="order-card-footer">
-                <div class="order-total">
-                  <span>مبلغ کل</span>
-                  <strong>۶۷۰٬۰۰۰ تومان</strong>
                 </div>
 
-                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
-              </div>
-            </article>
+                <div class="order-products">
+                  {% for item in order.items.all %}
+                    <div class="order-product-row">
+                      <div class="order-product-info">
+                        <h3 class="order-product-title">
+                          {{ item.display_title }}
+                        </h3>
 
-            <!--
-            <div class="profile-empty-state">
-              <div class="profile-empty-icon" aria-hidden="true">
-                <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-                  <path d="M6.5 7.5H17.5L18.75 20H5.25L6.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-                  <path d="M9 7.5C9 5.6 10.2 4.25 12 4.25C13.8 4.25 15 5.6 15 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                </svg>
+                        <p class="order-product-meta">
+                          {{ item.display_meta }}
+                        </p>
+                      </div>
+
+                      <span class="order-product-price">
+                        {{ item.line_total_toman|intcomma }} تومان
+                      </span>
+                    </div>
+                  {% empty %}
+                    <div class="order-product-row">
+                      <div class="order-product-info">
+                        <h3 class="order-product-title">آیتمی برای این سفارش ثبت نشده است.</h3>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="order-card-footer">
+                  <div class="order-total">
+                    <span>مبلغ کل</span>
+                    <strong>{{ order.total_toman|intcomma }} تومان</strong>
+                  </div>
+
+                  <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">
+                    مشاهده جزئیات
+                  </a>
+                </div>
+              </article>
+            {% empty %}
+              <div class="profile-empty-state">
+                <div class="profile-empty-icon" aria-hidden="true">
+                  <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
+                    <path d="M6.5 7.5H17.5L18.75 20H5.25L6.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M9 7.5C9 5.6 10.2 4.25 12 4.25C13.8 4.25 15 5.6 15 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <h3>سفارش جاری وجود ندارد.</h3>
+                <p>هنوز سفارشی در این بخش ثبت نشده است.</p>
               </div>
-              <h3>سفارش جاری وجود ندارد.</h3>
-              <p>هنوز سفارشی در این بخش ثبت نشده است.</p>
-            </div>
-            -->
+            {% endfor %}
           </div>
 
           <div
@@ -198,136 +156,85 @@
             data-order-panel="completed"
             hidden>
 
-            <article class="order-card">
-              <div class="order-card-header">
-                <div>
-                  <span class="order-label">شماره سفارش</span>
-                  <strong class="order-number">#۱۲۶۳</strong>
-                </div>
-
-                <span class="order-status is-completed">تحویل‌شده</span>
-              </div>
-
-              <div class="order-meta-grid">
-                <div class="order-meta-item">
-                  <span>تاریخ ثبت</span>
-                  <strong>۱۴۰۳/۰۷/۲۵</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>تعداد کالا</span>
-                  <strong>۴ کالا</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>مبلغ سفارش</span>
-                  <strong>۱٬۲۴۰٬۰۰۰ تومان</strong>
-                </div>
-              </div>
-
-              <div class="order-products">
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">قهوه کلمبیا</h3>
-                    <p class="order-product-meta">۲۵۰ گرم • دانه کامل • تعداد ۲</p>
+            {% for order in completed_orders %}
+              <article class="order-card">
+                <div class="order-card-header">
+                  <div>
+                    <span class="order-label">شماره سفارش</span>
+                    <strong class="order-number">#{{ order.code }}</strong>
                   </div>
-                  <span class="order-product-price">۷۴۰٬۰۰۰ تومان</span>
+
+                  <span class="order-status is-completed">
+                    {{ order.get_status_display }}
+                  </span>
                 </div>
 
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">پودر کاپوچینو فوری</h3>
-                    <p class="order-product-meta">۲۰ عددی • تعداد ۱</p>
+                <div class="order-meta-grid">
+                  <div class="order-meta-item">
+                    <span>تاریخ ثبت</span>
+                    <strong>{{ order.created_at|date:"Y/m/d" }}</strong>
                   </div>
-                  <span class="order-product-price">۲۶۰٬۰۰۰ تومان</span>
-                </div>
 
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">هات‌چاکلت تلخ</h3>
-                    <p class="order-product-meta">۴۰۰ گرم • تعداد ۱</p>
+                  <div class="order-meta-item">
+                    <span>تعداد کالا</span>
+                    <strong>{{ order.items_count }} کالا</strong>
                   </div>
-                  <span class="order-product-price">۲۴۰٬۰۰۰ تومان</span>
-                </div>
-              </div>
 
-              <div class="order-card-footer">
-                <div class="order-total">
-                  <span>مبلغ کل</span>
-                  <strong>۱٬۲۴۰٬۰۰۰ تومان</strong>
-                </div>
-
-                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
-              </div>
-            </article>
-
-            <article class="order-card">
-              <div class="order-card-header">
-                <div>
-                  <span class="order-label">شماره سفارش</span>
-                  <strong class="order-number">#۱۲۵۱</strong>
-                </div>
-
-                <span class="order-status is-completed">تکمیل‌شده</span>
-              </div>
-
-              <div class="order-meta-grid">
-                <div class="order-meta-item">
-                  <span>تاریخ ثبت</span>
-                  <strong>۱۴۰۳/۰۷/۱۰</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>تعداد کالا</span>
-                  <strong>۲ کالا</strong>
-                </div>
-
-                <div class="order-meta-item">
-                  <span>مبلغ سفارش</span>
-                  <strong>۵۶۰٬۰۰۰ تومان</strong>
-                </div>
-              </div>
-
-              <div class="order-products">
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">قهوه فرانسه ملایم</h3>
-                    <p class="order-product-meta">۲۵۰ گرم • آسیاب درشت • تعداد ۱</p>
+                  <div class="order-meta-item">
+                    <span>مبلغ سفارش</span>
+                    <strong>{{ order.total_toman|intcomma }} تومان</strong>
                   </div>
-                  <span class="order-product-price">۳۱۰٬۰۰۰ تومان</span>
                 </div>
 
-                <div class="order-product-row">
-                  <div class="order-product-info">
-                    <h3 class="order-product-title">چای سبز معطر</h3>
-                    <p class="order-product-meta">۲۰۰ گرم • تعداد ۱</p>
+                <div class="order-products">
+                  {% for item in order.items.all %}
+                    <div class="order-product-row">
+                      <div class="order-product-info">
+                        <h3 class="order-product-title">
+                          {{ item.display_title }}
+                        </h3>
+
+                        <p class="order-product-meta">
+                          {{ item.display_meta }}
+                        </p>
+                      </div>
+
+                      <span class="order-product-price">
+                        {{ item.line_total_toman|intcomma }} تومان
+                      </span>
+                    </div>
+                  {% empty %}
+                    <div class="order-product-row">
+                      <div class="order-product-info">
+                        <h3 class="order-product-title">آیتمی برای این سفارش ثبت نشده است.</h3>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="order-card-footer">
+                  <div class="order-total">
+                    <span>مبلغ کل</span>
+                    <strong>{{ order.total_toman|intcomma }} تومان</strong>
                   </div>
-                  <span class="order-product-price">۲۵۰٬۰۰۰ تومان</span>
+
+                  <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">
+                    مشاهده جزئیات
+                  </a>
                 </div>
-              </div>
-
-              <div class="order-card-footer">
-                <div class="order-total">
-                  <span>مبلغ کل</span>
-                  <strong>۵۶۰٬۰۰۰ تومان</strong>
+              </article>
+            {% empty %}
+              <div class="profile-empty-state">
+                <div class="profile-empty-icon" aria-hidden="true">
+                  <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
+                    <path d="M6.5 7.5H17.5L18.75 20H5.25L6.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M9 7.5C9 5.6 10.2 4.25 12 4.25C13.8 4.25 15 5.6 15 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  </svg>
                 </div>
-
-                <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">مشاهده جزئیات</a>
+                <h3>سفارش تکمیل‌شده‌ای وجود ندارد.</h3>
+                <p>بعد از تحویل سفارش، اطلاعات آن در این بخش نمایش داده می‌شود.</p>
               </div>
-            </article>
-
-            <!--
-            <div class="profile-empty-state">
-              <div class="profile-empty-icon" aria-hidden="true">
-                <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-                  <path d="M6.5 7.5H17.5L18.75 20H5.25L6.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-                  <path d="M9 7.5C9 5.6 10.2 4.25 12 4.25C13.8 4.25 15 5.6 15 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <h3>سفارش تکمیل‌شده‌ای وجود ندارد.</h3>
-              <p>بعد از تحویل سفارش، اطلاعات آن در این بخش نمایش داده می‌شود.</p>
-            </div>
-            -->
+            {% endfor %}
           </div>
         </div>
       </div>
