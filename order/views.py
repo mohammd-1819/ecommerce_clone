@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic.edit import FormView
@@ -17,7 +17,12 @@ from .services import (
     summary_to_json,
     validate_coupon_for_cart,
 )
-from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Prefetch, Sum, Value, IntegerField
+from django.db.models.functions import Coalesce
+from django.http import Http404
+from django.views.generic import DetailView
+from .models import Order, OrderItem
+
 
 
 class CheckoutDetailView(LoginRequiredMixin, FormView):
@@ -342,8 +347,178 @@ class CheckoutAddressSaveView(LoginRequiredMixin, View):
 
 
 
-class OrderDetailView(View):
-    template_name = 'order/order_detail.html'
+class UserOrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = "order/order_detail.html"
+    context_object_name = "order"
 
-    def get(self, request):
-        return render(request, self.template_name)
+    def get_queryset(self):
+        order_items_queryset = (
+            OrderItem.objects
+            .select_related("product", "variant")
+            .order_by("id")
+        )
+
+        return (
+            Order.objects
+            .filter(user=self.request.user)
+            .select_related(
+                "payment_method",
+                "coupon",
+                "address",
+                "checkout_session",
+                "cart",
+            )
+            .prefetch_related(
+                Prefetch("items", queryset=order_items_queryset)
+            )
+            .annotate(
+                items_count=Coalesce(
+                    Sum("items__quantity"),
+                    Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+        )
+
+    def get_object(self, queryset=None):
+        queryset = queryset or self.get_queryset()
+
+        order_code = self.kwargs.get("order_code")
+        pk = self.kwargs.get("pk")
+
+        if order_code:
+            return get_object_or_404(queryset, code=order_code)
+
+        if pk:
+            return get_object_or_404(queryset, pk=pk)
+
+        raise Http404("Order not found.")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        order = self.object
+
+        context["timeline_steps"] = self.get_timeline_steps(order)
+        context["order_status_badge_class"] = self.get_order_status_badge_class(order)
+        context["payment_status_class"] = self.get_payment_status_class(order)
+
+        return context
+
+    def get_order_status_badge_class(self, order):
+        status_class_map = {
+            Order.Status.PENDING_PAYMENT: "order-status-pending",
+            Order.Status.PAID: "order-status-paid",
+            Order.Status.PREPARING: "order-status-processing",
+            Order.Status.SHIPPED: "order-status-shipped",
+            Order.Status.DELIVERED: "order-status-delivered",
+            Order.Status.CANCELLED: "order-status-cancelled",
+            Order.Status.REFUNDED: "order-status-refunded",
+        }
+
+        return status_class_map.get(order.status, "order-status-processing")
+
+    def get_payment_status_class(self, order):
+        status_class_map = {
+            Order.PaymentStatus.UNPAID: "text-muted",
+            Order.PaymentStatus.PENDING: "text-warning",
+            Order.PaymentStatus.PAID: "text-success",
+            Order.PaymentStatus.FAILED: "text-danger",
+            Order.PaymentStatus.REFUNDED: "text-muted",
+        }
+
+        return status_class_map.get(order.payment_status, "")
+
+    def get_timeline_steps(self, order):
+        if order.status == Order.Status.CANCELLED:
+            return [
+                {
+                    "title": "ثبت سفارش",
+                    "description": "سفارش شما در سیستم ثبت شد.",
+                    "state_class": "is-complete",
+                },
+                {
+                    "title": "لغو سفارش",
+                    "description": "این سفارش لغو شده است.",
+                    "state_class": "is-active",
+                },
+            ]
+
+        if order.status == Order.Status.REFUNDED:
+            return [
+                {
+                    "title": "ثبت سفارش",
+                    "description": "سفارش شما در سیستم ثبت شد.",
+                    "state_class": "is-complete",
+                },
+                {
+                    "title": "پرداخت موفق",
+                    "description": "پرداخت سفارش تایید شده بود.",
+                    "state_class": "is-complete",
+                },
+                {
+                    "title": "بازگشت وجه",
+                    "description": "مبلغ سفارش بازگشت داده شده است.",
+                    "state_class": "is-active",
+                },
+            ]
+
+        steps = [
+            {
+                "status": Order.Status.PENDING_PAYMENT,
+                "title": "ثبت سفارش",
+                "description": "سفارش شما با موفقیت ثبت شد.",
+            },
+            {
+                "status": Order.Status.PAID,
+                "title": "پرداخت موفق",
+                "description": "پرداخت سفارش تایید شده است.",
+            },
+            {
+                "status": Order.Status.PREPARING,
+                "title": "در حال آماده‌سازی",
+                "description": "محصولات در حال بسته‌بندی و آماده‌سازی هستند.",
+            },
+            {
+                "status": Order.Status.SHIPPED,
+                "title": "ارسال سفارش",
+                "description": "سفارش به واحد ارسال یا پیک تحویل داده شده است.",
+            },
+            {
+                "status": Order.Status.DELIVERED,
+                "title": "تحویل شده",
+                "description": "سفارش در مقصد تحویل داده شده است.",
+            },
+        ]
+
+        current_index_map = {
+            Order.Status.PENDING_PAYMENT: 0,
+            Order.Status.PAID: 1,
+            Order.Status.PREPARING: 2,
+            Order.Status.SHIPPED: 3,
+            Order.Status.DELIVERED: 4,
+        }
+
+        current_index = current_index_map.get(order.status, 0)
+        timeline_steps = []
+
+        for index, step in enumerate(steps):
+            if order.status == Order.Status.DELIVERED:
+                state_class = "is-complete"
+            elif index < current_index:
+                state_class = "is-complete"
+            elif index == current_index:
+                state_class = "is-active"
+            else:
+                state_class = ""
+
+            timeline_steps.append(
+                {
+                    "title": step["title"],
+                    "description": step["description"],
+                    "state_class": state_class,
+                }
+            )
+
+        return timeline_steps

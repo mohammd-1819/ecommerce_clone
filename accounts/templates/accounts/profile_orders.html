@@ -129,7 +129,7 @@
                     <strong>{{ order.total_toman|intcomma }} تومان</strong>
                   </div>
 
-                  <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">
+                  <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' order.code %}">
                     مشاهده جزئیات
                   </a>
                 </div>
@@ -218,7 +218,7 @@
                     <strong>{{ order.total_toman|intcomma }} تومان</strong>
                   </div>
 
-                  <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' %}">
+                  <a class="btn btn-sm btn-primary" href="{% url 'order:order-detail' order.code %}">
                     مشاهده جزئیات
                   </a>
                 </div>

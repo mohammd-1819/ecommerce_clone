@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
-{% block title %}جزئیات سفارش | نام برند{% endblock %}
+{% block title %}جزئیات سفارش #{{ order.code }} | نام برند{% endblock %}
 
 {% block content %}
 
@@ -20,17 +20,19 @@
     <div class="order-detail-hero-content">
       <div>
         <span class="section-eyebrow">جزئیات سفارش</span>
-        <h1 class="page-title">سفارش شماره #۱۲۸۴</h1>
+        <h1 class="page-title">سفارش شماره #{{ order.code }}</h1>
         <p class="order-detail-hero-text">
           اطلاعات کامل سفارش، محصولات خریداری‌شده، وضعیت پرداخت و مشخصات ارسال را در این بخش مشاهده می‌کنید.
         </p>
       </div>
 
-      {% comment %} <div class="order-detail-hero-status">
-        <span class="order-status-badge order-status-processing">در حال آماده‌سازی</span>
-        <strong>۹۸۰٬۰۰۰ تومان</strong>
+      <div class="order-detail-hero-status">
+        <span class="order-status-badge {{ order_status_badge_class }}">
+          {{ order.get_status_display }}
+        </span>
+        <strong>{{ order.total_toman|intcomma }} تومان</strong>
         <small>مبلغ نهایی سفارش</small>
-      </div> {% endcomment %}
+      </div>
     </div>
   </div>
 </section>
@@ -48,38 +50,43 @@
               <span class="order-detail-label">خلاصه سفارش</span>
               <h2 class="order-detail-title">اطلاعات کلی سفارش</h2>
             </div>
-            <span class="order-status-badge order-status-processing">در حال آماده‌سازی</span>
+
+            <span class="order-status-badge {{ order_status_badge_class }}">
+              {{ order.get_status_display }}
+            </span>
           </div>
 
           <div class="order-overview-grid">
             <div class="order-overview-item">
               <span>شماره سفارش</span>
-              <strong>#۱۲۸۴</strong>
+              <strong>#{{ order.code }}</strong>
             </div>
 
             <div class="order-overview-item">
               <span>تاریخ ثبت</span>
-              <strong>۱۴۰۳/۰۸/۱۲</strong>
+              <strong>{{ order.created_at|date:"Y/m/d" }}</strong>
             </div>
 
             <div class="order-overview-item">
               <span>تعداد کالا</span>
-              <strong>۳ کالا</strong>
+              <strong>{{ order.items_count }} کالا</strong>
             </div>
 
             <div class="order-overview-item">
               <span>روش ارسال</span>
-              <strong>ارسال با پیک</strong>
+              <strong>{{ order.shipping_method_title|default:"ثبت نشده" }}</strong>
             </div>
 
             <div class="order-overview-item">
               <span>وضعیت پرداخت</span>
-              <strong class="text-success">پرداخت موفق</strong>
+              <strong class="{{ payment_status_class }}">
+                {{ order.get_payment_status_display }}
+              </strong>
             </div>
 
             <div class="order-overview-item">
               <span>کد پیگیری پرداخت</span>
-              <strong>۷۴۸۲۹۱</strong>
+              <strong>{{ order.payment_tracking_code|default:"ثبت نشده" }}</strong>
             </div>
           </div>
         </article>
@@ -93,45 +100,15 @@
           </div>
 
           <ol class="order-timeline" aria-label="وضعیت پردازش سفارش">
-            <li class="order-timeline-step is-complete">
-              <span class="order-timeline-dot"></span>
-              <div>
-                <strong>ثبت سفارش</strong>
-                <small>سفارش شما با موفقیت ثبت شد.</small>
-              </div>
-            </li>
-
-            <li class="order-timeline-step is-complete">
-              <span class="order-timeline-dot"></span>
-              <div>
-                <strong>پرداخت موفق</strong>
-                <small>پرداخت سفارش تایید شده است.</small>
-              </div>
-            </li>
-
-            <li class="order-timeline-step is-active">
-              <span class="order-timeline-dot"></span>
-              <div>
-                <strong>در حال آماده‌سازی</strong>
-                <small>محصولات در حال بسته‌بندی و آماده‌سازی هستند.</small>
-              </div>
-            </li>
-
-            <li class="order-timeline-step">
-              <span class="order-timeline-dot"></span>
-              <div>
-                <strong>ارسال سفارش</strong>
-                <small>پس از آماده‌سازی، سفارش به پیک تحویل داده می‌شود.</small>
-              </div>
-            </li>
-
-            <li class="order-timeline-step">
-              <span class="order-timeline-dot"></span>
-              <div>
-                <strong>تحویل شده</strong>
-                <small>سفارش در مقصد تحویل داده خواهد شد.</small>
-              </div>
-            </li>
+            {% for step in timeline_steps %}
+              <li class="order-timeline-step {{ step.state_class }}">
+                <span class="order-timeline-dot"></span>
+                <div>
+                  <strong>{{ step.title }}</strong>
+                  <small>{{ step.description }}</small>
+                </div>
+              </li>
+            {% endfor %}
           </ol>
         </article>
 
@@ -141,69 +118,86 @@
               <span class="order-detail-label">محصولات سفارش</span>
               <h2 class="order-detail-title">اقلام خریداری‌شده</h2>
             </div>
-            <span class="order-items-count">۳ کالا</span>
+
+            <span class="order-items-count">{{ order.items_count }} کالا</span>
           </div>
 
           <div class="order-items-list">
+            {% for item in order.items.all %}
+              <div class="order-item-row">
 
-            <div class="order-item-row">
-              <a class="order-item-image" href="#">
-                <img src="{% static 'images/product_1.png' %}" alt="قهوه عربیکا ویژه">
-              </a>
+                {% if item.product and item.product.get_absolute_url %}
+                  <a class="order-item-image" href="{{ item.product.get_absolute_url }}">
+                {% else %}
+                  <div class="order-item-image">
+                {% endif %}
 
-              <div class="order-item-info">
-                <h3>
-                  <a href="#">قهوه عربیکا ویژه</a>
-                </h3>
-                <p>۲۵۰ گرم · آسیاب متوسط</p>
+                  {% if item.product and item.product.main_image %}
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.display_title }}">
+                  {% else %}
+                    <img src="{% static 'images/product_1.png' %}" alt="{{ item.display_title }}">
+                  {% endif %}
+
+                {% if item.product and item.product.get_absolute_url %}
+                  </a>
+                {% else %}
+                  </div>
+                {% endif %}
+
+                <div class="order-item-info">
+                  <h3>
+                    {% if item.product and item.product.get_absolute_url %}
+                      <a href="{{ item.product.get_absolute_url }}">{{ item.display_title }}</a>
+                    {% else %}
+                      {{ item.display_title }}
+                    {% endif %}
+                  </h3>
+
+                  {% if item.variant_summary %}
+                    <p>{{ item.variant_summary }}</p>
+                  {% else %}
+                    <p>مشخصات تنوع ثبت نشده است.</p>
+                  {% endif %}
+                </div>
+
+                <div class="order-item-meta">
+                  <span>تعداد</span>
+                  <strong>{{ item.quantity }} عدد</strong>
+                </div>
+
+                <div class="order-item-price">
+                  <span>قیمت واحد</span>
+                  <strong>{{ item.unit_price_toman|intcomma }} تومان</strong>
+                </div>
+
+                <div class="order-item-total">
+                  <span>جمع</span>
+                  <strong>{{ item.line_total_toman|intcomma }} تومان</strong>
+                </div>
               </div>
-
-              <div class="order-item-meta">
-                <span>تعداد</span>
-                <strong>۱ عدد</strong>
+            {% empty %}
+              <div class="profile-empty-state">
+                <h3>محصولی برای این سفارش ثبت نشده است.</h3>
+                <p>در حال حاضر آیتمی برای این سفارش وجود ندارد.</p>
               </div>
-
-              <div class="order-item-price">
-                <span>قیمت واحد</span>
-                <strong>۳۲۰٬۰۰۰ تومان</strong>
-              </div>
-
-              <div class="order-item-total">
-                <span>جمع</span>
-                <strong>۳۲۰٬۰۰۰ تومان</strong>
-              </div>
-            </div>
-
-            <div class="order-item-row">
-              <a class="order-item-image" href="#">
-                <img src="{% static 'images/product_2.png' %}" alt="هات‌چاکلت کلاسیک">
-              </a>
-
-              <div class="order-item-info">
-                <h3>
-                  <a href="#">هات‌چاکلت کلاسیک</a>
-                </h3>
-                <p>۴۰۰ گرم · بسته اقتصادی</p>
-              </div>
-
-              <div class="order-item-meta">
-                <span>تعداد</span>
-                <strong>۲ عدد</strong>
-              </div>
-
-              <div class="order-item-price">
-                <span>قیمت واحد</span>
-                <strong>۳۳۰٬۰۰۰ تومان</strong>
-              </div>
-
-              <div class="order-item-total">
-                <span>جمع</span>
-                <strong>۶۶۰٬۰۰۰ تومان</strong>
-              </div>
-            </div>
-
+            {% endfor %}
           </div>
         </article>
+
+        {% if order.customer_note %}
+          <article class="card order-info-card reveal">
+            <div class="order-detail-card-head">
+              <div>
+                <span class="order-detail-label">یادداشت سفارش</span>
+                <h2 class="order-detail-title">توضیحات مشتری</h2>
+              </div>
+            </div>
+
+            <p class="profile-panel-text">
+              {{ order.customer_note|linebreaksbr }}
+            </p>
+          </article>
+        {% endif %}
 
       </div>
 
@@ -220,27 +214,34 @@
           <div class="order-price-list">
             <div class="order-price-row">
               <span>جمع محصولات</span>
-              <strong>۹۸۰٬۰۰۰ تومان</strong>
+              <strong>{{ order.subtotal_toman|intcomma }} تومان</strong>
             </div>
 
             <div class="order-price-row">
               <span>هزینه ارسال</span>
-              <strong>۰ تومان</strong>
+              <strong>{{ order.shipping_price_toman|intcomma }} تومان</strong>
             </div>
 
             <div class="order-price-row">
               <span>تخفیف</span>
-              <strong>۰ تومان</strong>
+              <strong>{{ order.discount_toman|intcomma }} تومان</strong>
             </div>
 
             <div class="order-price-row">
               <span>مالیات و هزینه خدمات</span>
-              <strong>۰ تومان</strong>
+              <strong>{{ order.tax_toman|intcomma }} تومان</strong>
             </div>
+
+            {% if order.coupon %}
+              <div class="order-price-row">
+                <span>کد تخفیف</span>
+                <strong>{{ order.coupon }}</strong>
+              </div>
+            {% endif %}
 
             <div class="order-price-row order-price-total">
               <span>مبلغ نهایی</span>
-              <strong>۹۸۰٬۰۰۰ تومان</strong>
+              <strong>{{ order.total_toman|intcomma }} تومان</strong>
             </div>
           </div>
         </article>
@@ -256,22 +257,33 @@
           <dl class="order-info-list">
             <div>
               <dt>نام گیرنده</dt>
-              <dd>کاربر عزیز</dd>
+              <dd>{{ order.recipient_full_name }}</dd>
             </div>
 
             <div>
               <dt>شماره تماس</dt>
-              <dd>۰۹۱۲۳۴۵۶۷۸۹</dd>
+              <dd>{{ order.recipient_phone }}</dd>
             </div>
+
+            {% if order.province or order.city %}
+              <div>
+                <dt>استان و شهر</dt>
+                <dd>
+                  {% if order.province %}{{ order.province }}{% endif %}
+                  {% if order.province and order.city %}، {% endif %}
+                  {% if order.city %}{{ order.city }}{% endif %}
+                </dd>
+              </div>
+            {% endif %}
 
             <div>
               <dt>آدرس</dt>
-              <dd>تهران، خیابان ولیعصر، بالاتر از میدان ونک، پلاک ۱۲، واحد ۴</dd>
+              <dd>{{ order.postal_address }}</dd>
             </div>
 
             <div>
               <dt>کد پستی</dt>
-              <dd>۱۵۹۹۹۱۲۳۴۵</dd>
+              <dd>{{ order.postal_code|default:"ثبت نشده" }}</dd>
             </div>
           </dl>
         </article>
@@ -287,22 +299,30 @@
           <dl class="order-info-list">
             <div>
               <dt>روش پرداخت</dt>
-              <dd>پرداخت آنلاین</dd>
+              <dd>{{ order.payment_method }}</dd>
             </div>
 
             <div>
               <dt>وضعیت پرداخت</dt>
-              <dd class="text-success">موفق</dd>
+              <dd class="{{ payment_status_class }}">
+                {{ order.get_payment_status_display }}
+              </dd>
             </div>
 
             <div>
               <dt>تاریخ پرداخت</dt>
-              <dd>۱۴۰۳/۰۸/۱۲ - ۱۸:۴۵</dd>
+              <dd>
+                {% if order.paid_at %}
+                  {{ order.paid_at|date:"Y/m/d - H:i" }}
+                {% else %}
+                  ثبت نشده
+                {% endif %}
+              </dd>
             </div>
 
             <div>
               <dt>کد پیگیری</dt>
-              <dd>۷۴۸۲۹۱</dd>
+              <dd>{{ order.payment_tracking_code|default:"ثبت نشده" }}</dd>
             </div>
           </dl>
         </article>

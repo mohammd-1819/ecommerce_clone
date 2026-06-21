@@ -195,6 +195,18 @@ class Order(TimeStampedModel):
         related_name="orders",
         verbose_name="کد تخفیف",
     )
+    shipping_method_title = models.CharField(
+        max_length=120,
+        blank=True,
+        default='روش امن',
+        verbose_name="روش ارسال",
+    )
+
+    payment_tracking_code = models.CharField(
+        max_length=120,
+        blank=True,
+        verbose_name="کد پیگیری پرداخت",
+    )
 
     subtotal_toman = models.PositiveBigIntegerField(default=0, verbose_name="جمع قیمت کالاها")
     discount_toman = models.PositiveBigIntegerField(default=0, verbose_name="تخفیف")
