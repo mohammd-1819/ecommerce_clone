@@ -40,178 +40,125 @@
 
           <div class="comments-summary">
             <div class="comments-summary-item">
-              <span class="comments-summary-number">۳</span>
+              <span class="comments-summary-number">{{ reviews_count|default:0 }}</span>
               <span class="comments-summary-label">دیدگاه ثبت‌شده</span>
             </div>
 
             <div class="comments-summary-item">
-              <span class="comments-summary-number">۳</span>
+              <span class="comments-summary-number">{{ reviewed_products_count|default:0 }}</span>
               <span class="comments-summary-label">محصول بررسی‌شده</span>
             </div>
 
             <div class="comments-summary-item">
-              <span class="comments-summary-number">۱۴۰۳/۰۸/۱۲</span>
+              <span class="comments-summary-number">
+                {% if latest_review %}
+                  {{ latest_review.created_at|date:"Y/m/d" }}
+                {% else %}
+                  -
+                {% endif %}
+              </span>
               <span class="comments-summary-label">آخرین دیدگاه</span>
             </div>
           </div>
 
-          <div class="comments-list">
+          {% if reviews %}
+            <div class="comments-list">
 
-            <article class="comment-card">
-              <div class="comment-card-head">
-                <div class="comment-user">
-                  <div class="comment-avatar" aria-hidden="true">ک</div>
+              {% for review in reviews %}
+                <article class="comment-card">
+                  <div class="comment-card-head">
+                    <div class="comment-user">
+                      <div class="comment-avatar" aria-hidden="true">
+                        {{ review.first_name|first|default:"ک" }}
+                      </div>
 
-                  <div>
-                    <h3 class="comment-user-name">کاربر عزیز</h3>
-                    <time class="comment-date" datetime="2024-11-02">
-                      ۱۴۰۳/۰۸/۱۲
-                    </time>
+                      <div>
+                        <h3 class="comment-user-name">
+                          {{ review.full_name|default:"کاربر عزیز" }}
+                        </h3>
+
+                        <time class="comment-date" datetime="{{ review.created_at|date:'c' }}">
+                          {{ review.created_at|date:"Y/m/d" }}
+                        </time>
+                      </div>
+                    </div>
+
+                    <div class="comment-icon" aria-hidden="true">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M7.5 10.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <path d="M7.5 14h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <path d="M5.4 19.2c1.2.55 2.58.8 4.1.8h5c4.35 0 6.5-2.15 6.5-6.5v-3c0-4.35-2.15-6.5-6.5-6.5h-5C5.15 4 3 6.15 3 10.5v3c0 2.42.67 4.17 2.02 5.22.28.22.42.58.35.93l-.35 1.74 1.78-.82c.32-.15.7-.14 1.02.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
                   </div>
-                </div>
 
-                <div class="comment-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M7.5 10.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M7.5 14h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M5.4 19.2c1.2.55 2.58.8 4.1.8h5c4.35 0 6.5-2.15 6.5-6.5v-3c0-4.35-2.15-6.5-6.5-6.5h-5C5.15 4 3 6.15 3 10.5v3c0 2.42.67 4.17 2.02 5.22.28.22.42.58.35.93l-.35 1.74 1.78-.82c.32-.15.7-.14 1.02.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-
-              <div class="comment-body">
-                <p class="comment-text">
-                  طعم قهوه متعادل و خوش‌عطر بود. بسته‌بندی هم تمیز و مرتب بود و برای استفاده روزانه انتخاب خوبی به نظر می‌رسد.
-                </p>
-              </div>
-
-              <a class="comment-product-card" href="#">
-                <div class="comment-product-image">
-                  <img src="{% static 'images/product_1.png' %}" alt="بسته قهوه عربیکا ویژه">
-                </div>
-
-                <div class="comment-product-info">
-                  <span class="comment-product-label">دیدگاه برای محصول</span>
-                  <h4 class="comment-product-title">قهوه عربیکا ویژه</h4>
-                  <p class="comment-product-meta">قهوه • ۲۵۰ گرم</p>
-                </div>
-
-                <span class="comment-product-link">
-                  مشاهده محصول
-                </span>
-              </a>
-            </article>
-
-            <article class="comment-card">
-              <div class="comment-card-head">
-                <div class="comment-user">
-                  <div class="comment-avatar" aria-hidden="true">ک</div>
-
-                  <div>
-                    <h3 class="comment-user-name">کاربر عزیز</h3>
-                    <time class="comment-date" datetime="2024-10-21">
-                      ۱۴۰۳/۰۷/۳۰
-                    </time>
+                  <div class="comment-body">
+                    <p class="comment-text">
+                      {{ review.body }}
+                    </p>
                   </div>
-                </div>
 
-                <div class="comment-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M7.5 10.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M7.5 14h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M5.4 19.2c1.2.55 2.58.8 4.1.8h5c4.35 0 6.5-2.15 6.5-6.5v-3c0-4.35-2.15-6.5-6.5-6.5h-5C5.15 4 3 6.15 3 10.5v3c0 2.42.67 4.17 2.02 5.22.28.22.42.58.35.93l-.35 1.74 1.78-.82c.32-.15.7-.14 1.02.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-              </div>
+                  <a class="comment-product-card" href="{% url 'product:product-detail' review.product.slug %}">
+                    <div class="comment-product-image">
+                      {% if review.product.main_image %}
+                        <img src="{{ review.product.main_image.url }}" alt="{{ review.product.title }}">
+                      {% else %}
+                        <img src="{% static 'images/product-placeholder.png' %}" alt="{{ review.product.title }}">
+                      {% endif %}
+                    </div>
 
-              <div class="comment-body">
-                <p class="comment-text">
-                  هات‌چاکلت بافت نرم و طعم خوبی داشت. شیرینی آن زیاد نبود و برای عصرهای سرد گزینه دلپذیری است.
-                </p>
-              </div>
+                    <div class="comment-product-info">
+                      <span class="comment-product-label">دیدگاه برای محصول</span>
 
-              <a class="comment-product-card" href="#">
-                <div class="comment-product-image">
-                  <img src="{% static 'images/product_2.png' %}" alt="بسته هات‌چاکلت کلاسیک">
-                </div>
+                      <h4 class="comment-product-title">
+                        {{ review.product.title }}
+                      </h4>
 
-                <div class="comment-product-info">
-                  <span class="comment-product-label">دیدگاه برای محصول</span>
-                  <h4 class="comment-product-title">هات‌چاکلت کلاسیک</h4>
-                  <p class="comment-product-meta">هات‌چاکلت • ۴۰۰ گرم</p>
-                </div>
+                      {% if review.product.category or review.product.weight %}
+                        <p class="comment-product-meta">
+                          {% if review.product.category %}
+                            {{ review.product.category.title|default:review.product.category }}
+                          {% endif %}
 
-                <span class="comment-product-link">
-                  مشاهده محصول
-                </span>
-              </a>
-            </article>
+                          {% if review.product.category and review.product.weight %}
+                            •
+                          {% endif %}
 
-            <article class="comment-card">
-              <div class="comment-card-head">
-                <div class="comment-user">
-                  <div class="comment-avatar" aria-hidden="true">ک</div>
+                          {% if review.product.weight %}
+                            {{ review.product.weight }}
+                          {% endif %}
+                        </p>
+                      {% endif %}
+                    </div>
 
-                  <div>
-                    <h3 class="comment-user-name">کاربر عزیز</h3>
-                    <time class="comment-date" datetime="2024-09-30">
-                      ۱۴۰۳/۰۷/۰۹
-                    </time>
-                  </div>
-                </div>
+                    <span class="comment-product-link">
+                      مشاهده محصول
+                    </span>
+                  </a>
+                </article>
+              {% endfor %}
 
-                <div class="comment-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M7.5 10.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M7.5 14h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M5.4 19.2c1.2.55 2.58.8 4.1.8h5c4.35 0 6.5-2.15 6.5-6.5v-3c0-4.35-2.15-6.5-6.5-6.5h-5C5.15 4 3 6.15 3 10.5v3c0 2.42.67 4.17 2.02 5.22.28.22.42.58.35.93l-.35 1.74 1.78-.82c.32-.15.7-.14 1.02.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-
-              <div class="comment-body">
-                <p class="comment-text">
-                  بسته هدیه ظاهر شیک و جمع‌وجوری داشت. برای هدیه دادن مناسب است و ترکیب محصولات داخل بسته هم کاربردی بود.
-                </p>
-              </div>
-
-              <a class="comment-product-card" href="#">
-                <div class="comment-product-image">
-                  <img src="{% static 'images/product_3.png' %}" alt="بسته هدیه قهوه و هات‌چاکلت">
-                </div>
-
-                <div class="comment-product-info">
-                  <span class="comment-product-label">دیدگاه برای محصول</span>
-                  <h4 class="comment-product-title">بسته هدیه گرم</h4>
-                  <p class="comment-product-meta">بسته هدیه • ویژه</p>
-                </div>
-
-                <span class="comment-product-link">
-                  مشاهده محصول
-                </span>
-              </a>
-            </article>
-
-          </div>
-
-          <div class="empty-state comments-empty hidden">
-            <div class="empty-state-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                <path d="M7.5 10.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M7.5 14h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M5.4 19.2c1.2.55 2.58.8 4.1.8h5c4.35 0 6.5-2.15 6.5-6.5v-3c0-4.35-2.15-6.5-6.5-6.5h-5C5.15 4 3 6.15 3 10.5v3c0 2.42.67 4.17 2.02 5.22.28.22.42.58.35.93l-.35 1.74 1.78-.82c.32-.15.7-.14 1.02.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
             </div>
+          {% else %}
+            <div class="empty-state comments-empty">
+              <div class="empty-state-icon" aria-hidden="true">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M7.5 10.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M7.5 14h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M5.4 19.2c1.2.55 2.58.8 4.1.8h5c4.35 0 6.5-2.15 6.5-6.5v-3c0-4.35-2.15-6.5-6.5-6.5h-5C5.15 4 3 6.15 3 10.5v3c0 2.42.67 4.17 2.02 5.22.28.22.42.58.35.93l-.35 1.74 1.78-.82c.32-.15.7-.14 1.02.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
 
-            <h3 class="empty-state-title">هنوز دیدگاهی ثبت نکرده‌اید</h3>
-            <p class="empty-state-text">
-              بعد از ثبت نظر برای محصولات، دیدگاه‌های شما در این بخش نمایش داده می‌شود.
-            </p>
+              <h3 class="empty-state-title">هنوز دیدگاهی ثبت نکرده‌اید</h3>
+              <p class="empty-state-text">
+                بعد از ثبت نظر برای محصولات، دیدگاه‌های شما در این بخش نمایش داده می‌شود.
+              </p>
 
-            <a class="btn btn-primary" href="#">
-              مشاهده محصولات
-            </a>
-          </div>
+              <a class="btn btn-primary" href="#">
+                مشاهده محصولات
+              </a>
+            </div>
+          {% endif %}
 
         </section>
       </div>

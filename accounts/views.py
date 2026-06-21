@@ -9,10 +9,10 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from .forms import UserAddressForm
 from .models import UserAddress
-
+from product.models import ProductReview
 
 
 
@@ -249,20 +249,44 @@ class ProfileAddressView(LoginRequiredMixin, TemplateView):
 
 
 
+
+class ProfileProductReviewListView(LoginRequiredMixin, ListView):
+    model = ProductReview
+    template_name = "accounts/profile_comments.html" 
+    context_object_name = "reviews"
+
+    def get_queryset(self):
+        return (
+            ProductReview.objects
+            .filter(
+                user=self.request.user,
+                status=ProductReview.Status.APPROVED,
+            )
+            .select_related("product")
+            .order_by("-created_at")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        reviews = self.object_list
+
+        context["reviews_count"] = reviews.count()
+        context["reviewed_products_count"] = (
+            reviews.values("product_id").distinct().count()
+        )
+        context["latest_review"] = reviews.first()
+
+        return context
+
+
+
 class ProfileDashboardView(View):
     template_name = 'accounts/profile_dashboard.html'
 
     def get(self, request):
         return render(request, self.template_name)
 
-
-
-
-class ProfileCommentsView(View):
-    template_name = 'accounts/profile_comments.html'
-
-    def get(self, request):
-        return render(request, self.template_name)
 
 
 class ProfileEditView(View):
