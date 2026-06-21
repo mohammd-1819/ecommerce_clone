@@ -48,175 +48,181 @@
             </button>
           </div>
 
+          {% if messages %}
+            <div class="profile-messages">
+              {% for message in messages %}
+                <div class="profile-message profile-message-{{ message.tags }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
           <div class="addresses-summary">
             <div class="addresses-summary-item">
-              <span class="addresses-summary-number">۲</span>
+              <span class="addresses-summary-number">{{ addresses_count|default:0 }}</span>
               <span class="addresses-summary-label">آدرس ذخیره‌شده</span>
             </div>
 
             <div class="addresses-summary-item">
-              <span class="addresses-summary-number">تهران</span>
+              <span class="addresses-summary-number">
+                {% if last_city %}
+                  {{ last_city }}
+                {% else %}
+                  —
+                {% endif %}
+              </span>
               <span class="addresses-summary-label">آخرین شهر ارسال</span>
             </div>
 
             <div class="addresses-summary-item">
-              <span class="addresses-summary-number">سریع</span>
+              <span class="addresses-summary-number">
+                {% if addresses_count %}
+                  آماده
+                {% else %}
+                  خالی
+                {% endif %}
+              </span>
               <span class="addresses-summary-label">آماده برای سفارش بعدی</span>
             </div>
           </div>
 
-          <div class="addresses-grid">
+          {% if addresses %}
+            <div class="addresses-grid">
 
-            <article class="address-card">
-              <div class="address-card-head">
-                <div class="address-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
+              {% for address in addresses %}
+                <article class="address-card" data-address-card="{{ address.pk }}">
+                  <div class="address-card-head">
+                    <div class="address-icon" aria-hidden="true">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
 
-                <div class="address-card-title-wrap">
-                  <h3 class="address-card-title">کاربر عزیز</h3>
-                  <p class="address-card-city">تهران، تهران</p>
-                </div>
-              </div>
+                    <div class="address-card-title-wrap">
+                      <h3 class="address-card-title">
+                        {% if address.full_name %}
+                          {{ address.full_name }}
+                        {% elif address.title %}
+                          {{ address.title }}
+                        {% else %}
+                          آدرس من
+                        {% endif %}
+                      </h3>
 
-              <div class="address-card-body">
-                <p class="address-full">
-                  خیابان ولیعصر، بالاتر از میدان ونک، کوچه روشن، ساختمان مهر، طبقه سوم
-                </p>
-
-                <dl class="address-meta-list">
-                  <div>
-                    <dt>پلاک</dt>
-                    <dd>۲۴</dd>
+                      <p class="address-card-city">
+                        {% if address.province and address.city %}
+                          {{ address.province }}، {{ address.city }}
+                        {% elif address.city %}
+                          {{ address.city }}
+                        {% elif address.province %}
+                          {{ address.province }}
+                        {% else %}
+                          شهر ثبت نشده
+                        {% endif %}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <dt>واحد</dt>
-                    <dd>۶</dd>
+                  <div class="address-card-body">
+                    <p class="address-full">
+                      {% if address.postal_address %}
+                        {{ address.postal_address }}
+                      {% else %}
+                        نشانی پستی ثبت نشده است.
+                      {% endif %}
+                    </p>
+
+                    <dl class="address-meta-list">
+                      <div>
+                        <dt>شماره تماس</dt>
+                        <dd>
+                          {% if address.phone_number %}
+                            {{ address.phone_number }}
+                          {% else %}
+                            —
+                          {% endif %}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>کد پستی</dt>
+                        <dd>
+                          {% if address.zip_code %}
+                            {{ address.zip_code }}
+                          {% else %}
+                            —
+                          {% endif %}
+                        </dd>
+                      </div>
+                    </dl>
                   </div>
 
-                  <div>
-                    <dt>کد پستی</dt>
-                    <dd>۱۵۹۸۷۴۵۶۳۲</dd>
+                  <div class="address-card-actions">
+                    <button
+                      class="address-action-btn"
+                      type="button"
+                      data-address-modal-open
+                      data-address-mode="edit"
+                      data-address-id="{{ address.pk }}"
+                      data-recipient-name="{{ address.full_name|default_if_none:'' }}"
+                      data-recipient-phone="{{ address.phone_number|default_if_none:'' }}"
+                      data-province="{{ address.province|default_if_none:'' }}"
+                      data-city="{{ address.city|default_if_none:'' }}"
+                      data-postal-code="{{ address.zip_code|default_if_none:'' }}"
+                      data-address-line="{{ address.postal_address|default_if_none:'' }}"
+                      aria-controls="address-modal"
+                    >
+                      ویرایش
+                    </button>
+
+                    <form
+                      class="address-delete-form"
+                      method="post"
+                      action="{% url 'accounts:profile-address' %}"
+                      data-address-delete-form
+                    >
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="delete">
+                      <input type="hidden" name="address_id" value="{{ address.pk }}">
+
+                      <button
+                        class="address-action-btn address-action-danger"
+                        type="submit"
+                        onclick="return confirm('آیا از حذف این آدرس مطمئن هستید؟');"
+                      >
+                        حذف
+                      </button>
+                    </form>
                   </div>
-                </dl>
-              </div>
+                </article>
+              {% endfor %}
 
-              <div class="address-card-actions">
-                <button
-                  class="address-action-btn"
-                  type="button"
-                  data-address-modal-open
-                  data-address-mode="edit"
-                  data-address-id="1"
-                  data-fullname="کاربر عزیز"
-                  data-province="تهران"
-                  data-city="تهران"
-                  data-plaque-number="۲۴"
-                  data-unit-number="۶"
-                  data-postal-address="خیابان ولیعصر، بالاتر از میدان ونک، کوچه روشن، ساختمان مهر، طبقه سوم"
-                  data-zip-code="۱۵۹۸۷۴۵۶۳۲"
-                  aria-controls="address-modal"
-                >
-                  ویرایش
-                </button>
-
-                <button class="address-action-btn address-action-danger" type="button">
-                  حذف
-                </button>
-              </div>
-            </article>
-
-            <article class="address-card">
-              <div class="address-card-head">
-                <div class="address-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M3.5 10.75 12 4l8.5 6.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M5.5 9.75V20h13V9.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M9.5 20v-6h5v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-
-                <div class="address-card-title-wrap">
-                  <h3 class="address-card-title">کاربر عزیز</h3>
-                  <p class="address-card-city">البرز، کرج</p>
-                </div>
-              </div>
-
-              <div class="address-card-body">
-                <p class="address-full">
-                  کرج، عظیمیه، بلوار استقلال، خیابان سرو، پلاک ۱۸، ساختمان آفتاب
-                </p>
-
-                <dl class="address-meta-list">
-                  <div>
-                    <dt>پلاک</dt>
-                    <dd>۱۸</dd>
-                  </div>
-
-                  <div>
-                    <dt>واحد</dt>
-                    <dd>۴</dd>
-                  </div>
-
-                  <div>
-                    <dt>کد پستی</dt>
-                    <dd>۳۱۴۵۶۷۸۹۱۲</dd>
-                  </div>
-                </dl>
-              </div>
-
-              <div class="address-card-actions">
-                <button
-                  class="address-action-btn"
-                  type="button"
-                  data-address-modal-open
-                  data-address-mode="edit"
-                  data-address-id="2"
-                  data-fullname="کاربر عزیز"
-                  data-province="البرز"
-                  data-city="کرج"
-                  data-plaque-number="۱۸"
-                  data-unit-number="۴"
-                  data-postal-address="کرج، عظیمیه، بلوار استقلال، خیابان سرو، پلاک ۱۸، ساختمان آفتاب"
-                  data-zip-code="۳۱۴۵۶۷۸۹۱۲"
-                  aria-controls="address-modal"
-                >
-                  ویرایش
-                </button>
-
-                <button class="address-action-btn address-action-danger" type="button">
-                  حذف
-                </button>
-              </div>
-            </article>
-
-          </div>
-
-          <div class="empty-state addresses-empty hidden">
-            <div class="empty-state-icon" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                <path d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
             </div>
-            <h3 class="empty-state-title">هنوز آدرسی ثبت نشده است</h3>
-            <p class="empty-state-text">
-              برای ثبت سفارش سریع‌تر، اولین نشانی ارسال خود را اضافه کنید.
-            </p>
-            <button
-              class="btn btn-primary"
-              type="button"
-              data-address-modal-open
-              data-address-mode="create"
-              aria-controls="address-modal"
-            >
-              افزودن آدرس
-            </button>
-          </div>
+          {% else %}
+            <div class="empty-state addresses-empty">
+              <div class="empty-state-icon" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 21s7-5.25 7-11a7 7 0 1 0-14 0c0 5.75 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="empty-state-title">هنوز آدرسی ثبت نشده است</h3>
+              <p class="empty-state-text">
+                برای ثبت سفارش سریع‌تر، اولین نشانی ارسال خود را اضافه کنید.
+              </p>
+              <button
+                class="btn btn-primary"
+                type="button"
+                data-address-modal-open
+                data-address-mode="create"
+                aria-controls="address-modal"
+              >
+                افزودن آدرس
+              </button>
+            </div>
+          {% endif %}
 
         </section>
       </div>
@@ -264,38 +270,44 @@
       </button>
     </div>
 
-    <form class="address-form" method="post" action="#" data-address-form>
-      {# {% csrf_token %} #}
+    <form
+      class="address-form"
+      method="post"
+      action="{% url 'accounts:profile-address' %}"
+      data-address-form
+    >
+      {% csrf_token %}
 
+      <input type="hidden" name="action" value="save">
       <input type="hidden" name="address_id" value="" data-address-id-input>
 
       <div class="form-grid address-form-grid">
         <div class="form-group">
-          <label class="form-label" for="address-fullname">نام و نام خانوادگی</label>
+          <label class="form-label" for="address-recipient-name">نام و نام خانوادگی گیرنده</label>
           <input
             class="form-input"
-            id="address-fullname"
-            name="fullname"
+            id="address-recipient-name"
+            name="recipient_name"
             type="text"
             placeholder="مثلاً کاربر عزیز"
             autocomplete="name"
-            data-address-field="fullname"
+            data-address-field="recipient_name"
             required
           >
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="address-zip-code">کد پستی</label>
+          <label class="form-label" for="address-recipient-phone">شماره تماس گیرنده</label>
           <input
             class="form-input"
-            id="address-zip-code"
-            name="zip_code"
+            id="address-recipient-phone"
+            name="recipient_phone"
             type="text"
             inputmode="numeric"
-            maxlength="10"
-            placeholder="مثلاً ۱۵۹۸۷۴۵۶۳۲"
-            autocomplete="postal-code"
-            data-address-field="zip_code"
+            maxlength="11"
+            placeholder="مثلاً 09123456789"
+            autocomplete="tel"
+            data-address-field="recipient_phone"
             required
           >
         </div>
@@ -329,41 +341,29 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="address-plaque-number">پلاک</label>
+          <label class="form-label" for="address-postal-code">کد پستی</label>
           <input
             class="form-input"
-            id="address-plaque-number"
-            name="plaque_number"
+            id="address-postal-code"
+            name="postal_code"
             type="text"
             inputmode="numeric"
-            placeholder="مثلاً ۲۴"
-            data-address-field="plaque_number"
-            required
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="address-unit-number">واحد</label>
-          <input
-            class="form-input"
-            id="address-unit-number"
-            name="unit_number"
-            type="text"
-            inputmode="numeric"
-            placeholder="مثلاً ۶"
-            data-address-field="unit_number"
+            maxlength="10"
+            placeholder="مثلاً ۱۵۹۸۷۴۵۶۳۲"
+            autocomplete="postal-code"
+            data-address-field="postal_code"
           >
         </div>
 
         <div class="form-group form-group-full">
-          <label class="form-label" for="address-postal-address">نشانی پستی</label>
+          <label class="form-label" for="address-line">آدرس کامل</label>
           <textarea
             class="form-textarea"
-            id="address-postal-address"
-            name="postal_address"
+            id="address-line"
+            name="address_line"
             placeholder="خیابان، کوچه، ساختمان، طبقه و توضیحات لازم برای ارسال"
             autocomplete="street-address"
-            data-address-field="postal_address"
+            data-address-field="address_line"
             required
           ></textarea>
         </div>

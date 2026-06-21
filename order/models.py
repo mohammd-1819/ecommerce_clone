@@ -78,7 +78,7 @@ class CheckoutSession(TimeStampedModel):
 
     selected_address = models.ForeignKey(
         USER_ADDRESS_MODEL,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="checkout_sessions",
