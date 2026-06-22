@@ -87,7 +87,7 @@
             <circle cx="9.6" cy="19.2" r="1" fill="currentColor"/>
             <circle cx="17.2" cy="19.2" r="1" fill="currentColor"/>
           </svg>
-          <span class="cart-count">۰</span>
+          <span class="cart-count">{{ cart_items_count|default:0 }}</span>
         </a>
         <button class="header-icon menu-toggle" type="button" data-menu-open aria-label="باز کردن منو" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
