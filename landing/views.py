@@ -23,7 +23,7 @@ from django.db.models import (
 
 
 from product.models import Product, ProductVariant, ProductCategory
-
+from product.cache import get_cached_search_modal_categories
 
 
 
@@ -234,35 +234,29 @@ class ProductSearchModalView(View):
         return queryset
 
     def get_categories(self, query):
-        queryset = (
-            ProductCategory.objects.filter(is_active=True)
-            .annotate(
-                active_product_count=Count(
-                    "products",
-                    filter=Q(
-                        products__is_active=True,
-                        products__variants__is_active=True,
-                        products__variants__weight__is_active=True,
-                    ),
-                    distinct=True,
-                )
-            )
-            .filter(active_product_count__gt=0)
+        categories = get_cached_search_modal_categories()
+
+        if not query:
+            return categories
+
+        normalized_query = query.casefold()
+
+        def category_priority(category):
+            title = category["title"].casefold()
+            slug = category["slug"].casefold()
+
+            if normalized_query in title or normalized_query in slug:
+                return 0
+
+            return 1
+
+        return sorted(
+            categories,
+            key=lambda category: (
+                category_priority(category),
+                category["title"],
+            ),
         )
-
-        if query:
-            queryset = queryset.annotate(
-                category_priority=Case(
-                    When(title__icontains=query, then=Value(0)),
-                    When(slug__icontains=query, then=Value(0)),
-                    default=Value(1),
-                    output_field=IntegerField(),
-                )
-            ).order_by("category_priority", "title")
-        else:
-            queryset = queryset.order_by("title")
-
-        return queryset
 
     def serialize_product(self, product):
         return {
@@ -285,17 +279,22 @@ class ProductSearchModalView(View):
         }
 
     def serialize_category(self, category, query):
+        normalized_query = query.casefold()
+
+        title = category["title"]
+        slug = category["slug"]
+
         return {
-            "id": category.id,
-            "title": category.title,
-            "slug": category.slug,
-            "url": self.get_category_url(category),
-            "product_count": category.active_product_count,
+            "id": category["id"],
+            "title": title,
+            "slug": slug,
+            "url": self.get_category_url(slug),
+            "product_count": category["active_product_count"],
             "is_match": bool(
                 query
                 and (
-                    query in category.title
-                    or query in category.slug
+                    normalized_query in title.casefold()
+                    or normalized_query in slug.casefold()
                 )
             ),
         }
@@ -322,10 +321,10 @@ class ProductSearchModalView(View):
         except NoReverseMatch:
             return "#"
 
-    def get_category_url(self, category):
+    def get_category_url(self, category_slug):
         try:
             product_list_url = reverse("product:product-list")
         except NoReverseMatch:
             product_list_url = "/products/"
 
-        return f"{product_list_url}?{urlencode({'category': category.slug})}"
+        return f"{product_list_url}?{urlencode({'category': category_slug})}"
