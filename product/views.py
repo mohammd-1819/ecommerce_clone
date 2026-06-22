@@ -13,7 +13,7 @@ from .forms import ProductReviewForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-
+from .cache import get_cached_active_product_categories
 
 
 class ProductListView(ListView):
@@ -90,7 +90,10 @@ class ProductListView(ListView):
         context.update(
             {
                 "filterset": self.filterset,
-                "categories": ProductCategory.objects.filter(is_active=True).order_by("title"),
+
+                # Cached with Redis
+                "categories": get_cached_active_product_categories(),
+
                 "selected_category_slugs": self.request.GET.getlist("category"),
                 "available_selected": self.request.GET.get("available") in ["1", "true", "True", "on"],
                 "price_min_value": self.request.GET.get("price_min", ""),

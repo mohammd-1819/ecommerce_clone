@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'accounts',
     'cart',
     'order',
-    'product',
+    "product.apps.ProductConfig",
     'core',
 ]
 
@@ -136,7 +136,14 @@ LOCALE_PATHS = [BASE_DIR / "locale"]
 LANGUAGES = [("fa", "Farsi"), ("en", "English")]
 
 
-
 CHECKOUT_SESSION_TTL_MINUTES = 60
 CHECKOUT_TAX_PERCENT = 10
 CHECKOUT_SHIPPING_PRICE_TOMAN = 0
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+    }
+}
