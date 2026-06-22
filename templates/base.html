@@ -11,6 +11,7 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body>
+
   <header class="site-header" aria-label="سربرگ سایت">
     <div class="container header-inner">
       <a class="logo" href="{% url 'landing:home' %}" aria-label="صفحه اصلی new danidor">
@@ -60,13 +61,14 @@
       {% endwith %}
 
       <div class="header-actions">
-        <button
-          class="header-icon search-icon"
-          type="button"
-          data-search-open
-          aria-label="جستجو در محصولات"
-          aria-expanded="false"
-        >
+          <button
+            class="header-icon search-icon"
+            type="button"
+            data-search-open
+            data-search-url="{% url 'landing:product-search-modal' %}"
+            aria-label="جستجو در محصولات"
+            aria-expanded="false"
+          >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
             <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -207,168 +209,338 @@
   </aside>
 
 
-  <section
-    class="search-overlay"
-    data-search-overlay
-    aria-hidden="true"
-    aria-labelledby="search-modal-title"
-  >
-    <button
-      class="search-overlay-backdrop"
-      type="button"
-      data-search-close
-      aria-label="بستن جستجو"
-    ></button>
+<section
+  class="search-overlay"
+  data-search-overlay
+  aria-hidden="true"
+  aria-labelledby="search-modal-title"
+>
+  <button
+    class="search-overlay-backdrop"
+    type="button"
+    data-search-close
+    aria-label="بستن جستجو"
+  ></button>
 
-    <div class="search-modal" role="dialog" aria-modal="true">
-      <div class="search-modal-head">
-        <div>
-          <span class="search-modal-eyebrow">جستجوی سریع</span>
-          <h2 class="search-modal-title" id="search-modal-title">دنبال چه محصولی هستید؟</h2>
-          <p class="search-modal-text">نام محصول، دسته‌بندی یا وزن مورد نظر را وارد کنید.</p>
-        </div>
-
-        <button class="search-modal-close" type="button" data-search-close aria-label="بستن جستجو">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </button>
+  <div class="search-modal" role="dialog" aria-modal="true">
+    <div class="search-modal-head">
+      <div>
+        <span class="search-modal-eyebrow">جستجوی سریع</span>
+        <h2 class="search-modal-title" id="search-modal-title">دنبال چه محصولی هستید؟</h2>
+        <p class="search-modal-text">نام محصول، دسته‌بندی یا وزن مورد نظر را وارد کنید.</p>
       </div>
 
-      <form class="search-modal-form" action="{% url 'product:product-list' %}" method="get" data-search-form>
-        <label class="search-input-label" for="global-product-search">جستجو در محصولات</label>
+      <button class="search-modal-close" type="button" data-search-close aria-label="بستن جستجو">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
 
-        <div class="search-input-row">
-          <div class="search-input-wrap">
-            <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+    <form class="search-modal-form" action="{% url 'product:product-list' %}" method="get" data-search-form>
+      <label class="search-input-label" for="global-product-search">جستجو در محصولات</label>
 
-            <input
-              class="search-modal-input"
-              id="global-product-search"
-              type="search"
-              name="q"
-              data-search-input
-              autocomplete="off"
-              placeholder="مثلاً قهوه ترک، هات‌چاکلت، بسته هدیه..."
-            >
-          </div>
-
-          <button class="btn btn-primary search-submit-btn" type="submit">جستجو</button>
-        </div>
-      </form>
-
-      <div class="search-quick-row" aria-label="جستجوهای پیشنهادی">
-        <button class="search-chip" type="button" data-search-chip="قهوه">قهوه</button>
-        <button class="search-chip" type="button" data-search-chip="چای">چای</button>
-        <button class="search-chip" type="button" data-search-chip="هات‌چاکلت">هات‌چاکلت</button>
-        <button class="search-chip" type="button" data-search-chip="پودر فوری">پودر فوری</button>
-        <button class="search-chip" type="button" data-search-chip="بسته هدیه">بسته هدیه</button>
-      </div>
-
-      <div class="search-results-head">
-        <h3 class="search-results-title">پیشنهادهای محبوب</h3>
-        <span class="search-results-count" data-search-results-label>چند انتخاب مناسب برای شروع</span>
-      </div>
-
-      <div class="search-results-grid" data-search-results>
-        <a
-          class="search-result-card"
-          href="{% url 'product:product-list' %}?q=قهوه ترک"
-          data-search-item
-          data-search-keywords="قهوه قهوه ترک ترک قوطی ۵۰۰ گرمی 500"
-        >
-          <span class="search-result-image">
-            <img src="{% static 'images/product_1.png' %}" alt="قهوه ترک قوطی ۵۰۰ گرمی">
-          </span>
-
-          <span class="search-result-content">
-            <span class="search-result-category">قهوه • ۵۰۰ گرم</span>
-            <strong class="search-result-title">قهوه ترک قوطی ۵۰۰ گرمی</strong>
-            <span class="search-result-footer">
-              <span class="search-result-price">۱٬۸۸۵٬۰۰۰ تومان</span>
-              <span class="search-result-link">مشاهده</span>
-            </span>
-          </span>
-        </a>
-
-        <a
-          class="search-result-card"
-          href="{% url 'product:product-list' %}?q=قهوه سینگل اوریجین"
-          data-search-item
-          data-search-keywords="قهوه سینگل اوریجین نیکاراگوئه ۲۵۰ گرمی 250"
-        >
-          <span class="search-result-image">
-            <img src="{% static 'images/product_2.png' %}" alt="قهوه سینگل اوریجین نیکاراگوئه ۲۵۰ گرمی">
-          </span>
-
-          <span class="search-result-content">
-            <span class="search-result-category">قهوه • ۲۵۰ گرم</span>
-            <strong class="search-result-title">قهوه سینگل اوریجین نیکاراگوئه</strong>
-            <span class="search-result-footer">
-              <span class="search-result-price">۱٬۰۴۹٬۹۹۸ تومان</span>
-              <span class="search-result-link">مشاهده</span>
-            </span>
-          </span>
-        </a>
-
-        <a
-          class="search-result-card"
-          href="{% url 'product:product-list' %}?q=هات چاکلت"
-          data-search-item
-          data-search-keywords="هات چاکلت کلاسیک قوطی ۸۰۰ گرمی شکلات 800"
-        >
-          <span class="search-result-image">
-            <img src="{% static 'images/product_3.png' %}" alt="هات چاکلت کلاسیک قوطی ۸۰۰ گرمی">
-          </span>
-
-          <span class="search-result-content">
-            <span class="search-result-category">هات‌چاکلت • ۸۰۰ گرم</span>
-            <strong class="search-result-title">هات‌چاکلت کلاسیک قوطی ۸۰۰ گرمی</strong>
-            <span class="search-result-footer">
-              <span class="search-result-price">۹۳۰٬۰۰۰ تومان</span>
-              <span class="search-result-link">مشاهده</span>
-            </span>
-          </span>
-        </a>
-
-        <a
-          class="search-result-card"
-          href="{% url 'product:product-list' %}?q=چای"
-          data-search-item
-          data-search-keywords="چای سیاه ممتاز بسته چای ایرانی"
-        >
-          <span class="search-result-image">
-            <img src="{% static 'images/product_4.png' %}" alt="چای سیاه ممتاز بسته‌ای">
-          </span>
-
-          <span class="search-result-content">
-            <span class="search-result-category">چای • بسته‌ای</span>
-            <strong class="search-result-title">چای سیاه ممتاز</strong>
-            <span class="search-result-footer">
-              <span class="search-result-price">۴۸۰٬۰۰۰ تومان</span>
-              <span class="search-result-link">مشاهده</span>
-            </span>
-          </span>
-        </a>
-      </div>
-
-      <div class="search-empty-state" data-search-empty hidden>
-        <span class="search-empty-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div class="search-input-row">
+        <div class="search-input-wrap">
+          <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
             <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
             <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
-        </span>
-        <strong>محصولی با این عبارت پیدا نشد</strong>
-        <span>عبارت کوتاه‌تری وارد کنید یا دسته‌بندی‌های پیشنهادی را امتحان کنید.</span>
+
+          <input
+            class="search-modal-input"
+            id="global-product-search"
+            type="search"
+            name="q"
+            data-search-input
+            autocomplete="off"
+            placeholder="مثلاً قهوه ترک، هات‌چاکلت، بسته هدیه..."
+          >
+        </div>
+
+        <button class="btn btn-primary search-submit-btn" type="submit">جستجو</button>
       </div>
+    </form>
+
+    <div
+      class="search-quick-row"
+      data-search-categories
+      aria-label="دسته‌بندی‌های پیشنهادی"
+    ></div>
+
+    <div class="search-results-head">
+      <h3 class="search-results-title" data-search-results-title>پیشنهادهای محبوب</h3>
+      <span class="search-results-count" data-search-results-label>چند انتخاب مناسب برای شروع</span>
     </div>
-  </section>
+
+    <div class="search-loading-state" data-search-loading hidden>
+      در حال جستجو...
+    </div>
+
+    <div class="search-results-grid" data-search-results></div>
+
+    <div class="search-empty-state" data-search-empty hidden>
+      <span class="search-empty-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10.8" cy="10.8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <strong>محصولی با این عبارت پیدا نشد</strong>
+      <span>عبارت کوتاه‌تری وارد کنید یا دسته‌بندی‌های پیشنهادی را امتحان کنید.</span>
+    </div>
+  </div>
+</section>
 
   <script src="{% static 'js/main.js' %}" defer></script>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const searchOpenBtn = document.querySelector("[data-search-open]");
+  const searchOverlay = document.querySelector("[data-search-overlay]");
+
+  if (!searchOpenBtn || !searchOverlay) return;
+
+  const searchUrl = searchOpenBtn.dataset.searchUrl;
+  const searchForm = searchOverlay.querySelector("[data-search-form]");
+  const searchInput = searchOverlay.querySelector("[data-search-input]");
+  const searchCloseBtns = searchOverlay.querySelectorAll("[data-search-close]");
+  const categoriesContainer = searchOverlay.querySelector("[data-search-categories]");
+  const resultsContainer = searchOverlay.querySelector("[data-search-results]");
+  const resultsTitle = searchOverlay.querySelector("[data-search-results-title]");
+  const resultsLabel = searchOverlay.querySelector("[data-search-results-label]");
+  const loadingState = searchOverlay.querySelector("[data-search-loading]");
+  const emptyState = searchOverlay.querySelector("[data-search-empty]");
+
+  let debounceTimer = null;
+  let currentRequest = null;
+
+  function openSearch() {
+    searchOverlay.classList.add("is-open");
+    searchOverlay.setAttribute("aria-hidden", "false");
+    searchOpenBtn.setAttribute("aria-expanded", "true");
+    document.body.classList.add("search-open");
+
+    loadSearchData("");
+
+    window.setTimeout(function () {
+      searchInput.focus();
+    }, 80);
+  }
+
+  function closeSearch() {
+    searchOverlay.classList.remove("is-open");
+    searchOverlay.setAttribute("aria-hidden", "true");
+    searchOpenBtn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("search-open");
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function buildSearchUrl(query) {
+    const url = new URL(searchUrl, window.location.origin);
+
+    if (query) {
+      url.searchParams.set("q", query);
+    }
+
+    url.searchParams.set("limit", "6");
+
+    return url.toString();
+  }
+
+  function setLoading(isLoading) {
+    if (!loadingState) return;
+    loadingState.hidden = !isLoading;
+  }
+
+  function setEmpty(isEmpty) {
+    if (!emptyState) return;
+    emptyState.hidden = !isEmpty;
+  }
+
+  function renderCategories(categories) {
+    if (!categoriesContainer) return;
+
+    if (!categories || !categories.length) {
+      categoriesContainer.innerHTML = "";
+      return;
+    }
+
+    categoriesContainer.innerHTML = categories
+      .map(function (category) {
+        return `
+          <button
+            class="search-chip"
+            type="button"
+            data-search-chip="${escapeHtml(category.title)}"
+          >
+            ${escapeHtml(category.title)}
+          </button>
+        `;
+      })
+      .join("");
+  }
+
+  function renderProducts(products) {
+    if (!resultsContainer) return;
+
+    if (!products || !products.length) {
+      resultsContainer.innerHTML = "";
+      return;
+    }
+
+    resultsContainer.innerHTML = products
+      .map(function (product) {
+        const imageHtml = product.image_url
+          ? `
+            <img
+              src="${escapeHtml(product.image_url)}"
+              alt="${escapeHtml(product.title)}"
+              loading="lazy"
+            >
+          `
+          : "";
+
+        return `
+          <a
+            class="search-result-card"
+            href="${escapeHtml(product.url)}"
+            data-search-item
+          >
+            <span class="search-result-image">
+              ${imageHtml}
+            </span>
+
+            <span class="search-result-content">
+              <span class="search-result-category">
+                ${escapeHtml(product.meta_label || "")}
+              </span>
+
+              <strong class="search-result-title">
+                ${escapeHtml(product.title)}
+              </strong>
+
+              <span class="search-result-footer">
+                <span class="search-result-price">
+                  ${escapeHtml(product.price_label || "")}
+                </span>
+                <span class="search-result-link">مشاهده</span>
+              </span>
+            </span>
+          </a>
+        `;
+      })
+      .join("");
+  }
+
+  async function loadSearchData(query) {
+    if (!searchUrl) return;
+
+    if (currentRequest) {
+      currentRequest.abort();
+    }
+
+    currentRequest = new AbortController();
+
+    setLoading(true);
+    setEmpty(false);
+
+    try {
+      const response = await fetch(buildSearchUrl(query), {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        signal: currentRequest.signal
+      });
+
+      if (!response.ok) {
+        throw new Error("Search request failed");
+      }
+
+      const data = await response.json();
+      const products = data.products || [];
+      const categories = data.categories || [];
+
+      if (resultsTitle) {
+        resultsTitle.textContent = data.heading || "نتایج جستجو";
+      }
+
+      if (resultsLabel) {
+        if (data.has_query) {
+          resultsLabel.textContent = products.length
+            ? `${products.length} محصول مرتبط پیدا شد`
+            : "نتیجه‌ای برای این جستجو پیدا نشد";
+        } else {
+          resultsLabel.textContent = "چند انتخاب مناسب برای شروع";
+        }
+      }
+
+      renderCategories(categories);
+      renderProducts(products);
+
+      setEmpty(products.length === 0);
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        if (resultsContainer) resultsContainer.innerHTML = "";
+        setEmpty(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleLiveSearch() {
+    window.clearTimeout(debounceTimer);
+
+    debounceTimer = window.setTimeout(function () {
+      loadSearchData(searchInput.value.trim());
+    }, 300);
+  }
+
+  searchOpenBtn.addEventListener("click", openSearch);
+
+  searchCloseBtns.forEach(function (button) {
+    button.addEventListener("click", closeSearch);
+  });
+
+  searchInput.addEventListener("input", handleLiveSearch);
+
+  categoriesContainer.addEventListener("click", function (event) {
+    const chip = event.target.closest("[data-search-chip]");
+
+    if (!chip) return;
+
+    const value = chip.dataset.searchChip || chip.textContent.trim();
+
+    searchInput.value = value;
+    loadSearchData(value);
+    searchInput.focus();
+  });
+
+  searchForm.addEventListener("submit", function (event) {
+    const query = searchInput.value.trim();
+
+    if (!query) {
+      event.preventDefault();
+      loadSearchData("");
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && searchOverlay.classList.contains("is-open")) {
+      closeSearch();
+    }
+  });
+});
+</script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>
