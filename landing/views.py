@@ -3,10 +3,10 @@ from django.views import View
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
+from django.views.generic import TemplateView
 from .forms import ContactRequestForm
 from .models import ContactRequest
 from urllib.parse import urlencode
-
 from django.http import JsonResponse
 from django.urls import NoReverseMatch, reverse
 from django.db.models import (
@@ -18,18 +18,61 @@ from django.db.models import (
     IntegerField,
     OuterRef,
     Subquery,
+    Prefetch,
 )
+
 
 from product.models import Product, ProductVariant, ProductCategory
 
 
 
 
-class HomeView(View):
-    template_name = 'landing/home.html'
+class LandingView(TemplateView):
+    template_name = "landing/home.html"
 
-    def get(self, request):
-        return render(request, self.template_name)
+    def get_popular_products_queryset(self):
+        active_variants = ProductVariant.objects.filter(
+            product=OuterRef("pk"),
+            is_active=True,
+        ).order_by(
+            "-is_default",
+            "weight__value_grams",
+            "created_at",
+        )
+
+        prefetch_active_variants = Prefetch(
+            "variants",
+            queryset=ProductVariant.objects.filter(is_active=True)
+            .select_related("weight")
+            .order_by("-is_default", "weight__value_grams"),
+        )
+
+        return (
+            Product.objects.filter(
+                is_active=True,
+                is_featured=True,
+                category__is_active=True,
+            )
+            .select_related("category")
+            .prefetch_related(prefetch_active_variants)
+            .annotate(
+                list_price_toman=Subquery(
+                    active_variants.values("price_toman")[:1]
+                ),
+                list_weight_title=Subquery(
+                    active_variants.values("weight__title")[:1]
+                ),
+            )
+            .filter(list_price_toman__isnull=False)
+            .order_by("-order_counter", "-created_at")[:4]
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["popular_products"] = self.get_popular_products_queryset()
+
+        return context
 
 
 
