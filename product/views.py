@@ -160,6 +160,7 @@ class ProductDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         product = self.object
+        
 
         variants = list(product.variants.all())
 

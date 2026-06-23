@@ -70,6 +70,25 @@ class Product(TimeStampedModel):
         verbose_name = "محصول"
         verbose_name_plural = "محصولات"
         ordering = ["-created_at"]
+        indexes = [
+            # Main product list: active products ordered newest first
+            models.Index(
+                fields=["is_active", "-created_at"],
+                name="product_active_created_idx",
+            ),
+
+            # Category product list: category + active + newest
+            models.Index(
+                fields=["category", "is_active", "-created_at"],
+                name="product_cat_active_created_idx",
+            ),
+
+            # Related products in detail page
+            models.Index(
+                fields=["category", "is_active", "-is_featured", "-created_at"],
+                name="product_related_idx",
+            ),
+        ]
 
     def __str__(self):
         return self.title
@@ -128,6 +147,25 @@ class ProductVariant(TimeStampedModel):
         constraints = [
             models.UniqueConstraint(fields=["product", "weight"], name="unique_product_weight_variant"),
         ]
+        indexes = [
+            # Helps active variant lookup per product
+            models.Index(
+                fields=["product", "is_active"],
+                name="variant_product_active_idx",
+            ),
+
+            # Helps default variant lookup/subquery ordering partially
+            models.Index(
+                fields=["product", "is_active", "-is_default", "created_at"],
+                name="variant_default_lookup_idx",
+            ),
+
+            # Helps stock availability checks if you use Product.is_available
+            models.Index(
+                fields=["product", "is_active", "stock_quantity"],
+                name="variant_stock_lookup_idx",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.product.title} - {self.weight.title}"
@@ -163,6 +201,16 @@ class ProductImage(TimeStampedModel):
     class Meta:
         verbose_name = "تصویر محصول"
         verbose_name_plural = "تصاویر محصول"
+        indexes = [
+            models.Index(
+                fields=["product", "-is_main", "created_at"],
+                name="prod_img_order_idx",
+            ),
+            models.Index(
+                fields=["variant", "created_at"],
+                name="prod_img_variant_idx",
+            ),
+        ]
 
     def __str__(self):
         return self.alt_text
@@ -181,6 +229,12 @@ class ProductAttribute(TimeStampedModel):
     class Meta:
         verbose_name = "ویژگی محصول"
         verbose_name_plural = "ویژگی‌های محصول"
+        indexes = [
+            models.Index(
+                fields=["product", "created_at"],
+                name="attr_product_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.title}: {self.value}"
@@ -223,6 +277,12 @@ class ProductReview(TimeStampedModel):
         verbose_name = "دیدگاه محصول"
         verbose_name_plural = "دیدگاه‌های محصول"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["product", "status", "-created_at"],
+                name="review_product_status_idx",
+            ),
+        ]
     
     @property
     def full_name(self):
