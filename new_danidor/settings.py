@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,7 +85,7 @@ DATABASES = {
         "NAME": os.getenv("POSTGRES_DB"),
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "HOST": os.getenv("POSTGRES_HOST", "db"),
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
@@ -140,7 +141,7 @@ CHECKOUT_SHIPPING_PRICE_TOMAN = 0
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": os.getenv("REDIS_CACHE_URL", "redis://127.0.0.1:6379/1"),
     }
 }
 
@@ -149,14 +150,16 @@ CACHES = {
 
 
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND") or None
 
 # Optional, but useful
-CELERY_TIMEZONE = "Asia/Tehran"  # or your project timezone
+CELERY_TIMEZONE = "Asia/Tehran"
 CELERY_ENABLE_UTC = True
 
-# You do not need a result backend for this cleanup task.
-CELERY_RESULT_BACKEND = None
+# do not need a result backend for cleanup task.
+
 
 CELERY_TASK_IGNORE_RESULT = True
 

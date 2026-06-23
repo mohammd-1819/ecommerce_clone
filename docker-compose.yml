@@ -1,0 +1,83 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn new_danidor.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+    env_file:
+      - .env.docker
+    ports:
+      - "8000:8000"
+    volumes:
+      - media_volume:/app/media
+      - static_volume:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A new_danidor worker --loglevel=info --concurrency=2
+    env_file:
+      - .env.docker
+    environment:
+      DOCKER_RUN_MIGRATIONS: "0"
+      DOCKER_COLLECTSTATIC: "0"
+    volumes:
+      - media_volume:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A new_danidor beat --loglevel=info
+    env_file:
+      - .env.docker
+    environment:
+      DOCKER_RUN_MIGRATIONS: "0"
+      DOCKER_COLLECTSTATIC: "0"
+    volumes:
+      - media_volume:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - .env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_volume:
+  static_volume:
